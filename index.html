@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KitaBantu Soskem JSIT Lampung</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @media print {
+      body * { visibility: hidden; }
+      #printable-report-area, #printable-report-area * { visibility: visible; }
+      #printable-report-area { position: absolute; left: 0; top: 0; width: 100%; }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans min-h-screen flex flex-col relative">
+
+  <!-- Header Navbar -->
+  <header class="bg-blue-900 text-white shadow-md sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="switchToPublicView()">
+        <img src="https://lh3.googleusercontent.com/d/1NYK166dwtbJFMNeNznw7EM3QCoHpRDEH" alt="Logo JSIT" class="h-10 w-auto object-contain bg-white/10 p-1 rounded-lg">
+        <div>
+          <h1 class="text-base md:text-lg font-bold leading-tight">KitaBantu</h1>
+          <p class="text-[10px] md:text-xs text-blue-200">Soskem JSIT Lampung</p>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-2">
+        <button onclick="switchToPublicView()" id="btn-nav-public" class="bg-blue-800 hover:bg-blue-700 text-white px-3 py-2 rounded-lg font-semibold text-xs md:text-sm transition flex items-center gap-1.5">
+          <span>🏠</span> <span class="hidden md:inline">Beranda</span>
+        </button>
+
+        <button onclick="handleOpenListDonasiModal()" id="btn-nav-list" title="List Semua Donasi" class="bg-blue-800 hover:bg-blue-700 text-white px-3 py-2 rounded-lg font-semibold text-xs md:text-sm transition flex items-center gap-1.5">
+          <span>📋</span> <span class="hidden md:inline">List Donasi</span>
+        </button>
+        
+        <button onclick="handleAdminNavClick()" id="btn-nav-admin" title="Login Admin" class="bg-amber-500 hover:bg-amber-600 text-white p-2 md:px-3 md:py-2 rounded-lg font-semibold text-xs md:text-sm transition flex items-center justify-center gap-1">
+          <span>🔐</span> <span class="hidden lg:inline">Admin</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= VIEW 1: BERANDA PUBLIK ================= -->
+  <div id="view-public" class="flex-grow space-y-8 pb-12">
+    <section id="hero-header" class="relative bg-blue-950 text-white py-14 px-4 bg-cover bg-center transition-all duration-500 shadow-inner" style="background-image: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)), url('https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1200');">
+      <div class="max-w-4xl mx-auto text-center space-y-2">
+        <h2 id="hero-title" class="text-2xl md:text-4xl font-extrabold tracking-tight">KitaBantu Soskem JSIT Lampung</h2>
+        <p id="hero-subtext" class="text-gray-200 text-xs md:text-sm max-w-2xl mx-auto leading-relaxed">
+          Wujud nyata kepedulian dan keprihatinan sosial bersama JSIT Lampung untuk keberlanjutan kebaikan sesama.
+        </p>
+      </div>
+    </section>
+
+    <main class="max-w-5xl mx-auto px-4 space-y-8">
+      <div class="bg-white rounded-2xl shadow-sm border p-6 space-y-6">
+        <div class="flex flex-col sm:flex-row justify-between items-center border-b pb-3 gap-2">
+          <h3 id="status-box-title" class="text-lg font-bold text-gray-800">Status Dana Kebajikan</h3>
+          <select id="status-program-selector" onchange="handleProgramFilterChange(this.value)" class="text-xs bg-gray-50 border p-2 rounded-lg font-semibold text-gray-700 max-w-xs w-full sm:w-auto">
+            <option value="ALL">🌐 Semua Program Donasi</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-blue-50/70 rounded-xl p-4 border border-blue-100 flex flex-col justify-between space-y-3">
+            <div class="flex items-center gap-3">
+              <span class="p-2 bg-blue-600 text-white rounded-lg text-lg">💰</span>
+              <div>
+                <p class="text-xs text-blue-900 font-medium">Total Dana Terkumpul</p>
+                <h4 id="stat-collected" class="font-extrabold text-blue-900 text-lg">Rp 0</h4>
+              </div>
+            </div>
+            <div>
+              <div class="w-full bg-blue-200 rounded-full h-2">
+                <div id="stat-progress-collected" class="bg-blue-600 h-2 rounded-full" style="width: 0%"></div>
+              </div>
+              <div class="flex justify-between text-[11px] text-gray-500 mt-1">
+                <span id="stat-target">Target: Rp 0</span>
+                <span id="stat-percent-collected">0%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-emerald-50/70 rounded-xl p-4 border border-emerald-100 flex flex-col justify-between space-y-3">
+            <div class="flex items-center gap-3">
+              <span class="p-2 bg-emerald-600 text-white rounded-lg text-lg">🌱</span>
+              <div>
+                <p class="text-xs text-emerald-900 font-medium">Dana Disalurkan</p>
+                <h4 id="stat-disalurkan" class="font-extrabold text-emerald-900 text-lg">Rp 0</h4>
+              </div>
+            </div>
+            <div>
+              <div class="w-full bg-emerald-200 rounded-full h-2">
+                <div id="stat-progress-disalurkan" class="bg-emerald-600 h-2 rounded-full" style="width: 0%"></div>
+              </div>
+              <div class="flex justify-between text-[11px] text-gray-500 mt-1">
+                <span>Penyaluran Program</span>
+                <span id="stat-percent-disalurkan">0%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-amber-50/70 rounded-xl p-4 border border-amber-100 flex flex-col justify-between space-y-3">
+            <div class="flex items-center gap-3">
+              <span class="p-2 bg-amber-500 text-white rounded-lg text-lg">💳</span>
+              <div>
+                <p class="text-xs text-amber-900 font-medium">Sisa Dana Tersedia</p>
+                <h4 id="stat-sisa" class="font-extrabold text-amber-900 text-lg">Rp 0</h4>
+              </div>
+            </div>
+            <p class="text-[11px] text-gray-500 text-left">Dana siap disalurkan ke penerima manfaat.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="program-section">
+        <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+          <span>🎯</span> Program Donasi Aktif
+        </h3>
+        
+        <div id="loading-public" class="text-center py-12">
+          <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent"></div>
+          <p class="mt-3 text-gray-500 text-sm">Memuat daftar program donasi...</p>
+        </div>
+
+        <div id="campaign-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 hidden"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ================= VIEW 2: HALAMAN DETAIL PROGRAM DONASI TERSENDIRI ================= -->
+  <div id="view-campaign-detail" class="flex-grow max-w-4xl mx-auto px-4 py-8 w-full hidden space-y-6">
+    <button onclick="switchToPublicView()" class="bg-white hover:bg-gray-100 text-gray-700 font-semibold text-xs px-4 py-2 rounded-xl border shadow-sm transition flex items-center gap-2">
+      <span>←</span> Kembali ke Beranda
+    </button>
+
+    <div id="campaign-detail-content" class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+    </div>
+  </div>
+
+  <!-- ================= VIEW 3: ADMIN DASHBOARD PANEL ================= -->
+  <div id="view-admin" class="flex-grow max-w-6xl mx-auto px-4 py-6 w-full space-y-6 hidden">
+    <div class="bg-white p-5 rounded-2xl shadow-sm border flex flex-col md:flex-row justify-between md:items-center gap-4">
+      <div>
+        <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+          <span>📊</span> Dashboard Admin KitaBantu
+        </h2>
+        <p class="text-xs text-gray-500">Kelola program donasi, tombol aktif/nonaktif, dan unduh laporan.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="openCreateProgramModal()" class="bg-blue-900 hover:bg-blue-950 text-white font-semibold text-xs px-4 py-2 rounded-lg transition flex items-center gap-1.5">
+          <span>+</span> Tambah Program Baru
+        </button>
+        <button onclick="logoutAdmin()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold text-xs px-3 py-2 rounded-lg transition border border-rose-200">
+          Keluar Admin
+        </button>
+      </div>
+    </div>
+
+    <div class="flex border-b border-gray-200 bg-white px-4 rounded-t-xl shadow-sm overflow-x-auto text-xs md:text-sm font-semibold">
+      <button onclick="switchAdminTab('tab-overview')" id="nav-tab-overview" class="py-3 px-4 border-b-2 border-blue-600 text-blue-600 flex items-center gap-2">
+        <span>📈</span> Ringkasan
+      </button>
+      <button onclick="switchAdminTab('tab-programs')" id="nav-tab-programs" class="py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex items-center gap-2">
+        <span>📋</span> Kelola Program Donasi
+      </button>
+      <button onclick="switchAdminTab('tab-header')" id="nav-tab-header" class="py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex items-center gap-2">
+        <span>🖼️</span> Banner Header Web
+      </button>
+      <button onclick="switchAdminTab('tab-reports')" id="nav-tab-reports" class="py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex items-center gap-2">
+        <span>📄</span> Rekap & Laporan
+      </button>
+    </div>
+
+    <!-- TAB 1: OVERVIEW -->
+    <div id="tab-overview" class="space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white p-5 rounded-2xl border shadow-sm flex items-center gap-4">
+          <div class="p-3 bg-blue-100 text-blue-700 rounded-xl text-2xl">💰</div>
+          <div>
+            <p class="text-xs text-gray-500 font-medium">Total Donasi Terkumpul</p>
+            <h3 id="admin-card-donasi" class="text-lg font-bold text-gray-800">Rp 0</h3>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border shadow-sm flex items-center gap-4">
+          <div class="p-3 bg-emerald-100 text-emerald-700 rounded-xl text-2xl">👥</div>
+          <div>
+            <p class="text-xs text-gray-500 font-medium">Total Transaksi Donatur</p>
+            <h3 id="admin-card-donatur" class="text-lg font-bold text-gray-800">0</h3>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border shadow-sm flex items-center gap-4">
+          <div class="p-3 bg-purple-100 text-purple-700 rounded-xl text-2xl">📋</div>
+          <div>
+            <p class="text-xs text-gray-500 font-medium">Program Donasi</p>
+            <h3 id="admin-card-program" class="text-lg font-bold text-gray-800">0</h3>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border shadow-sm flex items-center gap-4">
+          <div class="p-3 bg-amber-100 text-amber-700 rounded-xl text-2xl">💳</div>
+          <div>
+            <p class="text-xs text-gray-500 font-medium">Sisa Dana Tersedia</p>
+            <h3 id="admin-card-sisa" class="text-lg font-bold text-gray-800">Rp 0</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border p-5 shadow-sm space-y-4">
+        <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
+          <span>🕒</span> Transaksi Donasi Masuk Terbaru
+        </h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-gray-600">
+            <thead class="bg-gray-50 uppercase text-[10px] text-gray-500 border-b">
+              <tr>
+                <th class="p-3">ID Transaksi</th>
+                <th class="p-3">Tanggal</th>
+                <th class="p-3">Donatur</th>
+                <th class="p-3">Program</th>
+                <th class="p-3">Nominal</th>
+                <th class="p-3">Metode</th>
+                <th class="p-3">Bukti</th>
+              </tr>
+            </thead>
+            <tbody id="admin-table-recent-donations" class="divide-y">
+              <tr><td colspan="7" class="p-4 text-center text-gray-400">Memuat data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: KELOLA PROGRAM DONASI -->
+    <div id="tab-programs" class="bg-white p-5 rounded-2xl border shadow-sm space-y-4 hidden">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="font-bold text-gray-800 text-sm">Daftar & Status Program Donasi</h3>
+        <button onclick="openCreateProgramModal()" class="bg-blue-900 hover:bg-blue-950 text-white font-semibold text-xs px-3 py-1.5 rounded-lg transition">
+          + Tambah Program Baru
+        </button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-gray-600">
+          <thead class="bg-gray-50 uppercase text-[10px] text-gray-500 border-b">
+            <tr>
+              <th class="p-3">Cover</th>
+              <th class="p-3">Judul Program</th>
+              <th class="p-3">Kategori</th>
+              <th class="p-3">Target</th>
+              <th class="p-3">Terkumpul</th>
+              <th class="p-3 text-center">Status / Aktifkan</th>
+              <th class="p-3 text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="admin-table-programs" class="divide-y">
+            <tr><td colspan="7" class="p-4 text-center text-gray-400">Memuat program...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 3: HEADER SETTINGS -->
+    <div id="tab-header" class="bg-white p-6 rounded-2xl border shadow-sm space-y-5 hidden max-w-2xl">
+      <h3 class="font-bold text-gray-800 text-sm border-b pb-3 flex items-center gap-2">
+        <span>🖼️</span> Pengaturan Header Tampilan Utama Web
+      </h3>
+
+      <form id="form-header-settings" onsubmit="handleSaveHeaderSettings(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">Judul Header Utama (Hero Title)</label>
+          <input type="text" id="setting-hero-title" required class="w-full p-2.5 border rounded-lg text-sm">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">Subteks Deskripsi Header</label>
+          <textarea id="setting-hero-subtext" rows="3" required class="w-full p-2.5 border rounded-lg text-sm"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">Upload Gambar Header Baru</label>
+          <input type="file" id="setting-hero-file" accept="image/*" class="w-full text-xs p-1 border rounded-lg mb-1">
+          <input type="hidden" id="setting-hero-bg-url">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">Total Dana Disalurkan Manual (Rp)</label>
+          <input type="number" id="setting-disalurkan" min="0" class="w-full p-2.5 border rounded-lg text-sm">
+        </div>
+
+        <button type="submit" id="btn-save-header" class="bg-blue-900 hover:bg-blue-950 text-white font-bold px-5 py-2.5 rounded-lg text-sm transition">
+          Simpan Perubahan Header
+        </button>
+      </form>
+    </div>
+
+    <!-- TAB 4: REKAP LAPORAN -->
+    <div id="tab-reports" class="bg-white p-6 rounded-2xl border shadow-sm space-y-5 hidden">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-4 gap-3">
+        <div>
+          <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
+            <span>📄</span> Rekap Laporan Pertanggungjawaban Program
+          </h3>
+          <p class="text-xs text-gray-500">Unduh data rekap dalam bentuk dokumen cetak/PDF atau CSV.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="exportDonationsToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-2 rounded-lg transition flex items-center gap-1">
+            <span>📥</span> Unduh CSV Rekap
+          </button>
+          <button onclick="printReport()" class="bg-blue-900 hover:bg-blue-950 text-white text-xs font-bold px-3 py-2 rounded-lg transition flex items-center gap-1">
+            <span>🖨️</span> Cetak Laporan PDF
+          </button>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 bg-gray-50 p-3 rounded-xl border">
+        <label class="text-xs font-bold text-gray-700">Pilih Program Donasi:</label>
+        <select id="report-program-filter" onchange="filterReportTable()" class="p-2 border rounded-lg text-xs bg-white">
+          <option value="ALL">-- Semua Program Donasi --</option>
+        </select>
+      </div>
+
+      <div id="printable-report-area" class="overflow-x-auto space-y-4">
+        <div class="text-center py-2 border-b">
+          <h2 class="text-lg font-bold text-gray-900">LAPORAN REKAPITULASI DANA DONASI</h2>
+          <p class="text-xs text-gray-600">KitaBantu Soskem JSIT Lampung - Bukti Pertanggungjawaban Resmi</p>
+        </div>
+
+        <table class="w-full text-left text-xs text-gray-700 border-collapse border">
+          <thead class="bg-gray-100 text-[11px] font-bold border-b">
+            <tr>
+              <th class="p-2.5 border">No</th>
+              <th class="p-2.5 border">ID Transaksi</th>
+              <th class="p-2.5 border">Tanggal</th>
+              <th class="p-2.5 border">Nama Donatur</th>
+              <th class="p-2.5 border">Program Donasi</th>
+              <th class="p-2.5 border">Nominal (Rp)</th>
+              <th class="p-2.5 border">Metode</th>
+              <th class="p-2.5 border">Status</th>
+            </tr>
+          </thead>
+          <tbody id="report-table-body" class="divide-y">
+            <tr><td colspan="8" class="p-4 text-center text-gray-400">Memuat rekap...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-gray-900 text-gray-400 py-6 text-center text-xs mt-auto">
+    <p>© 2026 KitaBantu Soskem JSIT Lampung. All rights reserved.</p>
+  </footer>
+
+  <!-- ================= MODAL DIALOGS ================= -->
+
+  <!-- Modal Admin Auth -->
+  <div id="modal-admin-auth" class="fixed inset-0 bg-black/60 flex items-center justify-center p-3 z-50 hidden">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 relative shadow-2xl space-y-4">
+      <button onclick="closeModal('modal-admin-auth')" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 font-bold">&times;</button>
+      <div class="text-center">
+        <span class="text-3xl">🔐</span>
+        <h3 class="text-lg font-bold text-gray-800 mt-2">Masuk Panel Admin</h3>
+        <p class="text-xs text-gray-500 mt-1">Gunakan kredensial admin resmi Anda</p>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">Username</label>
+          <input type="text" id="admin-user-input" placeholder="Masukkan Username" class="w-full p-2.5 border rounded-lg text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">Password</label>
+          <input type="password" id="admin-pass-input" placeholder="Masukkan Password" class="w-full p-2.5 border rounded-lg text-sm">
+        </div>
+      </div>
+      <button onclick="authenticateAdmin()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 rounded-lg text-sm transition">
+        Verifikasi & Masuk
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal List Donasi Semua Program -->
+  <div id="modal-list-donasi" class="fixed inset-0 bg-black/60 flex items-center justify-center p-3 z-50 hidden">
+    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto relative shadow-2xl p-6 space-y-4">
+      <button onclick="closeModal('modal-list-donasi')" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 font-bold text-lg">&times;</button>
+
+      <div class="border-b pb-3">
+        <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+          <span>📋</span> Daftar Semua Program Donasi
+        </h3>
+        <p class="text-xs text-gray-500 mt-0.5">Pilih dan klik judul program donasi untuk langsung berdonasi.</p>
+      </div>
+
+      <div id="modal-list-donasi-items" class="space-y-3 divide-y"></div>
+    </div>
+  </div>
+
+  <!-- Modal Tambah / Edit Program -->
+  <div id="modal-add-program" class="fixed inset-0 bg-black/60 flex items-center justify-center p-3 z-50 hidden">
+    <div class="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl p-6 space-y-4">
+      <button onclick="closeModal('modal-add-program')" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 font-bold text-lg">&times;</button>
+      
+      <h3 id="modal-program-title" class="text-lg font-bold text-gray-800 border-b pb-2 flex items-center gap-2">
+        <span>🛠️</span> Tambah Program Donasi
+      </h3>
+
+      <form id="form-program" onsubmit="handleProgramFormSubmit(event)" class="space-y-3 text-xs">
+        <input type="hidden" id="prog-id" name="id">
+
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Judul Program Donasi</label>
+          <input type="text" id="prog-title" name="title" required placeholder="Contoh: Beasiswa Anak Yatim Lampung" class="w-full p-2 border rounded-lg text-xs">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-gray-700 mb-1">Kategori</label>
+            <select id="prog-category" name="category" class="w-full p-2 border rounded-lg text-xs">
+              <option value="Kemanusiaan">Kemanusiaan</option>
+              <option value="Pendidikan">Pendidikan</option>
+              <option value="Sosial">Sosial</option>
+              <option value="Bencana Alam">Bencana Alam</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-gray-700 mb-1">Target Dana (Rp)</label>
+            <input type="number" id="prog-target" name="target" required min="100000" placeholder="10000000" class="w-full p-2 border rounded-lg text-xs">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Upload Gambar Cover / Banner Program</label>
+          <input type="file" id="prog-image-file" accept="image/*" class="w-full p-1 border rounded-lg mb-1">
+          <input type="hidden" id="prog-image-url" name="imageUrl">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-gray-700 mb-1">Teks Header Singkat</label>
+            <input type="text" id="prog-header-text" name="headerText" placeholder="Contoh: Bantu Beasiswa Hari Ini" class="w-full p-2 border rounded-lg text-xs">
+          </div>
+          <div>
+            <label class="block font-bold text-gray-700 mb-1">Deadline / Batas Waktu</label>
+            <input type="date" id="prog-deadline" name="deadline" class="w-full p-2 border rounded-lg text-xs">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Deskripsi Lengkap</label>
+          <textarea id="prog-description" name="description" rows="3" required placeholder="Jelaskan peruntukan donasi..." class="w-full p-2 border rounded-lg text-xs"></textarea>
+        </div>
+
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Status Program</label>
+          <select id="prog-status" name="status" class="w-full p-2 border rounded-lg text-xs">
+            <option value="Aktif">Aktif</option>
+            <option value="Nonaktif">Nonaktif</option>
+          </select>
+        </div>
+
+        <button type="submit" id="btn-save-prog" class="w-full bg-blue-900 hover:bg-blue-950 text-white font-bold py-2.5 rounded-lg text-xs transition">
+          Simpan Program
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Form Transfer Donasi -->
+  <div id="modal-donation" class="fixed inset-0 bg-black/60 flex items-center justify-center p-2 z-50 hidden">
+    <div class="bg-white rounded-2xl max-w-xl w-full max-h-[92vh] overflow-y-auto relative shadow-2xl flex flex-col">
+      <button onclick="closeModal('modal-donation')" class="absolute top-3 right-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-full w-8 h-8 flex items-center justify-center font-bold z-10">&times;</button>
+      <div id="modal-donation-content" class="p-5"></div>
+    </div>
+  </div>
+
+  <!-- Toast Donasi -->
+  <div id="thankyou-toast" class="fixed bottom-5 left-5 z-50 max-w-xs bg-white rounded-2xl shadow-2xl border border-blue-100 p-3.5 transform translate-y-32 opacity-0 transition-all duration-500 pointer-events-none flex items-center gap-3">
+    <div class="p-2 bg-emerald-100 text-emerald-700 rounded-xl text-xl flex-shrink-0">💚</div>
+    <div class="text-xs space-y-0.5">
+      <p class="font-bold text-gray-800">Terima Kasih!</p>
+      <p class="text-gray-600 leading-tight">
+        <b id="toast-donor-name" class="text-blue-900">Hamba Allah</b> berdonasi 
+        <b id="toast-donor-amount" class="text-emerald-700">Rp 100.000</b>
+      </p>
+      <p id="toast-donor-program" class="text-[10px] text-gray-400 italic line-clamp-1">Program Kebajikan JSIT</p>
+    </div>
+  </div>
+
+  <!-- Custom Alert -->
+  <div id="custom-alert" class="fixed top-5 right-5 z-50 bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 transform -translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <span id="alert-icon" class="text-xl">✅</span>
+    <p id="alert-message" class="text-sm font-semibold"></p>
+  </div>
+
+  <!-- Script Logika -->
+  <script>
+    // ==========================================
+    // KONFIGURASI WEB APP GOOGLE APPS SCRIPT
+    // ==========================================
+    // PASTE URL WEB APP GOOGLE APPS SCRIPT ANDA DI SINI!
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz6JJG_vCVQHsxPz7xnNTLNs_crbVVTna524uWYzlJTuOSz8tLMqCippX2I_iTCFfDXFw/exec";
+
+    let globalInitialData = null;
+    let activeCampaignData = null;
+    let verifiedAdminAuth = null;
+    try {
+      verifiedAdminAuth = JSON.parse(localStorage.getItem('kitabantu_admin_auth')) || null;
+    } catch(e) {
+      verifiedAdminAuth = null;
+    }
+
+    let globalAdminData = null;
+    let toastTimer = null;
+    let currentToastIndex = 0;
+
+    window.onload = function() {
+      loadPublicData();
+    };
+
+    // Helper panggil REST API Google Apps Script
+    async function callApi(action, payload = {}) {
+      if (!SCRIPT_URL || SCRIPT_URL.includes("PASTE_URL_WEB_APP")) {
+        alert("Harap masukkan URL Web App Google Apps Script pada variabel SCRIPT_URL di index.html!");
+        throw new Error("SCRIPT_URL belum dikonfigurasi.");
+      }
+      const bodyData = JSON.stringify({ action: action, ...payload });
+      const response = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8',
+        },
+        body: bodyData
+      });
+      return await response.json();
+    }
+
+    function formatRupiah(number) {
+      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(number || 0);
+    }
+
+    function getSisaHariText(deadlineStr) {
+      if (!deadlineStr) return "Tanpa Batas";
+      
+      let deadline;
+      if (deadlineStr.includes('-')) {
+        const parts = deadlineStr.split('-');
+        deadline = new Date(parts[0], parts[1] - 1, parts[2]);
+      } else {
+        deadline = new Date(deadlineStr);
+      }
+
+      if (isNaN(deadline.getTime())) return "Tanpa Batas";
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      deadline.setHours(0,0,0,0);
+      const diffTime = deadline - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays > 0) return `${diffDays} Hari lagi`;
+      if (diffDays === 0) return "Hari Terakhir";
+      return "Selesai";
+    }
+
+    function showCustomAlert(message, isSuccess = true) {
+      const alertEl = document.getElementById('custom-alert');
+      const msgEl = document.getElementById('alert-message');
+      const iconEl = document.getElementById('alert-icon');
+
+      if (!alertEl || !msgEl || !iconEl) return;
+
+      msgEl.innerText = message;
+      if (isSuccess) {
+        alertEl.className = alertEl.className.replace(/bg-\w+-\d+/, 'bg-emerald-600');
+        iconEl.innerText = '✅';
+      } else {
+        alertEl.className = alertEl.className.replace(/bg-\w+-\d+/, 'bg-rose-600');
+        iconEl.innerText = '⚠️';
+      }
+
+      alertEl.classList.remove('-translate-y-20', 'opacity-0', 'pointer-events-none');
+      alertEl.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        alertEl.classList.remove('translate-y-0', 'opacity-100');
+        alertEl.classList.add('-translate-y-20', 'opacity-0', 'pointer-events-none');
+      }, 3500);
+    }
+
+    function openModal(modalId) {
+      const el = document.getElementById(modalId);
+      if (el) el.classList.remove('hidden');
+    }
+
+    function closeModal(modalId) {
+      const el = document.getElementById(modalId);
+      if (el) el.classList.add('hidden');
+    }
+
+    function switchToPublicView() {
+      document.getElementById('view-public').classList.remove('hidden');
+      document.getElementById('view-campaign-detail').classList.add('hidden');
+      document.getElementById('view-admin').classList.add('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function handleOpenListDonasiModal() {
+      openModal('modal-list-donasi');
+      if (globalInitialData && globalInitialData.campaigns) {
+        renderListDonasiModal(globalInitialData.campaigns);
+      }
+    }
+
+    function handleAdminNavClick() {
+      if (verifiedAdminAuth) {
+        switchToAdminView();
+      } else {
+        openModal('modal-admin-auth');
+      }
+    }
+
+    // ================= PUBLIK LOAD & LOGIK =================
+    function loadPublicData() {
+      const loadingEl = document.getElementById('loading-public');
+      const gridEl = document.getElementById('campaign-grid');
+
+      if (loadingEl) {
+        loadingEl.classList.remove('hidden');
+        loadingEl.innerHTML = `
+          <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent"></div>
+          <p class="mt-3 text-gray-500 text-sm">Memuat daftar program donasi...</p>
+        `;
+      }
+      if (gridEl) gridEl.classList.add('hidden');
+
+      callApi('getInitialData')
+        .then(function(res) {
+          if (!res) {
+            if (loadingEl) loadingEl.innerHTML = '<p class="text-rose-500 text-xs">Gagal memuat data dari Spreadsheet.</p>';
+            return;
+          }
+          globalInitialData = res;
+
+          if (res.settings) {
+            const titleEl = document.getElementById('hero-title');
+            const subtextEl = document.getElementById('hero-subtext');
+            const headerEl = document.getElementById('hero-header');
+            
+            if (titleEl) titleEl.innerText = res.settings.HeroTitle || 'KitaBantu Soskem JSIT Lampung';
+            if (subtextEl) subtextEl.innerText = res.settings.HeroSubtext || '';
+            if (res.settings.HeroBgImage && headerEl) {
+              headerEl.style.backgroundImage = `linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)), url('${res.settings.HeroBgImage}')`;
+            }
+          }
+
+          populateStatusProgramSelector(res.campaigns || []);
+          renderStats(res.stats || { totalTarget: 0, totalCollected: 0, totalDisalurkan: 0, sisaDana: 0 });
+          renderCampaignGrid(res.campaigns || []);
+          renderListDonasiModal(res.campaigns || []);
+          if (res.recentDonations && res.recentDonations.length > 0) {
+            startThankYouToastLoop(res.recentDonations);
+          }
+        })
+        .catch(function(err) {
+          console.error("Gagal memuat data:", err);
+          if (loadingEl) {
+            loadingEl.innerHTML = `
+              <div class="text-center py-6 text-rose-600 bg-rose-50 rounded-xl p-4 border border-rose-200">
+                <p class="text-2xl mb-1">⚠️</p>
+                <p class="font-bold text-sm">Gagal memuat program donasi.</p>
+                <p class="text-xs text-gray-500 mt-1">${err.message || err}</p>
+                <button onclick="loadPublicData()" class="mt-3 bg-blue-900 text-white text-xs px-4 py-2 rounded-lg font-bold hover:bg-blue-950 transition">Coba Muat Ulang</button>
+              </div>
+            `;
+          }
+        });
+    }
+
+    function startThankYouToastLoop(recentDonations) {
+      if (!recentDonations || recentDonations.length === 0) return;
+      if (toastTimer) clearInterval(toastTimer);
+
+      const toast = document.getElementById('thankyou-toast');
+      const nameEl = document.getElementById('toast-donor-name');
+      const amountEl = document.getElementById('toast-donor-amount');
+      const progEl = document.getElementById('toast-donor-program');
+
+      if (!toast || !nameEl || !amountEl || !progEl) return;
+
+      function triggerToast() {
+        const item = recentDonations[currentToastIndex];
+        if (!item) return;
+
+        nameEl.innerText = item.name || "Hamba Allah";
+        amountEl.innerText = formatRupiah(item.amount);
+        progEl.innerText = item.program || "Program Kebajikan";
+
+        toast.classList.remove('translate-y-32', 'opacity-0', 'pointer-events-none');
+        toast.classList.add('translate-y-0', 'opacity-100');
+
+        setTimeout(() => {
+          toast.classList.remove('translate-y-0', 'opacity-100');
+          toast.classList.add('translate-y-32', 'opacity-0', 'pointer-events-none');
+        }, 4000);
+
+        currentToastIndex = (currentToastIndex + 1) % recentDonations.length;
+      }
+
+      setTimeout(triggerToast, 2000);
+      toastTimer = setInterval(triggerToast, 8000);
+    }
+
+    function renderListDonasiModal(campaigns) {
+      const container = document.getElementById('modal-list-donasi-items');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (!campaigns || campaigns.length === 0) {
+        container.innerHTML = '<p class="text-xs text-gray-400 italic text-center py-4">Belum ada program donasi aktif.</p>';
+        return;
+      }
+
+      campaigns.forEach(c => {
+        container.innerHTML += `
+          <div class="pt-3 flex gap-3 items-center hover:bg-blue-50/50 p-2 rounded-xl transition cursor-pointer" onclick="openCampaignDetailPage('${c.id}'); closeModal('modal-list-donasi');">
+            <img src="${c.imageUrl}" class="w-16 h-16 rounded-lg object-cover flex-shrink-0">
+            <div class="flex-grow text-xs space-y-1">
+              <span class="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded-full">${c.category}</span>
+              <h4 class="font-bold text-gray-800 text-sm hover:text-blue-900">${c.title}</h4>
+              <div class="flex justify-between text-gray-500 text-[11px]">
+                <span>Terkumpul: <b class="text-blue-900">${formatRupiah(c.collected)}</b></span>
+                <span>⏳ ${getSisaHariText(c.deadline)}</span>
+              </div>
+            </div>
+            <span class="text-blue-900 font-bold text-sm">→</span>
+          </div>
+        `;
+      });
+    }
+
+    function openCampaignDetailPage(campaignId) {
+      closeModal('modal-list-donasi');
+      document.getElementById('view-public').classList.add('hidden');
+      document.getElementById('view-admin').classList.add('hidden');
+
+      const detailView = document.getElementById('view-campaign-detail');
+      const container = document.getElementById('campaign-detail-content');
+      detailView.classList.remove('hidden');
+
+      container.innerHTML = `
+        <div class="text-center py-16">
+          <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent"></div>
+          <p class="mt-3 text-gray-500 text-xs">Memuat detail program donasi...</p>
+        </div>
+      `;
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      callApi('getCampaignDetails', { campaignId: campaignId })
+        .then(data => {
+          if (!data || !data.campaign) {
+            showCustomAlert('Program tidak ditemukan.', false);
+            switchToPublicView();
+            return;
+          }
+
+          activeCampaignData = data;
+          const c = data.campaign;
+          const percent = c.target > 0 ? Math.min(Math.round((c.collected / c.target) * 100), 100) : 0;
+          const totalDisalurkan = (globalInitialData && globalInitialData.stats) ? globalInitialData.stats.totalDisalurkan : 0;
+          const sisaDanaProgram = Math.max(0, c.collected - totalDisalurkan);
+
+          container.innerHTML = `
+            <div class="relative">
+              <img src="${c.imageUrl}" class="w-full h-64 md:h-80 object-cover">
+              <span class="absolute top-3 right-3 bg-amber-500 text-white text-xs px-3 py-1 rounded-full font-extrabold shadow-md flex items-center gap-1">
+                ⏳ ${getSisaHariText(c.deadline)}
+              </span>
+            </div>
+
+            <div class="p-6 space-y-6">
+              <div>
+                <span class="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-bold uppercase">${c.category}</span>
+                <h2 class="text-xl md:text-2xl font-bold text-gray-800 mt-2">${c.title}</h2>
+                <p class="text-xs text-gray-500 mt-1">${c.description}</p>
+              </div>
+
+              <div class="bg-gray-50 rounded-2xl p-5 border space-y-4">
+                <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
+                  <span>💰</span> Status Dana Program Ini
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                  <div class="bg-white p-3 rounded-xl border">
+                    <p class="text-gray-500">Target Dana</p>
+                    <p class="font-bold text-base text-gray-800">${formatRupiah(c.target)}</p>
+                  </div>
+                  <div class="bg-white p-3 rounded-xl border">
+                    <p class="text-blue-900 font-medium">Dana Terkumpul</p>
+                    <p class="font-extrabold text-base text-blue-900">${formatRupiah(c.collected)}</p>
+                  </div>
+                  <div class="bg-white p-3 rounded-xl border">
+                    <p class="text-amber-900 font-medium">Sisa Dana Tersedia</p>
+                    <p class="font-extrabold text-base text-amber-900">${formatRupiah(sisaDanaProgram)}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="w-full bg-gray-200 rounded-full h-2.5 mb-1">
+                    <div class="bg-blue-600 h-2.5 rounded-full" style="width: ${percent}%"></div>
+                  </div>
+                  <div class="flex justify-between text-xs font-semibold text-gray-600">
+                    <span>Pencapaian Target</span>
+                    <span>${percent}%</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-blue-50/60 p-6 rounded-2xl border border-blue-100 space-y-4">
+                <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2 border-b pb-2">
+                  <span>💳</span> Form Donasi Transfer
+                </h3>
+                
+                <form onsubmit="handlePublicDonationSubmit(event)" class="space-y-3 text-xs">
+                  <input type="hidden" name="campaignId" value="${c.id}">
+                  <div>
+                    <label class="block font-semibold text-gray-700 mb-1">Nominal Cepat</label>
+                    <div class="grid grid-cols-3 gap-2">
+                      <button type="button" onclick="setPresetAmount(20000)" class="bg-white border border-blue-600 text-blue-700 py-2 rounded-xl font-bold hover:bg-blue-50 transition">20Rb</button>
+                      <button type="button" onclick="setPresetAmount(50000)" class="bg-white border border-blue-600 text-blue-700 py-2 rounded-xl font-bold hover:bg-blue-50 transition">50Rb</button>
+                      <button type="button" onclick="setPresetAmount(100000)" class="bg-white border border-blue-600 text-blue-700 py-2 rounded-xl font-bold hover:bg-blue-50 transition">100Rb</button>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block font-semibold text-gray-700">Nominal Donasi (Rp)</label>
+                    <input type="number" id="input-donation-amount" name="amount" min="10000" required placeholder="Minimal Rp 10.000" class="w-full mt-1 p-2.5 border rounded-xl text-sm">
+                  </div>
+                  <div class="grid grid-cols-2 gap-2">
+                    <div>
+                      <label class="block font-semibold text-gray-700">Nama Lengkap</label>
+                      <input type="text" name="donorName" placeholder="Nama Donatur" class="w-full mt-1 p-2.5 border rounded-xl">
+                    </div>
+                    <div>
+                      <label class="block font-semibold text-gray-700">No. WhatsApp</label>
+                      <input type="tel" name="phone" placeholder="0812345678" required class="w-full mt-1 p-2.5 border rounded-xl">
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block font-semibold text-gray-700">Metode Pembayaran</label>
+                    <select name="paymentMethod" required class="w-full mt-1 p-2.5 border rounded-xl bg-white">
+                      <option value="Transfer BCA - 1234567890 a.n JSIT Lampung">Transfer BCA (1234567890)</option>
+                      <option value="Transfer Mandiri - 0987654321 a.n JSIT Lampung">Transfer Mandiri (0987654321)</option>
+                      <option value="QRIS Direct">QRIS All Payment</option>
+                    </select>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <input type="checkbox" name="isAnonymous" id="isAnon">
+                    <label for="isAnon" class="text-gray-600">Sembunyikan nama donatur (Hamba Allah)</label>
+                  </div>
+                  <div>
+                    <label class="block font-semibold text-gray-700">Pesan / Doa Terbaik</label>
+                    <textarea name="message" rows="2" placeholder="Tuliskan doa terbaik Anda..." class="w-full mt-1 p-2.5 border rounded-xl"></textarea>
+                  </div>
+                  <button type="submit" id="btn-public-donation" class="w-full bg-blue-900 text-white font-bold py-3 rounded-xl hover:bg-blue-950 transition text-sm shadow-md">
+                    Lanjut Pembayaran
+                  </button>
+                </form>
+              </div>
+
+              <div class="space-y-3 pt-2">
+                <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2 border-b pb-2">
+                  <span>💬</span> Doa & Dukungan Donatur (${data.donors.length})
+                </h3>
+                
+                <div class="space-y-2 max-h-60 overflow-y-auto">
+                  ${data.donors.length > 0 ? data.donors.map(d => `
+                    <div class="bg-gray-50 p-3 rounded-xl border text-xs">
+                      <div class="flex justify-between font-bold text-gray-800">
+                        <span>${d.name}</span>
+                        <span class="text-emerald-700">${formatRupiah(d.amount)}</span>
+                      </div>
+                      ${d.message ? `<p class="italic text-gray-600 mt-1">"${d.message}"</p>` : ''}
+                    </div>
+                  `).join('') : '<p class="text-xs text-gray-400 italic text-center py-4">Belum ada doa tertulis untuk program ini.</p>'}
+                </div>
+              </div>
+            </div>
+          `;
+        })
+        .catch(err => {
+          showCustomAlert('Gagal mengambil data: ' + err.message, false);
+          switchToPublicView();
+        });
+    }
+
+    function populateStatusProgramSelector(campaigns) {
+      const sel = document.getElementById('status-program-selector');
+      if (!sel) return;
+      sel.innerHTML = '<option value="ALL">🌐 Semua Program Donasi</option>';
+      if (campaigns && campaigns.length > 0) {
+        campaigns.forEach(c => {
+          sel.innerHTML += `<option value="${c.id}">🎯 ${c.title}</option>`;
+        });
+      }
+    }
+
+    function handleProgramFilterChange(campaignId) {
+      if (!globalInitialData) return;
+
+      if (campaignId === 'ALL') {
+        renderStats(globalInitialData.stats);
+        document.getElementById('status-box-title').innerText = "Status Dana Kebajikan";
+      } else {
+        const campaign = globalInitialData.campaigns.find(c => String(c.id) === String(campaignId));
+        if (campaign) {
+          const totalDisalurkan = globalInitialData.stats.totalDisalurkan || 0;
+          const sisa = Math.max(0, campaign.collected - totalDisalurkan);
+
+          renderStats({
+            totalCollected: campaign.collected,
+            totalTarget: campaign.target,
+            totalDisalurkan: totalDisalurkan,
+            sisaDana: sisa
+          });
+          document.getElementById('status-box-title').innerText = "Status Dana: " + campaign.title;
+        }
+      }
+    }
+
+    function renderStats(stats) {
+      if (!stats) return;
+      document.getElementById('stat-collected').innerText = formatRupiah(stats.totalCollected);
+      document.getElementById('stat-target').innerText = 'Target: ' + formatRupiah(stats.totalTarget);
+      
+      const percentCollected = stats.totalTarget > 0 ? Math.min(Math.round((stats.totalCollected / stats.totalTarget) * 100), 100) : 0;
+      document.getElementById('stat-progress-collected').style.width = percentCollected + '%';
+      document.getElementById('stat-percent-collected').innerText = percentCollected + '%';
+
+      document.getElementById('stat-disalurkan').innerText = formatRupiah(stats.totalDisalurkan);
+      const percentDisalurkan = stats.totalCollected > 0 ? Math.min(Math.round((stats.totalDisalurkan / stats.totalCollected) * 100), 100) : 0;
+      document.getElementById('stat-progress-disalurkan').style.width = percentDisalurkan + '%';
+      document.getElementById('stat-percent-disalurkan').innerText = percentDisalurkan + '%';
+
+      document.getElementById('stat-sisa').innerText = formatRupiah(stats.sisaDana);
+    }
+
+    function renderCampaignGrid(campaigns) {
+      const loadingEl = document.getElementById('loading-public');
+      if (loadingEl) loadingEl.classList.add('hidden');
+
+      const grid = document.getElementById('campaign-grid');
+      if (!grid) return;
+      grid.classList.remove('hidden');
+      grid.innerHTML = '';
+
+      if (!campaigns || campaigns.length === 0) {
+        grid.innerHTML = '<div class="col-span-full bg-white p-8 rounded-2xl border text-center text-gray-500 space-y-2"><p class="text-2xl">📋</p><p class="font-bold text-gray-700">Belum ada program donasi aktif saat ini.</p><p class="text-xs text-gray-400">Silakan aktifkan status program donasi melalui Panel Admin.</p></div>';
+        return;
+      }
+
+      campaigns.forEach(c => {
+        const percent = c.target > 0 ? Math.min(Math.round((c.collected / c.target) * 100), 100) : 0;
+        const sisaHari = getSisaHariText(c.deadline);
+
+        grid.innerHTML += `
+          <div class="bg-white rounded-2xl shadow-sm border overflow-hidden flex flex-col justify-between hover:shadow-md transition">
+            <div>
+              <div class="relative cursor-pointer" onclick="openCampaignDetailPage('${c.id}')">
+                <img src="${c.imageUrl || 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600'}" class="h-44 w-full object-cover" alt="${c.title}">
+                
+                <span class="absolute top-2.5 right-2.5 bg-amber-500/90 backdrop-blur-sm text-white text-[11px] px-2.5 py-1 rounded-full font-extrabold shadow-md flex items-center gap-1">
+                  ⏳ ${sisaHari}
+                </span>
+              </div>
+
+              <div class="p-4 space-y-2">
+                <span class="text-[10px] bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full font-bold uppercase">${c.category || 'Program'}</span>
+                <h4 class="font-bold text-gray-800 text-sm line-clamp-2 cursor-pointer hover:text-blue-900" onclick="openCampaignDetailPage('${c.id}')">${c.title}</h4>
+                <p class="text-xs text-gray-500 line-clamp-2">${c.description}</p>
+                
+                <div class="pt-2">
+                  <div class="w-full bg-gray-200 rounded-full h-2 mb-1.5">
+                    <div class="bg-blue-600 h-2 rounded-full" style="width: ${percent}%"></div>
+                  </div>
+                  <div class="flex justify-between text-xs text-gray-600 font-medium">
+                    <span>Terkumpul: <b class="text-blue-900">${formatRupiah(c.collected)}</b></span>
+                    <span>${percent}%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-4 pt-0 space-y-2">
+              <button onclick="openCampaignDetailPage('${c.id}')" class="w-full bg-blue-900 hover:bg-blue-950 text-white font-bold py-2.5 rounded-xl text-xs transition">
+                Donasi Sekarang
+              </button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function setPresetAmount(val) { document.getElementById('input-donation-amount').value = val; }
+
+    function handlePublicDonationSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-public-donation');
+      btn.disabled = true; btn.innerText = 'Memproses...';
+
+      const form = e.target;
+      const payload = {
+        campaignId: form.campaignId.value,
+        amount: form.amount.value,
+        donorName: form.donorName.value,
+        phone: form.phone.value,
+        paymentMethod: form.paymentMethod.value,
+        isAnonymous: form.isAnonymous.checked,
+        message: form.message.value
+      };
+
+      callApi('processDonation', { form: payload })
+        .then(res => {
+          if (res.success) {
+            openModal('modal-donation');
+            const content = document.getElementById('modal-donation-content');
+            content.innerHTML = `
+              <div class="text-center py-4 space-y-3 text-xs">
+                <span class="text-4xl">🎉</span>
+                <h3 class="text-base font-bold text-gray-800">Terima Kasih Atas Donasi Anda!</h3>
+                <p class="text-gray-600">ID Transaksi: <b class="text-blue-900">${res.donationId}</b></p>
+
+                <div class="bg-blue-50 p-3 rounded-lg text-left border border-blue-200 space-y-1">
+                  <p><strong>Nominal Transfer:</strong> ${formatRupiah(res.amount)}</p>
+                  <p><strong>Metode Pembayaran:</strong> ${res.paymentMethod}</p>
+                  <p><strong>Program:</strong> ${res.programTitle}</p>
+                </div>
+
+                <div class="border-t pt-3 text-left">
+                  <label class="block font-bold text-gray-700 mb-1">Unggah Bukti Transfer:</label>
+                  <input type="file" id="proof-file" accept="image/*" class="w-full mb-3 p-1 border rounded">
+                  <button onclick="submitTransferProof('${res.donationId}')" id="btn-upload-proof" class="w-full bg-blue-900 text-white font-bold py-2 rounded hover:bg-blue-950">
+                    Kirim Bukti Pembayaran
+                  </button>
+                </div>
+              </div>
+            `;
+            loadPublicData();
+          } else {
+            showCustomAlert('Gagal: ' + res.message, false);
+            btn.disabled = false; btn.innerText = 'Lanjut Pembayaran';
+          }
+        })
+        .catch(err => {
+          showCustomAlert('Gagal memproses donasi: ' + err.message, false);
+          btn.disabled = false; btn.innerText = 'Lanjut Pembayaran';
+        });
+    }
+
+    function submitTransferProof(donationId) {
+      const fileInput = document.getElementById('proof-file');
+      if (fileInput.files.length === 0) {
+        showCustomAlert('Silakan pilih foto bukti transfer.', false);
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+      const btn = document.getElementById('btn-upload-proof');
+      btn.disabled = true; btn.innerText = 'Mengunggah...';
+
+      reader.onload = function(evt) {
+        const fileData = { fileName: file.name, mimeType: file.type, data: evt.target.result };
+        callApi('uploadProof', { donationId: donationId, fileData: fileData })
+          .then(res => {
+            if (res.success) {
+              showCustomAlert('Bukti transfer berhasil diunggah!');
+              closeModal('modal-donation');
+            } else {
+              showCustomAlert('Gagal: ' + res.message, false);
+              btn.disabled = false; btn.innerText = 'Kirim Bukti Pembayaran';
+            }
+          })
+          .catch(err => {
+            showCustomAlert('Gagal mengunggah bukti: ' + err.message, false);
+            btn.disabled = false; btn.innerText = 'Kirim Bukti Pembayaran';
+          });
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // ================= ADMIN LOGIC & PANEL =================
+    function authenticateAdmin() {
+      const u = document.getElementById('admin-user-input').value;
+      const p = document.getElementById('admin-pass-input').value;
+
+      callApi('verifyAdminCredentials', { username: u, password: p })
+        .then(isValid => {
+          if (isValid) {
+            verifiedAdminAuth = { username: u, password: p };
+            localStorage.setItem('kitabantu_admin_auth', JSON.stringify(verifiedAdminAuth));
+            closeModal('modal-admin-auth');
+            switchToAdminView();
+          } else {
+            showCustomAlert('Username atau Password Salah!', false);
+          }
+        })
+        .catch(err => {
+          showCustomAlert('Gagal verifikasi admin: ' + err.message, false);
+        });
+    }
+
+    function logoutAdmin() {
+      verifiedAdminAuth = null;
+      localStorage.removeItem('kitabantu_admin_auth');
+      switchToPublicView();
+      showCustomAlert('Berhasil keluar dari mode admin.');
+    }
+
+    function switchToAdminView() {
+      document.getElementById('view-public').classList.add('hidden');
+      document.getElementById('view-campaign-detail').classList.add('hidden');
+      document.getElementById('view-admin').classList.remove('hidden');
+      loadAdminDashboardData();
+    }
+
+    function switchAdminTab(tabId) {
+      const tabs = ['tab-overview', 'tab-programs', 'tab-header', 'tab-reports'];
+      tabs.forEach(t => {
+        document.getElementById(t).classList.add('hidden');
+        document.getElementById('nav-' + t).className = "py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex items-center gap-2";
+      });
+
+      document.getElementById(tabId).classList.remove('hidden');
+      document.getElementById('nav-' + tabId).className = "py-3 px-4 border-b-2 border-blue-600 text-blue-600 flex items-center gap-2";
+    }
+
+    function loadAdminDashboardData() {
+      callApi('getDashboardData', { auth: verifiedAdminAuth })
+        .then(data => {
+          if (!data) return;
+          globalAdminData = data;
+
+          document.getElementById('admin-card-donasi').innerText = formatRupiah(data.stats.totalDonasi);
+          document.getElementById('admin-card-donatur').innerText = data.stats.totalDonatur;
+          document.getElementById('admin-card-program').innerText = data.stats.totalProgram;
+          document.getElementById('admin-card-sisa').innerText = formatRupiah(data.stats.sisaDana);
+
+          if (data.settings) {
+            document.getElementById('setting-hero-title').value = data.settings.HeroTitle || '';
+            document.getElementById('setting-hero-subtext').value = data.settings.HeroSubtext || '';
+            document.getElementById('setting-hero-bg-url').value = data.settings.HeroBgImage || '';
+            document.getElementById('setting-disalurkan').value = data.settings.TotalDisalurkan || 0;
+          }
+
+          renderAdminRecentDonations(data.donations);
+          renderAdminProgramsTable(data.programs);
+          populateReportFilter(data.programs);
+          renderReportTable(data.donations);
+        })
+        .catch(err => {
+          showCustomAlert('Gagal memuat dashboard admin: ' + err.message, false);
+        });
+    }
+
+    function renderAdminRecentDonations(donations) {
+      const tbody = document.getElementById('admin-table-recent-donations');
+      tbody.innerHTML = '';
+
+      if (!donations || donations.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-gray-400">Belum ada transaksi.</td></tr>';
+        return;
+      }
+
+      donations.slice(0, 10).forEach(d => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-gray-50">
+            <td class="p-3 font-mono text-[11px] font-bold text-blue-900">${d.donationId}</td>
+            <td class="p-3 text-gray-500">${d.date}</td>
+            <td class="p-3 font-semibold text-gray-800">${d.name}</td>
+            <td class="p-3">${d.program}</td>
+            <td class="p-3 font-bold text-emerald-700">${formatRupiah(d.amount)}</td>
+            <td class="p-3">${d.paymentMethod}</td>
+            <td class="p-3">
+              ${d.proofUrl && d.proofUrl !== '-' ? `<a href="${d.proofUrl}" target="_blank" class="text-blue-600 underline text-[11px]">Lihat Bukti</a>` : '<span class="text-gray-400">-</span>'}
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function renderAdminProgramsTable(programs) {
+      const tbody = document.getElementById('admin-table-programs');
+      tbody.innerHTML = '';
+
+      if (!programs || programs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-gray-400">Belum ada program.</td></tr>';
+        return;
+      }
+
+      programs.forEach(p => {
+        const isAktif = String(p.status).trim().toLowerCase() === 'aktif';
+        tbody.innerHTML += `
+          <tr class="hover:bg-gray-50">
+            <td class="p-3"><img src="${p.imageUrl}" class="h-10 w-14 object-cover rounded"></td>
+            <td class="p-3 font-semibold text-gray-800">${p.title}</td>
+            <td class="p-3"><span class="bg-gray-100 px-2 py-0.5 rounded text-[10px] font-bold">${p.category}</span></td>
+            <td class="p-3">${formatRupiah(p.target)}</td>
+            <td class="p-3 font-bold text-blue-900">${formatRupiah(p.collected)}</td>
+            
+            <td class="p-3 text-center">
+              <button onclick="toggleProgramStatus('${p.id}')" title="Klik untuk mengubah status" class="px-3 py-1 rounded-lg text-[11px] font-bold transition shadow-sm ${isAktif ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-rose-600 hover:bg-rose-700 text-white'}">
+                ${isAktif ? '🟢 Aktif' : '🔴 Nonaktif'}
+              </button>
+            </td>
+
+            <td class="p-3 text-center flex items-center justify-center gap-1">
+              <button onclick="openEditProgramModal('${p.id}')" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-2.5 py-1 rounded text-[11px]">Edit</button>
+              <button onclick="confirmDeleteProgram('${p.id}')" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-2 py-1 rounded text-[11px]">Hapus</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function toggleProgramStatus(progId) {
+      callApi('toggleProgramStatusByAdmin', { progId: progId, auth: verifiedAdminAuth })
+        .then(res => {
+          if (res.success) {
+            showCustomAlert(res.message);
+            loadAdminDashboardData();
+            loadPublicData();
+          } else {
+            showCustomAlert(res.message, false);
+          }
+        })
+        .catch(err => {
+          showCustomAlert('Gagal mengubah status: ' + err.message, false);
+        });
+    }
+
+    function openCreateProgramModal() {
+      document.getElementById('modal-program-title').innerText = 'Tambah Program Donasi Baru';
+      document.getElementById('form-program').reset();
+      document.getElementById('prog-id').value = '';
+      document.getElementById('prog-image-url').value = '';
+      openModal('modal-add-program');
+    }
+
+    function openEditProgramModal(progId) {
+      const program = globalAdminData.programs.find(p => String(p.id) === String(progId));
+      if (!program) return;
+
+      document.getElementById('modal-program-title').innerText = 'Edit Program Donasi';
+      document.getElementById('prog-id').value = program.id;
+      document.getElementById('prog-title').value = program.title;
+      document.getElementById('prog-category').value = program.category;
+      document.getElementById('prog-target').value = program.target;
+      document.getElementById('prog-image-url').value = program.imageUrl;
+      document.getElementById('prog-header-text').value = program.headerText;
+      document.getElementById('prog-deadline').value = program.deadline;
+      document.getElementById('prog-description').value = program.description;
+      document.getElementById('prog-status').value = program.status;
+
+      openModal('modal-add-program');
+    }
+
+    function confirmDeleteProgram(progId) {
+      if (confirm('Apakah Anda yakin ingin menghapus program donasi ini?')) {
+        callApi('deleteProgramByAdmin', { progId: progId, auth: verifiedAdminAuth })
+          .then(res => {
+            if (res.success) {
+              showCustomAlert(res.message);
+              loadAdminDashboardData();
+              loadPublicData();
+            } else {
+              showCustomAlert(res.message, false);
+            }
+          })
+          .catch(err => {
+            showCustomAlert('Gagal menghapus program: ' + err.message, false);
+          });
+      }
+    }
+
+    function handleProgramFormSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-save-prog');
+      btn.disabled = true; btn.innerText = 'Menyimpan...';
+
+      const fileInput = document.getElementById('prog-image-file');
+
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const fileData = { fileName: file.name, mimeType: file.type, data: evt.target.result };
+          callApi('uploadImageToDrive', { fileData: fileData })
+            .then(imgRes => {
+              if (imgRes.success) {
+                submitProgramPayload(e.target, imgRes.url);
+              } else {
+                showCustomAlert('Gagal upload gambar: ' + imgRes.message, false);
+                btn.disabled = false; btn.innerText = 'Simpan Program';
+              }
+            })
+            .catch(err => {
+              showCustomAlert('Gagal upload gambar: ' + err.message, false);
+              btn.disabled = false; btn.innerText = 'Simpan Program';
+            });
+        };
+        reader.readAsDataURL(file);
+      } else {
+        submitProgramPayload(e.target, document.getElementById('prog-image-url').value);
+      }
+    }
+
+    function submitProgramPayload(form, imageUrl) {
+      const payload = {
+        id: form.id.value,
+        title: form.title.value,
+        category: form.category.value,
+        target: form.target.value,
+        imageUrl: imageUrl,
+        headerText: form.headerText.value,
+        deadline: form.deadline.value,
+        description: form.description.value,
+        status: form.status.value
+      };
+
+      callApi('saveCampaignByAdmin', { data: payload, auth: verifiedAdminAuth })
+        .then(res => {
+          const btn = document.getElementById('btn-save-prog');
+          btn.disabled = false; btn.innerText = 'Simpan Program';
+          if (res.success) {
+            showCustomAlert(res.message);
+            form.reset();
+            closeModal('modal-add-program');
+            loadAdminDashboardData();
+            loadPublicData();
+          } else {
+            showCustomAlert(res.message, false);
+          }
+        })
+        .catch(err => {
+          const btn = document.getElementById('btn-save-prog');
+          btn.disabled = false; btn.innerText = 'Simpan Program';
+          showCustomAlert('Gagal menyimpan program: ' + err.message, false);
+        });
+    }
+
+    function handleSaveHeaderSettings(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-save-header');
+      btn.disabled = true; btn.innerText = 'Menyimpan...';
+
+      const fileInput = document.getElementById('setting-hero-file');
+
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const fileData = { fileName: file.name, mimeType: file.type, data: evt.target.result };
+          callApi('uploadImageToDrive', { fileData: fileData })
+            .then(imgRes => {
+              if (imgRes.success) {
+                saveHeaderPayload(imgRes.url);
+              } else {
+                showCustomAlert('Gagal upload banner: ' + imgRes.message, false);
+                btn.disabled = false; btn.innerText = 'Simpan Perubahan Header';
+              }
+            })
+            .catch(err => {
+              showCustomAlert('Gagal upload banner: ' + err.message, false);
+              btn.disabled = false; btn.innerText = 'Simpan Perubahan Header';
+            });
+        };
+        reader.readAsDataURL(file);
+      } else {
+        saveHeaderPayload(document.getElementById('setting-hero-bg-url').value);
+      }
+    }
+
+    function saveHeaderPayload(bgUrl) {
+      const payload = {
+        heroTitle: document.getElementById('setting-hero-title').value,
+        heroSubtext: document.getElementById('setting-hero-subtext').value,
+        heroBgImage: bgUrl,
+        totalDisalurkan: document.getElementById('setting-disalurkan').value
+      };
+
+      callApi('saveHeaderSettings', { data: payload, auth: verifiedAdminAuth })
+        .then(res => {
+          const btn = document.getElementById('btn-save-header');
+          btn.disabled = false; btn.innerText = 'Simpan Perubahan Header';
+          if (res.success) {
+            showCustomAlert(res.message);
+            loadAdminDashboardData();
+            loadPublicData();
+          } else {
+            showCustomAlert(res.message, false);
+          }
+        })
+        .catch(err => {
+          const btn = document.getElementById('btn-save-header');
+          btn.disabled = false; btn.innerText = 'Simpan Perubahan Header';
+          showCustomAlert('Gagal menyimpan header: ' + err.message, false);
+        });
+    }
+
+    // ================= LAPORAN & EXPORT =================
+    function populateReportFilter(programs) {
+      const filterSelect = document.getElementById('report-program-filter');
+      if (!filterSelect) return;
+      filterSelect.innerHTML = '<option value="ALL">-- Semua Program Donasi --</option>';
+      programs.forEach(p => {
+        filterSelect.innerHTML += `<option value="${p.title}">${p.title}</option>`;
+      });
+    }
+
+    function filterReportTable() {
+      const selectedProgram = document.getElementById('report-program-filter').value;
+      if (!globalAdminData) return;
+
+      if (selectedProgram === 'ALL') {
+        renderReportTable(globalAdminData.donations);
+      } else {
+        const filtered = globalAdminData.donations.filter(d => d.program === selectedProgram);
+        renderReportTable(filtered);
+      }
+    }
+
+    function renderReportTable(donations) {
+      const tbody = document.getElementById('report-table-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (!donations || donations.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-gray-400 border">Tidak ada data rekap.</td></tr>';
+        return;
+      }
+
+      let total = 0;
+      donations.forEach((d, idx) => {
+        total += d.amount;
+        tbody.innerHTML += `
+          <tr>
+            <td class="p-2 border text-center">${idx + 1}</td>
+            <td class="p-2 border font-mono font-bold">${d.donationId}</td>
+            <td class="p-2 border">${d.date}</td>
+            <td class="p-2 border font-semibold">${d.name}</td>
+            <td class="p-2 border">${d.program}</td>
+            <td class="p-2 border font-bold text-right">${formatRupiah(d.amount)}</td>
+            <td class="p-2 border">${d.paymentMethod}</td>
+            <td class="p-2 border text-center">${d.status}</td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML += `
+        <tr class="bg-gray-100 font-bold">
+          <td colspan="5" class="p-2.5 border text-right">TOTAL TERKUMPUL:</td>
+          <td class="p-2.5 border text-right text-blue-900">${formatRupiah(total)}</td>
+          <td colspan="2" class="p-2.5 border"></td>
+        </tr>
+      `;
+    }
+
+    function exportDonationsToCSV() {
+      if (!globalAdminData || !globalAdminData.donations) return;
+      
+      const filterVal = document.getElementById('report-program-filter').value;
+      let dataToExport = globalAdminData.donations;
+      if (filterVal !== 'ALL') {
+        dataToExport = dataToExport.filter(d => d.program === filterVal);
+      }
+
+      let csvText = "ID Transaksi,Tanggal,Nama Donatur,No WA,Email,Program,Nominal,Metode,Status\n";
+
+      dataToExport.forEach(d => {
+        let row = `"${d.donationId}","${d.date}","${d.name}","'${d.phone}","${d.email}","${d.program}",${d.amount},"${d.paymentMethod}","${d.status}"`;
+        csvText += row + "\n";
+      });
+
+      const encodedUri = "data:text/csv;charset=utf-8,%EF%BB%BF" + encodeURIComponent(csvText);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `Laporan_Donasi_${filterVal.replace(/\s+/g, '_')}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function printReport() {
+      window.print();
+    }
+  </script>
+</body>
+</html>
