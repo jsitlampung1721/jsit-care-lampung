@@ -45,15 +45,14 @@
   <!-- ================= VIEW 1: BERANDA PUBLIK ================= -->
   <div id="view-public" class="flex-grow space-y-8 pb-12">
     
-    <!-- Hero Banner Slider otomatis -->
-    <section id="hero-header" class="relative bg-blue-950 text-white py-14 px-4 bg-cover bg-center transition-all duration-700 shadow-inner min-h-[220px] flex items-center justify-center cursor-pointer" onclick="clickHeroSlide()">
+    <!-- Hero Banner Slider Utama (Pendukung Hingga 3 Gambar Slider) -->
+    <section id="hero-header" class="relative bg-blue-950 text-white py-14 px-4 bg-cover bg-center transition-all duration-700 shadow-inner min-h-[220px] flex items-center justify-center">
       <div class="max-w-4xl mx-auto text-center space-y-3">
-        <span id="hero-badge" class="bg-blue-600 text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider inline-block">KitaBantu JSIT</span>
-        <h2 id="hero-title" class="text-2xl md:text-4xl font-extrabold tracking-tight hover:underline">KitaBantu Soskem JSIT Lampung</h2>
+        <span class="bg-blue-600 text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider inline-block">KitaBantu JSIT</span>
+        <h2 id="hero-title" class="text-2xl md:text-4xl font-extrabold tracking-tight">KitaBantu Soskem JSIT Lampung</h2>
         <p id="hero-subtext" class="text-gray-200 text-xs md:text-sm max-w-2xl mx-auto leading-relaxed">
           Wujud nyata kepedulian dan keprihatinan sosial bersama JSIT Lampung untuk keberlanjutan kebaikan sesama.
         </p>
-        <p class="text-[11px] text-amber-300 font-semibold pt-1">👉 Klik Banner Ini Untuk Donasi Program Utama Hari Ini</p>
       </div>
     </section>
 
@@ -88,7 +87,7 @@
     </main>
   </div>
 
-  <!-- ================= VIEW 2: HALAMAN LIST DONASI (PENGGANTI POPUP) ================= -->
+  <!-- ================= VIEW 2: HALAMAN LIST DONASI ================= -->
   <div id="view-list-donasi" class="flex-grow max-w-5xl mx-auto px-4 py-8 w-full hidden space-y-6">
     <div class="bg-white rounded-2xl p-6 md:p-8 border shadow-sm space-y-6">
       <div class="text-center space-y-1 border-b pb-6">
@@ -144,7 +143,7 @@
       </div>
     </div>
 
-    <!-- Tab Navigasi Admin (Restored Standalone Header Banner Tab) -->
+    <!-- Tab Navigasi Admin -->
     <div class="flex border-b border-gray-200 bg-white px-4 rounded-t-xl shadow-sm overflow-x-auto text-xs md:text-sm font-semibold">
       <button onclick="switchAdminTab('tab-overview')" id="nav-tab-overview" class="py-3 px-4 border-b-2 border-blue-600 text-blue-600 flex items-center gap-2">
         <span>📈</span> Ringkasan
@@ -252,10 +251,10 @@
       </div>
     </div>
 
-    <!-- TAB 3: BANNER HEADER WEB (Dikembalikan sebagai tab tersendiri) -->
+    <!-- TAB 3: BANNER HEADER WEB (Pengaturan Slider Maks 3 Gambar, Rekening & Penyaluran Dana) -->
     <div id="tab-header" class="bg-white p-6 rounded-2xl border shadow-sm space-y-5 hidden max-w-2xl">
       <h3 class="font-bold text-gray-800 text-sm border-b pb-3 flex items-center gap-2">
-        <span>🖼️</span> Pengaturan Banner Header Utama Web & Kontak Admin
+        <span>🖼️</span> Pengaturan Banner Slider Header, Penyaluran Dana & Rekening Payment
       </h3>
 
       <form id="form-header-settings" onsubmit="handleSaveHeaderSettings(event)" class="space-y-4">
@@ -269,12 +268,44 @@
           <textarea id="setting-hero-subtext" rows="2" required class="w-full p-2.5 border rounded-lg text-sm"></textarea>
         </div>
 
-        <div>
-          <label class="block text-xs font-bold text-gray-700 mb-1">Upload Gambar Header Baru</label>
-          <input type="file" id="setting-hero-file" accept="image/*" class="w-full text-xs p-1 border rounded-lg mb-1">
-          <input type="hidden" id="setting-hero-bg-url">
+        <!-- Slider Header (Upload Maksimal 3 Gambar) -->
+        <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100 space-y-3">
+          <h4 class="font-bold text-xs text-blue-900">Upload Gambar Hero Slider Banner (Maksimal 3 Gambar)</h4>
+          
+          <div>
+            <label class="block text-[11px] font-semibold text-gray-700 mb-1">Gambar Slider 1 (Utama)</label>
+            <input type="file" id="setting-hero-file1" accept="image/*" class="w-full text-xs p-1 border rounded-lg mb-1 bg-white">
+            <input type="hidden" id="setting-hero-bg-url1">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-semibold text-gray-700 mb-1">Gambar Slider 2 (Opsional)</label>
+            <input type="file" id="setting-hero-file2" accept="image/*" class="w-full text-xs p-1 border rounded-lg mb-1 bg-white">
+            <input type="hidden" id="setting-hero-bg-url2">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-semibold text-gray-700 mb-1">Gambar Slider 3 (Opsional)</label>
+            <input type="file" id="setting-hero-file3" accept="image/*" class="w-full text-xs p-1 border rounded-lg mb-1 bg-white">
+            <input type="hidden" id="setting-hero-bg-url3">
+          </div>
         </div>
 
+        <!-- Pengaturan Metode Pembayaran & Rekening Bank -->
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">Daftar Metode Pembayaran & Nomor Rekening (1 per baris)</label>
+          <textarea id="setting-payment-methods" rows="3" required placeholder="Transfer BCA - 1234567890 a.n JSIT Lampung&#10;Transfer Mandiri - 0987654321 a.n JSIT Lampung&#10;QRIS All Payment" class="w-full p-2.5 border rounded-lg text-xs font-mono"></textarea>
+          <p class="text-[10px] text-gray-400 mt-0.5">Tulis 1 pilihan per baris. Opsi ini akan tampil di form donasi publik.</p>
+        </div>
+
+        <!-- Pengaturan Total Dana Disalurkan Manual -->
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">Total Dana Disalurkan Manual (Rp)</label>
+          <input type="number" id="setting-disalurkan" min="0" required class="w-full p-2.5 border rounded-lg text-sm">
+          <p class="text-[10px] text-gray-400 mt-0.5">Sisa Dana Tersedia akan dihitung otomatis: Total Terkumpul - Total Disalurkan.</p>
+        </div>
+
+        <!-- Pengaturan Admin WA -->
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold text-gray-700 mb-1">Nama Admin WA Konfirmasi</label>
@@ -286,18 +317,13 @@
           </div>
         </div>
 
-        <div>
-          <label class="block text-xs font-bold text-gray-700 mb-1">Total Dana Disalurkan Manual (Rp)</label>
-          <input type="number" id="setting-disalurkan" min="0" class="w-full p-2.5 border rounded-lg text-sm">
-        </div>
-
-        <button type="submit" id="btn-save-header" class="bg-blue-900 hover:bg-blue-950 text-white font-bold px-4 py-2 rounded-lg text-xs transition">
-          Simpan Perubahan Header & Admin WA
+        <button type="submit" id="btn-save-header" class="bg-blue-900 hover:bg-blue-950 text-white font-bold px-4 py-2.5 rounded-lg text-xs transition w-full">
+          Simpan Semua Pengaturan Banner, Rekening & Penyaluran
         </button>
       </form>
     </div>
 
-    <!-- TAB 4: REKAP & LAPORAN (Dilengkapi Tombol Edit Status & Hapus) -->
+    <!-- TAB 4: REKAP & LAPORAN -->
     <div id="tab-reports" class="bg-white p-6 rounded-2xl border shadow-sm space-y-5 hidden">
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-4 gap-3">
         <div>
@@ -480,7 +506,7 @@
     </div>
   </div>
 
-  <!-- Toast Donasi (Warna Biru Senada Tema) -->
+  <!-- Toast Donasi (HANYA MUNCUL DI BERANDA) -->
   <div id="thankyou-toast" class="fixed bottom-5 left-5 z-50 max-w-xs bg-blue-900 text-white rounded-2xl shadow-2xl border border-blue-700 p-3.5 transform translate-y-32 opacity-0 transition-all duration-500 pointer-events-none flex items-center gap-3">
     <div class="p-2 bg-blue-800 text-amber-300 rounded-xl text-xl flex-shrink-0">💙</div>
     <div class="text-xs space-y-0.5">
@@ -516,8 +542,8 @@
     let toastTimer = null;
     let currentToastIndex = 0;
 
-    // State Slider Hero
-    let heroSlides = [];
+    // State Slider Hero (Maks 3 Gambar Utama Header)
+    let heroBgImages = [];
     let currentHeroIndex = 0;
     let heroTimer = null;
 
@@ -653,7 +679,7 @@
           }
           globalInitialData = res;
 
-          setupHeroSlider(res.settings, res.campaigns || []);
+          setupHeroHeader(res.settings);
           populateStatusProgramSelector(res.campaigns || []);
           renderCampaignGrid(res.campaigns || []);
           renderListDonasiPageTable(res.campaigns || []);
@@ -677,69 +703,46 @@
         });
     }
 
-    // ================= SLIDER HERO BANNER =================
-    function setupHeroSlider(settings, campaigns) {
-      heroSlides = [];
+    // ================= HERO BANNER SLIDER (UTAMA - MAKS 3 GAMBAR) =================
+    function setupHeroHeader(settings) {
+      if (!settings) return;
 
-      if (campaigns && campaigns.length > 0) {
-        campaigns.forEach(c => {
-          heroSlides.push({
-            title: c.headerText || c.title,
-            subtext: c.description || (settings ? settings.HeroSubtext : ''),
-            imageUrl: c.imageUrl,
-            campaignId: c.id,
-            badge: c.category || 'Program Utama'
-          });
-        });
-      } else if (settings) {
-        heroSlides.push({
-          title: settings.HeroTitle || 'KitaBantu Soskem JSIT Lampung',
-          subtext: settings.HeroSubtext || '',
-          imageUrl: settings.HeroBgImage || 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1200',
-          campaignId: null,
-          badge: 'KitaBantu JSIT'
-        });
+      const titleEl = document.getElementById('hero-title');
+      const subtextEl = document.getElementById('hero-subtext');
+
+      if (titleEl) titleEl.innerText = settings.HeroTitle || 'KitaBantu Soskem JSIT Lampung';
+      if (subtextEl) subtextEl.innerText = settings.HeroSubtext || '';
+
+      // Ambil hingga 3 gambar background hero
+      heroBgImages = [];
+      if (settings.HeroBgImage1) heroBgImages.push(settings.HeroBgImage1);
+      if (settings.HeroBgImage2) heroBgImages.push(settings.HeroBgImage2);
+      if (settings.HeroBgImage3) heroBgImages.push(settings.HeroBgImage3);
+
+      if (heroBgImages.length === 0) {
+        heroBgImages.push('https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1200');
       }
 
-      if (heroTimer) clearInterval(heroTimer);
       currentHeroIndex = 0;
-      updateHeroSlideDisplay();
+      updateHeroBg();
 
-      if (heroSlides.length > 1) {
+      if (heroTimer) clearInterval(heroTimer);
+      if (heroBgImages.length > 1) {
         heroTimer = setInterval(() => {
-          currentHeroIndex = (currentHeroIndex + 1) % heroSlides.length;
-          updateHeroSlideDisplay();
+          currentHeroIndex = (currentHeroIndex + 1) % heroBgImages.length;
+          updateHeroBg();
         }, 5000);
       }
     }
 
-    function updateHeroSlideDisplay() {
-      if (heroSlides.length === 0) return;
-      const slide = heroSlides[currentHeroIndex];
+    function updateHeroBg() {
       const headerEl = document.getElementById('hero-header');
-      const titleEl = document.getElementById('hero-title');
-      const subtextEl = document.getElementById('hero-subtext');
-      const badgeEl = document.getElementById('hero-badge');
-
-      if (headerEl && slide.imageUrl) {
-        headerEl.style.backgroundImage = `linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)), url('${slide.imageUrl}')`;
-      }
-      if (titleEl) titleEl.innerText = slide.title;
-      if (subtextEl) subtextEl.innerText = slide.subtext;
-      if (badgeEl) badgeEl.innerText = slide.badge;
-    }
-
-    function clickHeroSlide() {
-      if (heroSlides.length === 0) return;
-      const slide = heroSlides[currentHeroIndex];
-      if (slide && slide.campaignId) {
-        openCampaignDetailPage(slide.campaignId);
-      } else if (globalInitialData && globalInitialData.campaigns && globalInitialData.campaigns.length > 0) {
-        openCampaignDetailPage(globalInitialData.campaigns[0].id);
+      if (headerEl && heroBgImages[currentHeroIndex]) {
+        headerEl.style.backgroundImage = `linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)), url('${heroBgImages[currentHeroIndex]}')`;
       }
     }
 
-    // ================= HALAMAN DAFTAR PROGRAM DONASI (SESUAI GAMBAR) =================
+    // ================= HALAMAN DAFTAR PROGRAM DONASI =================
     function renderListDonasiPageTable(campaigns) {
       const tbody = document.getElementById('list-donasi-page-tbody');
       if (!tbody) return;
@@ -781,6 +784,7 @@
       });
     }
 
+    // ================= TOAST TERIMA KASIH (HANYA MUNCUL DI BERANDA) =================
     function startThankYouToastLoop(recentDonations) {
       if (!recentDonations || recentDonations.length === 0) return;
       if (toastTimer) clearInterval(toastTimer);
@@ -793,6 +797,12 @@
       if (!toast || !nameEl || !amountEl || !progEl) return;
 
       function triggerToast() {
+        // GUARD: Jangan tampilkan toast jika pengguna TIDAK di halaman beranda
+        const publicView = document.getElementById('view-public');
+        if (!publicView || publicView.classList.contains('hidden')) {
+          return;
+        }
+
         const item = recentDonations[currentToastIndex];
         if (!item) return;
 
@@ -841,8 +851,21 @@
           activeCampaignData = data;
           const c = data.campaign;
           const percent = c.target > 0 ? Math.min(Math.round((c.collected / c.target) * 100), 100) : 0;
+          
+          // Ambil total penyaluran dana dari settings
           const totalDisalurkan = (globalInitialData && globalInitialData.stats) ? globalInitialData.stats.totalDisalurkan : 0;
           const sisaDanaProgram = Math.max(0, c.collected - totalDisalurkan);
+
+          // Siapkan Opsi Metode Pembayaran Dinamis dari Settings Admin
+          let paymentOptionsHtml = '';
+          const rawMethods = (globalInitialData && globalInitialData.settings && globalInitialData.settings.PaymentMethods) 
+            ? globalInitialData.settings.PaymentMethods 
+            : "Transfer BCA - 1234567890 a.n JSIT Lampung\nTransfer Mandiri - 0987654321 a.n JSIT Lampung\nQRIS All Payment";
+          
+          const methodsArr = rawMethods.split('\n').map(m => m.trim()).filter(m => m !== '');
+          methodsArr.forEach(m => {
+            paymentOptionsHtml += `<option value="${m}">${m}</option>`;
+          });
 
           container.innerHTML = `
             <div class="relative">
@@ -859,7 +882,7 @@
                 <p class="text-xs text-gray-500 mt-1">${c.description}</p>
               </div>
 
-              <!-- Status Dana Kebajikan hanya muncul saat program diklik -->
+              <!-- Status Dana Kebajikan Program Ini -->
               <div class="bg-blue-50/50 rounded-2xl p-5 border border-blue-100 space-y-4 shadow-sm">
                 <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
                   <span>💰</span> Status Dana Kebajikan Program Ini
@@ -919,14 +942,15 @@
                       <input type="tel" name="phone" placeholder="0812345678" required class="w-full mt-1 p-2.5 border rounded-xl">
                     </div>
                   </div>
+
+                  <!-- Dropdown Metode Pembayaran Dinamis -->
                   <div>
-                    <label class="block font-semibold text-gray-700">Metode Pembayaran</label>
-                    <select name="paymentMethod" required class="w-full mt-1 p-2.5 border rounded-xl bg-white">
-                      <option value="Transfer BCA - 1234567890 a.n JSIT Lampung">Transfer BCA (1234567890)</option>
-                      <option value="Transfer Mandiri - 0987654321 a.n JSIT Lampung">Transfer Mandiri (0987654321)</option>
-                      <option value="QRIS Direct">QRIS All Payment</option>
+                    <label class="block font-semibold text-gray-700">Metode Pembayaran / Transfer Bank</label>
+                    <select name="paymentMethod" required class="w-full mt-1 p-2.5 border rounded-xl bg-white font-medium">
+                      ${paymentOptionsHtml}
                     </select>
                   </div>
+
                   <div class="flex items-center gap-2">
                     <input type="checkbox" name="isAnonymous" id="isAnon">
                     <label for="isAnon" class="text-gray-600">Sembunyikan nama donatur (Hamba Allah)</label>
@@ -1059,7 +1083,6 @@
 
     function setPresetAmount(val) { document.getElementById('input-donation-amount').value = val; }
 
-    // ================= DONASI & NOTIFIKASI WA =================
     function handlePublicDonationSubmit(e) {
       e.preventDefault();
       const btn = document.getElementById('btn-public-donation');
@@ -1234,7 +1257,10 @@
           if (data.settings) {
             document.getElementById('setting-hero-title').value = data.settings.HeroTitle || '';
             document.getElementById('setting-hero-subtext').value = data.settings.HeroSubtext || '';
-            document.getElementById('setting-hero-bg-url').value = data.settings.HeroBgImage || '';
+            document.getElementById('setting-hero-bg-url1').value = data.settings.HeroBgImage1 || '';
+            document.getElementById('setting-hero-bg-url2').value = data.settings.HeroBgImage2 || '';
+            document.getElementById('setting-hero-bg-url3').value = data.settings.HeroBgImage3 || '';
+            document.getElementById('setting-payment-methods').value = data.settings.PaymentMethods || '';
             document.getElementById('setting-admin-wa').value = data.settings.AdminWA || '';
             document.getElementById('setting-admin-name').value = data.settings.AdminWAName || '';
             document.getElementById('setting-disalurkan').value = data.settings.TotalDisalurkan || 0;
@@ -1441,65 +1467,64 @@
         });
     }
 
-    function handleSaveHeaderSettings(e) {
-      e.preventDefault();
-      const btn = document.getElementById('btn-save-header');
-      btn.disabled = true; btn.innerText = 'Menyimpan...';
-
-      const fileInput = document.getElementById('setting-hero-file');
-
-      if (fileInput.files.length > 0) {
+    // Process Upload Gambar Slider Header (Maksimal 3 File)
+    async function uploadHeroFileIfSelected(fileInputId, hiddenUrlId) {
+      const fileInput = document.getElementById(fileInputId);
+      if (fileInput && fileInput.files.length > 0) {
         const file = fileInput.files[0];
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          const fileData = { fileName: file.name, mimeType: file.type, data: evt.target.result };
-          callApi('uploadImageToDrive', { fileData: fileData })
-            .then(imgRes => {
-              if (imgRes.success) {
-                saveHeaderPayload(imgRes.url);
-              } else {
-                showCustomAlert('Gagal upload banner: ' + imgRes.message, false);
-                btn.disabled = false; btn.innerText = 'Simpan Perubahan Header & Admin WA';
-              }
-            })
-            .catch(err => {
-              showCustomAlert('Gagal upload banner: ' + err.message, false);
-              btn.disabled = false; btn.innerText = 'Simpan Perubahan Header & Admin WA';
-            });
-        };
-        reader.readAsDataURL(file);
-      } else {
-        saveHeaderPayload(document.getElementById('setting-hero-bg-url').value);
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = function(evt) {
+            const fileData = { fileName: file.name, mimeType: file.type, data: evt.target.result };
+            callApi('uploadImageToDrive', { fileData: fileData })
+              .then(imgRes => {
+                if (imgRes.success) resolve(imgRes.url);
+                else resolve(document.getElementById(hiddenUrlId).value);
+              })
+              .catch(() => resolve(document.getElementById(hiddenUrlId).value));
+          };
+          reader.readAsDataURL(file);
+        });
       }
+      return document.getElementById(hiddenUrlId).value;
     }
 
-    function saveHeaderPayload(bgUrl) {
-      const payload = {
-        heroTitle: document.getElementById('setting-hero-title').value,
-        heroSubtext: document.getElementById('setting-hero-subtext').value,
-        heroBgImage: bgUrl,
-        adminWA: document.getElementById('setting-admin-wa').value,
-        adminWAName: document.getElementById('setting-admin-name').value,
-        totalDisalurkan: document.getElementById('setting-disalurkan').value
-      };
+    async function handleSaveHeaderSettings(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-save-header');
+      btn.disabled = true; btn.innerText = 'Proses Menyimpan Gambar & Pengaturan...';
 
-      callApi('saveHeaderSettings', { data: payload, auth: verifiedAdminAuth })
-        .then(res => {
-          const btn = document.getElementById('btn-save-header');
-          btn.disabled = false; btn.innerText = 'Simpan Perubahan Header & Admin WA';
-          if (res.success) {
-            showCustomAlert(res.message);
-            loadAdminDashboardData();
-            loadPublicData();
-          } else {
-            showCustomAlert(res.message, false);
-          }
-        })
-        .catch(err => {
-          const btn = document.getElementById('btn-save-header');
-          btn.disabled = false; btn.innerText = 'Simpan Perubahan Header & Admin WA';
-          showCustomAlert('Gagal menyimpan header: ' + err.message, false);
-        });
+      try {
+        const url1 = await uploadHeroFileIfSelected('setting-hero-file1', 'setting-hero-bg-url1');
+        const url2 = await uploadHeroFileIfSelected('setting-hero-file2', 'setting-hero-bg-url2');
+        const url3 = await uploadHeroFileIfSelected('setting-hero-file3', 'setting-hero-bg-url3');
+
+        const payload = {
+          heroTitle: document.getElementById('setting-hero-title').value,
+          heroSubtext: document.getElementById('setting-hero-subtext').value,
+          heroBgImage1: url1,
+          heroBgImage2: url2,
+          heroBgImage3: url3,
+          paymentMethods: document.getElementById('setting-payment-methods').value,
+          adminWA: document.getElementById('setting-admin-wa').value,
+          adminWAName: document.getElementById('setting-admin-name').value,
+          totalDisalurkan: document.getElementById('setting-disalurkan').value
+        };
+
+        const res = await callApi('saveHeaderSettings', { data: payload, auth: verifiedAdminAuth });
+        btn.disabled = false; btn.innerText = 'Simpan Semua Pengaturan Banner, Rekening & Penyaluran';
+        
+        if (res.success) {
+          showCustomAlert(res.message);
+          loadAdminDashboardData();
+          loadPublicData();
+        } else {
+          showCustomAlert(res.message, false);
+        }
+      } catch (err) {
+        btn.disabled = false; btn.innerText = 'Simpan Semua Pengaturan Banner, Rekening & Penyaluran';
+        showCustomAlert('Gagal menyimpan pengaturan: ' + err.message, false);
+      }
     }
 
     // ================= LAPORAN, EXPORT & AKSI EDIT STATUS =================
