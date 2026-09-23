@@ -15,6 +15,29 @@
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans min-h-screen flex flex-col relative">
 
+  <!-- Top Bar Di Atas Header (Jam & Sosmed) -->
+  <div class="bg-blue-950 text-gray-300 text-[11px] py-1.5 px-4 border-b border-blue-800/60">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-1.5">
+      <div class="flex items-center gap-1.5 font-medium text-amber-300">
+        <span>🕒</span> <span id="top-bar-clock">Loading jam digital...</span>
+      </div>
+      <div class="flex items-center gap-3" id="top-bar-sosmed">
+        <a id="link-fb" href="#" target="_blank" title="Facebook" class="hover:text-white transition flex items-center gap-1">
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        </a>
+        <a id="link-ig" href="#" target="_blank" title="Instagram" class="hover:text-white transition flex items-center gap-1">
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        </a>
+        <a id="link-yt" href="#" target="_blank" title="YouTube" class="hover:text-white transition flex items-center gap-1">
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        </a>
+        <a id="link-tiktok" href="#" target="_blank" title="TikTok" class="hover:text-white transition flex items-center gap-1">
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.98-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.29-3.14 1.72-6.22 4.7-7.23 1.01-.35 2.09-.45 3.14-.38v4.02c-.52-.08-1.07-.04-1.57.11-.84.23-1.57.82-1.92 1.61-.41.87-.36 1.94.13 2.76.47.8 1.34 1.32 2.27 1.38 1.05.08 2.11-.32 2.78-1.13.51-.61.78-1.4.77-2.2.02-4.78 0-9.56.01-14.34z"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
   <!-- Header Navbar -->
   <header class="bg-blue-900 text-white shadow-md sticky top-0 z-40">
     <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
@@ -43,9 +66,9 @@
   </header>
 
   <!-- ================= VIEW 1: BERANDA PUBLIK ================= -->
-  <div id="view-public" class="flex-grow space-y-8 pb-12">
+  <div id="view-public" class="flex-grow space-y-6 pb-12">
     
-    <!-- Hero Banner Slider Utama (Pendukung Hingga 3 Gambar Slider) -->
+    <!-- Hero Banner Slider Utama -->
     <section id="hero-header" class="relative bg-blue-950 text-white py-14 px-4 bg-cover bg-center transition-all duration-700 shadow-inner min-h-[220px] flex items-center justify-center">
       <div class="max-w-4xl mx-auto text-center space-y-3">
         <span class="bg-blue-600 text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider inline-block">KitaBantu JSIT</span>
@@ -53,6 +76,19 @@
         <p id="hero-subtext" class="text-gray-200 text-xs md:text-sm max-w-2xl mx-auto leading-relaxed">
           Wujud nyata kepedulian dan keprihatinan sosial bersama JSIT Lampung untuk keberlanjutan kebaikan sesama.
         </p>
+      </div>
+    </section>
+
+    <!-- Quotes Kebajikan Otomatis Berubah Setiap Hari -->
+    <section class="max-w-5xl mx-auto px-4">
+      <div class="bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 text-white rounded-2xl p-4 md:p-5 shadow-sm border border-blue-700 flex items-center gap-3">
+        <div class="p-2.5 bg-white/10 rounded-xl text-2xl flex-shrink-0">✨</div>
+        <div class="space-y-0.5">
+          <p class="text-[10px] text-amber-300 font-bold uppercase tracking-wider">Inspirasi Kebajikan Hari Ini</p>
+          <p id="daily-quote-text" class="text-xs md:text-sm font-semibold italic text-blue-50 leading-snug">
+            "Harta tidak akan berkurang karena sedekah. Mari tebar kebaikan bersama JSIT Lampung."
+          </p>
+        </div>
       </div>
     </section>
 
@@ -154,6 +190,9 @@
       <button onclick="switchAdminTab('tab-header')" id="nav-tab-header" class="py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex items-center gap-2">
         <span>🖼️</span> Banner Header Web
       </button>
+      <button onclick="switchAdminTab('tab-admin-sosmed')" id="nav-tab-admin-sosmed" class="py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex items-center gap-2">
+        <span>⚙️</span> Admin & Sosmed
+      </button>
       <button onclick="switchAdminTab('tab-reports')" id="nav-tab-reports" class="py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex items-center gap-2">
         <span>📄</span> Rekap & Laporan
       </button>
@@ -220,8 +259,22 @@
       </div>
     </div>
 
-    <!-- TAB 2: KELOLA PROGRAM DONASI -->
-    <div id="tab-programs" class="bg-white p-5 rounded-2xl border shadow-sm space-y-4 hidden">
+    <!-- TAB 2: KELOLA PROGRAM DONASI & PENYALURAN DANA -->
+    <div id="tab-programs" class="bg-white p-5 rounded-2xl border shadow-sm space-y-6 hidden">
+      <!-- Form Input Dana Disalurkan Manual -->
+      <div class="bg-amber-50/50 p-4 rounded-xl border border-amber-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+        <div>
+          <h4 class="font-bold text-xs text-amber-900">Total Dana Disalurkan Kepada Penerima (Rp)</h4>
+          <p class="text-[11px] text-amber-700">Nominal ini digunakan untuk menghitung Sisa Dana Tersedia secara akurat.</p>
+        </div>
+        <div class="flex items-center gap-2 w-full md:w-auto">
+          <input type="number" id="setting-disalurkan" min="0" placeholder="0" class="p-2 border rounded-lg text-xs bg-white w-full md:w-44 font-bold text-gray-800">
+          <button onclick="handleSaveDisalurkanAmount()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-3 py-2 rounded-lg text-xs transition whitespace-nowrap">
+            Simpan Dana Disalurkan
+          </button>
+        </div>
+      </div>
+
       <div class="flex justify-between items-center border-b pb-3">
         <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
           <span>📋</span> Daftar & Status Program Donasi
@@ -251,10 +304,10 @@
       </div>
     </div>
 
-    <!-- TAB 3: BANNER HEADER WEB (Pengaturan Slider Maks 3 Gambar, Rekening & Penyaluran Dana) -->
+    <!-- TAB 3: BANNER HEADER WEB & METODE PEMBAYARAN -->
     <div id="tab-header" class="bg-white p-6 rounded-2xl border shadow-sm space-y-5 hidden max-w-2xl">
       <h3 class="font-bold text-gray-800 text-sm border-b pb-3 flex items-center gap-2">
-        <span>🖼️</span> Pengaturan Banner Slider Header, Penyaluran Dana & Rekening Payment
+        <span>🖼️</span> Pengaturan Banner Header Utama & Rekening Pembayaran
       </h3>
 
       <form id="form-header-settings" onsubmit="handleSaveHeaderSettings(event)" class="space-y-4">
@@ -295,35 +348,66 @@
         <div>
           <label class="block text-xs font-bold text-gray-700 mb-1">Daftar Metode Pembayaran & Nomor Rekening (1 per baris)</label>
           <textarea id="setting-payment-methods" rows="3" required placeholder="Transfer BCA - 1234567890 a.n JSIT Lampung&#10;Transfer Mandiri - 0987654321 a.n JSIT Lampung&#10;QRIS All Payment" class="w-full p-2.5 border rounded-lg text-xs font-mono"></textarea>
-          <p class="text-[10px] text-gray-400 mt-0.5">Tulis 1 pilihan per baris. Opsi ini akan tampil di form donasi publik.</p>
-        </div>
-
-        <!-- Pengaturan Total Dana Disalurkan Manual -->
-        <div>
-          <label class="block text-xs font-bold text-gray-700 mb-1">Total Dana Disalurkan Manual (Rp)</label>
-          <input type="number" id="setting-disalurkan" min="0" required class="w-full p-2.5 border rounded-lg text-sm">
-          <p class="text-[10px] text-gray-400 mt-0.5">Sisa Dana Tersedia akan dihitung otomatis: Total Terkumpul - Total Disalurkan.</p>
-        </div>
-
-        <!-- Pengaturan Admin WA -->
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-bold text-gray-700 mb-1">Nama Admin WA Konfirmasi</label>
-            <input type="text" id="setting-admin-name" placeholder="Admin Soskem JSIT" class="w-full p-2.5 border rounded-lg text-sm">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-gray-700 mb-1">No. WA Admin (contoh: 628123456789)</label>
-            <input type="text" id="setting-admin-wa" placeholder="628123456789" class="w-full p-2.5 border rounded-lg text-sm">
-          </div>
+          <p class="text-[10px] text-gray-400 mt-0.5">Sistem akan otomatis mendeteksi nomor rekening untuk tombol salin.</p>
         </div>
 
         <button type="submit" id="btn-save-header" class="bg-blue-900 hover:bg-blue-950 text-white font-bold px-4 py-2.5 rounded-lg text-xs transition w-full">
-          Simpan Semua Pengaturan Banner, Rekening & Penyaluran
+          Simpan Banner Header & Metode Pembayaran
         </button>
       </form>
     </div>
 
-    <!-- TAB 4: REKAP & LAPORAN -->
+    <!-- TAB 4: ADMIN & SOSMED (DIPISAH SESUAI PERMINTAAN) -->
+    <div id="tab-admin-sosmed" class="bg-white p-6 rounded-2xl border shadow-sm space-y-5 hidden max-w-2xl">
+      <h3 class="font-bold text-gray-800 text-sm border-b pb-3 flex items-center gap-2">
+        <span>⚙️</span> Pengaturan Kontak Admin & Link Sosial Media
+      </h3>
+
+      <form id="form-admin-sosmed" onsubmit="handleSaveAdminSosmedSettings(event)" class="space-y-4">
+        <!-- Pengaturan Admin WA -->
+        <div class="grid grid-cols-2 gap-3 bg-gray-50 p-3 rounded-xl border">
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Nama Admin WA Konfirmasi</label>
+            <input type="text" id="setting-admin-name" required placeholder="Admin Soskem JSIT" class="w-full p-2.5 border rounded-lg text-sm bg-white">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">No. WA Admin (contoh: 628123456789)</label>
+            <input type="text" id="setting-admin-wa" required placeholder="628123456789" class="w-full p-2.5 border rounded-lg text-sm bg-white">
+          </div>
+        </div>
+
+        <!-- Pengaturan Link Sosmed Header -->
+        <div class="space-y-3">
+          <h4 class="font-bold text-xs text-gray-800">Link Sosial Media Header Web:</h4>
+          
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Link Facebook</label>
+            <input type="url" id="setting-link-fb" placeholder="https://facebook.com/namapage" class="w-full p-2.5 border rounded-lg text-xs">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Link Instagram</label>
+            <input type="url" id="setting-link-ig" placeholder="https://instagram.com/username" class="w-full p-2.5 border rounded-lg text-xs">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Link YouTube</label>
+            <input type="url" id="setting-link-yt" placeholder="https://youtube.com/@channel" class="w-full p-2.5 border rounded-lg text-xs">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Link TikTok</label>
+            <input type="url" id="setting-link-tiktok" placeholder="https://tiktok.com/@username" class="w-full p-2.5 border rounded-lg text-xs">
+          </div>
+        </div>
+
+        <button type="submit" id="btn-save-admin-sosmed" class="bg-blue-900 hover:bg-blue-950 text-white font-bold px-4 py-2.5 rounded-lg text-xs transition w-full">
+          Simpan Kontak Admin & Sosial Media
+        </button>
+      </form>
+    </div>
+
+    <!-- TAB 5: REKAP & LAPORAN -->
     <div id="tab-reports" class="bg-white p-6 rounded-2xl border shadow-sm space-y-5 hidden">
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-4 gap-3">
         <div>
@@ -380,6 +464,26 @@
   <footer class="bg-gray-900 text-gray-400 py-6 text-center text-xs mt-auto">
     <p>© 2026 KitaBantu Soskem JSIT Lampung. All rights reserved.</p>
   </footer>
+
+  <!-- Floating WhatsApp Widget Pojok Kanan Bawah -->
+  <div class="fixed bottom-5 right-5 z-40 flex flex-col items-end gap-2">
+    <div id="wa-popup-card" class="bg-white p-3.5 rounded-2xl shadow-2xl border border-emerald-200 hidden max-w-xs text-xs space-y-2">
+      <div class="flex justify-between items-center border-b pb-1">
+        <p class="font-bold text-gray-800 flex items-center gap-1"><span>💬</span> Chat Admin WhatsApp</p>
+        <button onclick="toggleWaWidget()" class="text-gray-400 hover:text-gray-600 font-bold">&times;</button>
+      </div>
+      <p id="wa-widget-admin-name" class="text-emerald-700 font-extrabold">Admin Soskem JSIT</p>
+      <a id="wa-widget-link" href="#" target="_blank" class="block w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-3 rounded-xl text-center text-xs transition shadow-md">
+        Buka WhatsApp Sekarang
+      </a>
+    </div>
+
+    <button onclick="toggleWaWidget()" title="Hubungi Admin WA" class="bg-emerald-500 hover:bg-emerald-600 text-white p-3.5 rounded-full shadow-2xl transition transform hover:scale-105 flex items-center justify-center">
+      <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24">
+        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/>
+      </svg>
+    </button>
+  </div>
 
   <!-- ================= MODAL DIALOGS ================= -->
 
@@ -542,14 +646,53 @@
     let toastTimer = null;
     let currentToastIndex = 0;
 
-    // State Slider Hero (Maks 3 Gambar Utama Header)
     let heroBgImages = [];
     let currentHeroIndex = 0;
     let heroTimer = null;
 
+    // Quotes Kebajikan Otomatis
+    const donationQuotes = [
+      "\"Harta tidak akan berkurang karena sedekah. Mari tebar kebaikan bersama JSIT Lampung hari ini.\"",
+      "\"Sedekah itu memadamkan dosa sebagaimana air memadamkan api.\"",
+      "\"Tangan di atas lebih baik daripada tangan di bawah. Bantuan Anda sangat berarti bagi saudara kita.\"",
+      "\"Senyummu di hadapan saudaramu adalah sedekah, dan bantuanmu adalah keberkahan hidup.\"",
+      "\"Sebaik-baik manusia adalah yang paling bermanfaat bagi orang lain.\"",
+      "\"Bantu saudaramu yang membutuhkan, niscaya Allah akan membantumu di saat kesusahan.\"",
+      "\"Sedikit dari kita, sangat berarti besar bagi keberlanjutan mereka yang membutuhkan.\"",
+      "\"Berbagilah dengan ikhlas, karena senyum kebahagiaan mereka adalah keberkahan kita bersama.\""
+    ];
+
     window.onload = function() {
+      updateLiveClock();
+      setInterval(updateLiveClock, 1000);
+      setDailyQuote();
       loadPublicData();
     };
+
+    function updateLiveClock() {
+      const now = new Date();
+      const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      
+      const dayName = days[now.getDay()];
+      const date = now.getDate();
+      const monthName = months[now.getMonth()];
+      const year = now.getFullYear();
+      const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+      const clockEl = document.getElementById('top-bar-clock');
+      if (clockEl) {
+        clockEl.innerText = `${dayName}, ${date} ${monthName} ${year} | ${timeStr} WIB`;
+      }
+    }
+
+    function setDailyQuote() {
+      const today = new Date();
+      const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+      const index = dayOfYear % donationQuotes.length;
+      const el = document.getElementById('daily-quote-text');
+      if (el) el.innerText = donationQuotes[index];
+    }
 
     async function callApi(action, payload = {}) {
       if (!SCRIPT_URL || SCRIPT_URL.includes("PASTE_URL_WEB_APP")) {
@@ -617,6 +760,20 @@
       }, 3500);
     }
 
+    function copyTextToClipboard(text) {
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(() => {
+        showCustomAlert(`Nomor rekening / teks berhasil disalin: ${text}`);
+      }).catch(err => {
+        showCustomAlert('Gagal menyalin teks.', false);
+      });
+    }
+
+    function toggleWaWidget() {
+      const card = document.getElementById('wa-popup-card');
+      if (card) card.classList.toggle('hidden');
+    }
+
     function openModal(modalId) {
       const el = document.getElementById(modalId);
       if (el) el.classList.remove('hidden');
@@ -680,6 +837,8 @@
           globalInitialData = res;
 
           setupHeroHeader(res.settings);
+          updateTopBarSosmed(res.settings);
+          updateWaWidget(res.settings);
           populateStatusProgramSelector(res.campaigns || []);
           renderCampaignGrid(res.campaigns || []);
           renderListDonasiPageTable(res.campaigns || []);
@@ -703,7 +862,24 @@
         });
     }
 
-    // ================= HERO BANNER SLIDER (UTAMA - MAKS 3 GAMBAR) =================
+    function updateTopBarSosmed(settings) {
+      if (!settings) return;
+      document.getElementById('link-fb').href = settings.LinkFB || '#';
+      document.getElementById('link-ig').href = settings.LinkIG || '#';
+      document.getElementById('link-yt').href = settings.LinkYT || '#';
+      document.getElementById('link-tiktok').href = settings.LinkTikTok || '#';
+    }
+
+    function updateWaWidget(settings) {
+      if (!settings) return;
+      const waName = settings.AdminWAName || 'Admin Soskem JSIT';
+      const waNumber = settings.AdminWA || '628123456789';
+      
+      document.getElementById('wa-widget-admin-name').innerText = waName;
+      document.getElementById('wa-widget-link').href = `https://wa.me/${waNumber}?text=${encodeURIComponent('Halo ' + waName + ', saya ingin bertanya mengenai program donasi KitaBantu.')}`;
+    }
+
+    // ================= HERO BANNER SLIDER (MAKS 3 GAMBAR) =================
     function setupHeroHeader(settings) {
       if (!settings) return;
 
@@ -713,7 +889,6 @@
       if (titleEl) titleEl.innerText = settings.HeroTitle || 'KitaBantu Soskem JSIT Lampung';
       if (subtextEl) subtextEl.innerText = settings.HeroSubtext || '';
 
-      // Ambil hingga 3 gambar background hero
       heroBgImages = [];
       if (settings.HeroBgImage1) heroBgImages.push(settings.HeroBgImage1);
       if (settings.HeroBgImage2) heroBgImages.push(settings.HeroBgImage2);
@@ -797,7 +972,6 @@
       if (!toast || !nameEl || !amountEl || !progEl) return;
 
       function triggerToast() {
-        // GUARD: Jangan tampilkan toast jika pengguna TIDAK di halaman beranda
         const publicView = document.getElementById('view-public');
         if (!publicView || publicView.classList.contains('hidden')) {
           return;
@@ -852,19 +1026,35 @@
           const c = data.campaign;
           const percent = c.target > 0 ? Math.min(Math.round((c.collected / c.target) * 100), 100) : 0;
           
-          // Ambil total penyaluran dana dari settings
           const totalDisalurkan = (globalInitialData && globalInitialData.stats) ? globalInitialData.stats.totalDisalurkan : 0;
           const sisaDanaProgram = Math.max(0, c.collected - totalDisalurkan);
 
-          // Siapkan Opsi Metode Pembayaran Dinamis dari Settings Admin
+          // Render Opsi Pembayaran + Tombol Salin/Copy Icon
           let paymentOptionsHtml = '';
+          let paymentListDisplayHtml = '';
           const rawMethods = (globalInitialData && globalInitialData.settings && globalInitialData.settings.PaymentMethods) 
             ? globalInitialData.settings.PaymentMethods 
             : "Transfer BCA - 1234567890 a.n JSIT Lampung\nTransfer Mandiri - 0987654321 a.n JSIT Lampung\nQRIS All Payment";
           
           const methodsArr = rawMethods.split('\n').map(m => m.trim()).filter(m => m !== '');
+          
           methodsArr.forEach(m => {
             paymentOptionsHtml += `<option value="${m}">${m}</option>`;
+
+            // Deteksi Nomor Rekening untuk tombol Copy
+            const matchNum = m.match(/\d{8,20}/);
+            const numOnly = matchNum ? matchNum[0] : '';
+
+            paymentListDisplayHtml += `
+              <div class="flex items-center justify-between bg-white p-2.5 rounded-xl border border-blue-100">
+                <span class="font-semibold text-gray-800">${m}</span>
+                ${numOnly ? `
+                  <button type="button" onclick="copyTextToClipboard('${numOnly}')" title="Salin Nomor Rekening" class="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-900 rounded-lg transition border border-blue-200">
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                  </button>
+                ` : ''}
+              </div>
+            `;
           });
 
           container.innerHTML = `
@@ -913,6 +1103,14 @@
                 </div>
               </div>
 
+              <!-- Daftar Rekening dengan Icon Copy -->
+              <div class="bg-blue-50/30 p-4 rounded-2xl border border-blue-100 space-y-2 text-xs">
+                <p class="font-bold text-gray-800">Daftar Rekening Pembayaran Resmi (Klik Icon Salin):</p>
+                <div class="space-y-2">
+                  ${paymentListDisplayHtml}
+                </div>
+              </div>
+
               <div class="bg-white p-6 rounded-2xl border space-y-4 shadow-sm">
                 <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2 border-b pb-2">
                   <span>💳</span> Form Donasi Transfer
@@ -943,9 +1141,8 @@
                     </div>
                   </div>
 
-                  <!-- Dropdown Metode Pembayaran Dinamis -->
                   <div>
-                    <label class="block font-semibold text-gray-700">Metode Pembayaran / Transfer Bank</label>
+                    <label class="block font-semibold text-gray-700">Pilih Rekening Pembayaran</label>
                     <select name="paymentMethod" required class="w-full mt-1 p-2.5 border rounded-xl bg-white font-medium">
                       ${paymentOptionsHtml}
                     </select>
@@ -1233,7 +1430,7 @@
     }
 
     function switchAdminTab(tabId) {
-      const tabs = ['tab-overview', 'tab-programs', 'tab-header', 'tab-reports'];
+      const tabs = ['tab-overview', 'tab-programs', 'tab-header', 'tab-admin-sosmed', 'tab-reports'];
       tabs.forEach(t => {
         document.getElementById(t).classList.add('hidden');
         document.getElementById('nav-' + t).className = "py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex items-center gap-2";
@@ -1264,6 +1461,10 @@
             document.getElementById('setting-admin-wa').value = data.settings.AdminWA || '';
             document.getElementById('setting-admin-name').value = data.settings.AdminWAName || '';
             document.getElementById('setting-disalurkan').value = data.settings.TotalDisalurkan || 0;
+            document.getElementById('setting-link-fb').value = data.settings.LinkFB || '';
+            document.getElementById('setting-link-ig').value = data.settings.LinkIG || '';
+            document.getElementById('setting-link-yt').value = data.settings.LinkYT || '';
+            document.getElementById('setting-link-tiktok').value = data.settings.LinkTikTok || '';
           }
 
           renderAdminRecentDonations(data.donations);
@@ -1339,6 +1540,23 @@
           </tr>
         `;
       });
+    }
+
+    function handleSaveDisalurkanAmount() {
+      const val = document.getElementById('setting-disalurkan').value;
+      callApi('saveDisalurkanAmount', { amount: val, auth: verifiedAdminAuth })
+        .then(res => {
+          if (res.success) {
+            showCustomAlert(res.message);
+            loadAdminDashboardData();
+            loadPublicData();
+          } else {
+            showCustomAlert(res.message, false);
+          }
+        })
+        .catch(err => {
+          showCustomAlert('Gagal menyimpan penyaluran dana: ' + err.message, false);
+        });
     }
 
     function toggleProgramStatus(progId) {
@@ -1467,7 +1685,6 @@
         });
     }
 
-    // Process Upload Gambar Slider Header (Maksimal 3 File)
     async function uploadHeroFileIfSelected(fileInputId, hiddenUrlId) {
       const fileInput = document.getElementById(fileInputId);
       if (fileInput && fileInput.files.length > 0) {
@@ -1492,7 +1709,7 @@
     async function handleSaveHeaderSettings(e) {
       e.preventDefault();
       const btn = document.getElementById('btn-save-header');
-      btn.disabled = true; btn.innerText = 'Proses Menyimpan Gambar & Pengaturan...';
+      btn.disabled = true; btn.innerText = 'Proses Menyimpan Gambar Banner...';
 
       try {
         const url1 = await uploadHeroFileIfSelected('setting-hero-file1', 'setting-hero-bg-url1');
@@ -1505,14 +1722,11 @@
           heroBgImage1: url1,
           heroBgImage2: url2,
           heroBgImage3: url3,
-          paymentMethods: document.getElementById('setting-payment-methods').value,
-          adminWA: document.getElementById('setting-admin-wa').value,
-          adminWAName: document.getElementById('setting-admin-name').value,
-          totalDisalurkan: document.getElementById('setting-disalurkan').value
+          paymentMethods: document.getElementById('setting-payment-methods').value
         };
 
         const res = await callApi('saveHeaderSettings', { data: payload, auth: verifiedAdminAuth });
-        btn.disabled = false; btn.innerText = 'Simpan Semua Pengaturan Banner, Rekening & Penyaluran';
+        btn.disabled = false; btn.innerText = 'Simpan Banner Header & Metode Pembayaran';
         
         if (res.success) {
           showCustomAlert(res.message);
@@ -1522,9 +1736,40 @@
           showCustomAlert(res.message, false);
         }
       } catch (err) {
-        btn.disabled = false; btn.innerText = 'Simpan Semua Pengaturan Banner, Rekening & Penyaluran';
+        btn.disabled = false; btn.innerText = 'Simpan Banner Header & Metode Pembayaran';
         showCustomAlert('Gagal menyimpan pengaturan: ' + err.message, false);
       }
+    }
+
+    function handleSaveAdminSosmedSettings(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-save-admin-sosmed');
+      btn.disabled = true; btn.innerText = 'Menyimpan Kontak & Sosmed...';
+
+      const payload = {
+        adminWA: document.getElementById('setting-admin-wa').value,
+        adminWAName: document.getElementById('setting-admin-name').value,
+        linkFB: document.getElementById('setting-link-fb').value,
+        linkIG: document.getElementById('setting-link-ig').value,
+        linkYT: document.getElementById('setting-link-yt').value,
+        linkTikTok: document.getElementById('setting-link-tiktok').value
+      };
+
+      callApi('saveAdminSosmedSettings', { data: payload, auth: verifiedAdminAuth })
+        .then(res => {
+          btn.disabled = false; btn.innerText = 'Simpan Kontak Admin & Sosial Media';
+          if (res.success) {
+            showCustomAlert(res.message);
+            loadAdminDashboardData();
+            loadPublicData();
+          } else {
+            showCustomAlert(res.message, false);
+          }
+        })
+        .catch(err => {
+          btn.disabled = false; btn.innerText = 'Simpan Kontak Admin & Sosial Media';
+          showCustomAlert('Gagal menyimpan sosmed: ' + err.message, false);
+        });
     }
 
     // ================= LAPORAN, EXPORT & AKSI EDIT STATUS =================
