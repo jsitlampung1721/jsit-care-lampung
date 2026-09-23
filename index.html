@@ -58,8 +58,8 @@
           <span>📋</span> <span class="hidden md:inline">List Donasi</span>
         </button>
         
-        <button onclick="handleAdminNavClick()" id="btn-nav-admin" title="Login Admin" class="bg-amber-500 hover:bg-amber-600 text-white p-2 md:px-3 md:py-2 rounded-lg font-semibold text-xs md:text-sm transition flex items-center justify-center gap-1">
-          <span>🔐</span> <span class="hidden lg:inline">Login</span>
+        <button onclick="handleAdminNavClick()" id="btn-nav-admin" title="Login Pengguna" class="bg-amber-500 hover:bg-amber-600 text-white p-2 md:px-3 md:py-2 rounded-lg font-semibold text-xs md:text-sm transition flex items-center justify-center gap-1">
+          <span>🔐</span> <span id="lbl-nav-login" class="hidden lg:inline">Masuk</span>
         </button>
       </div>
     </div>
@@ -137,6 +137,7 @@
             <tr class="bg-gray-50 border-b text-gray-500 font-bold uppercase text-[11px]">
               <th class="p-3 text-center w-12">NO</th>
               <th class="p-3">PROGRAM DONASI</th>
+              <th class="p-3">UNIT SEKOLAH</th>
               <th class="p-3">TARGET</th>
               <th class="p-3">TERKUMPUL</th>
               <th class="p-3 w-36">PROGRESS</th>
@@ -144,7 +145,7 @@
             </tr>
           </thead>
           <tbody id="list-donasi-page-tbody" class="divide-y text-gray-700">
-            <tr><td colspan="6" class="p-6 text-center text-gray-400">Memuat data program...</td></tr>
+            <tr><td colspan="7" class="p-6 text-center text-gray-400">Memuat data program...</td></tr>
           </tbody>
         </table>
       </div>
@@ -160,26 +161,26 @@
     <div id="campaign-detail-content" class="bg-white rounded-2xl shadow-sm border overflow-hidden"></div>
   </div>
 
-  <!-- ================= VIEW 4: ADMIN DASHBOARD PANEL ================= -->
+  <!-- ================= VIEW 4: MULTI-USER DASHBOARD PANEL ================= -->
   <div id="view-admin" class="flex-grow max-w-6xl mx-auto px-4 py-6 w-full space-y-6 hidden">
     <div class="bg-white p-5 rounded-2xl shadow-sm border flex flex-col md:flex-row justify-between md:items-center gap-4">
       <div>
         <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-          <span>📊</span> Dashboard Admin KitaBantu
+          <span>📊</span> Dashboard Portal <span id="admin-user-role-badge" class="bg-blue-100 text-blue-900 text-xs px-2.5 py-1 rounded-full font-extrabold uppercase">Role</span>
         </h2>
-        <p class="text-xs text-gray-500">Kelola program donasi, status transaksi, dan laporan.</p>
+        <p class="text-xs text-gray-500 mt-1">Selamat datang, <b id="admin-user-fullname" class="text-gray-800">User</b> (<span id="admin-user-sekolah">SIT</span>)</p>
       </div>
       <div class="flex items-center gap-2">
         <button onclick="openCreateProgramModal()" class="bg-blue-900 hover:bg-blue-950 text-white font-semibold text-xs px-4 py-2 rounded-lg transition flex items-center gap-1.5">
           <span>+</span> Tambah Program Baru
         </button>
         <button onclick="logoutAdmin()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold text-xs px-3 py-2 rounded-lg transition border border-rose-200">
-          Keluar Admin
+          Keluar
         </button>
       </div>
     </div>
 
-    <!-- Tab Navigasi Admin -->
+    <!-- Tab Navigasi Admin Multi-Role -->
     <div class="flex border-b border-gray-200 bg-white px-4 rounded-t-xl shadow-sm overflow-x-auto text-xs md:text-sm font-semibold">
       <button onclick="switchAdminTab('tab-overview')" id="nav-tab-overview" class="py-3 px-4 border-b-2 border-blue-600 text-blue-600 flex items-center gap-2">
         <span>📈</span> Ringkasan
@@ -187,14 +188,19 @@
       <button onclick="switchAdminTab('tab-programs')" id="nav-tab-programs" class="py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex items-center gap-2">
         <span>📋</span> Kelola Program Donasi
       </button>
-      <button onclick="switchAdminTab('tab-header')" id="nav-tab-header" class="py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex items-center gap-2">
-        <span>🖼️</span> Banner Header Web
-      </button>
-      <button onclick="switchAdminTab('tab-admin-sosmed')" id="nav-tab-admin-sosmed" class="py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex items-center gap-2">
-        <span>⚙️</span> Admin & Sosmed
-      </button>
       <button onclick="switchAdminTab('tab-reports')" id="nav-tab-reports" class="py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex items-center gap-2">
         <span>📄</span> Rekap & Laporan
+      </button>
+
+      <!-- Khusus Superadmin & Admin Pusat -->
+      <button onclick="switchAdminTab('tab-header')" id="nav-tab-header" class="py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 items-center gap-2 role-restricted-super">
+        <span>🖼️</span> Banner Header Web
+      </button>
+      <button onclick="switchAdminTab('tab-admin-sosmed')" id="nav-tab-admin-sosmed" class="py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 items-center gap-2 role-restricted-super">
+        <span>⚙️</span> Kontak & Sosmed
+      </button>
+      <button onclick="switchAdminTab('tab-users-mgmt')" id="nav-tab-users-mgmt" class="py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 items-center gap-2 role-restricted-super">
+        <span>👥</span> Kelola Pengguna
       </button>
     </div>
 
@@ -220,7 +226,7 @@
         <div class="bg-white p-5 rounded-2xl border shadow-sm flex items-center gap-4">
           <div class="p-3 bg-purple-100 text-purple-700 rounded-xl text-2xl">📋</div>
           <div>
-            <p class="text-xs text-gray-500 font-medium">Program Donasi</p>
+            <p class="text-xs text-gray-500 font-medium">Program Donasi Aktif</p>
             <h3 id="admin-card-program" class="text-lg font-bold text-gray-800">0</h3>
           </div>
         </div>
@@ -276,11 +282,11 @@
             <tr>
               <th class="p-3">Cover</th>
               <th class="p-3">Judul Program</th>
-              <th class="p-3">Kategori</th>
+              <th class="p-3">Sekolah/Pengaju</th>
               <th class="p-3">Target</th>
               <th class="p-3">Terkumpul</th>
               <th class="p-3">Disalurkan</th>
-              <th class="p-3 text-center">Status / Aktifkan</th>
+              <th class="p-3 text-center">Status</th>
               <th class="p-3 text-center">Aksi</th>
             </tr>
           </thead>
@@ -291,7 +297,7 @@
       </div>
     </div>
 
-    <!-- TAB 3: BANNER HEADER WEB & METODE PEMBAYARAN -->
+    <!-- TAB 3: BANNER HEADER WEB -->
     <div id="tab-header" class="bg-white p-6 rounded-2xl border shadow-sm space-y-5 hidden max-w-2xl">
       <h3 class="font-bold text-gray-800 text-sm border-b pb-3 flex items-center gap-2">
         <span>🖼️</span> Pengaturan Banner Header Utama & Rekening Pembayaran
@@ -308,7 +314,6 @@
           <textarea id="setting-hero-subtext" rows="2" required class="w-full p-2.5 border rounded-lg text-sm"></textarea>
         </div>
 
-        <!-- Slider Header (Upload Maksimal 3 Gambar) -->
         <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100 space-y-3">
           <h4 class="font-bold text-xs text-blue-900">Upload Gambar Hero Slider Banner (Maksimal 3 Gambar)</h4>
           
@@ -331,7 +336,6 @@
           </div>
         </div>
 
-        <!-- Pengaturan Metode Pembayaran & Rekening Bank -->
         <div>
           <label class="block text-xs font-bold text-gray-700 mb-1">Daftar Metode Pembayaran & Nomor Rekening (1 per baris)</label>
           <textarea id="setting-payment-methods" rows="3" required placeholder="Transfer BCA - 1234567890 a.n JSIT Lampung&#10;Transfer Mandiri - 0987654321 a.n JSIT Lampung&#10;QRIS All Payment" class="w-full p-2.5 border rounded-lg text-xs font-mono"></textarea>
@@ -392,7 +396,40 @@
       </form>
     </div>
 
-    <!-- TAB 5: REKAP & LAPORAN -->
+    <!-- TAB 5: KELOLA MULTI-USER (KHUSUS SUPERADMIN) -->
+    <div id="tab-users-mgmt" class="bg-white p-6 rounded-2xl border shadow-sm space-y-5 hidden">
+      <div class="flex justify-between items-center border-b pb-3">
+        <div>
+          <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
+            <span>👥</span> Manajemen Akun Pengguna (Multi-User)
+          </h3>
+          <p class="text-xs text-gray-500">Buat akun untuk pengurus cabang / unit sekolah SIT di Lampung.</p>
+        </div>
+        <button onclick="openAddUserModal()" class="bg-blue-900 hover:bg-blue-950 text-white font-semibold text-xs px-3 py-1.5 rounded-lg transition">
+          + Tambah Akun Baru
+        </button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-gray-600 border-collapse">
+          <thead>
+            <tr class="bg-gray-50 uppercase text-[10px] text-gray-500 border-b">
+              <th class="p-3">Username</th>
+              <th class="p-3">Nama Lengkap</th>
+              <th class="p-3">Role / Peran</th>
+              <th class="p-3">Unit Sekolah SIT</th>
+              <th class="p-3 text-center">Status</th>
+              <th class="p-3 text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="admin-table-users" class="divide-y">
+            <tr><td colspan="6" class="p-4 text-center text-gray-400">Memuat pengguna...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 6: REKAP & LAPORAN -->
     <div id="tab-reports" class="bg-white p-6 rounded-2xl border shadow-sm space-y-5 hidden">
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-4 gap-3">
         <div>
@@ -472,14 +509,14 @@
 
   <!-- ================= MODAL DIALOGS ================= -->
 
-  <!-- Modal Admin Auth -->
+  <!-- Modal User Auth Login Multi-User -->
   <div id="modal-admin-auth" class="fixed inset-0 bg-black/60 flex items-center justify-center p-3 z-50 hidden">
     <div class="bg-white rounded-2xl max-w-sm w-full p-6 relative shadow-2xl space-y-4">
       <button onclick="closeModal('modal-admin-auth')" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 font-bold">&times;</button>
       <div class="text-center">
         <span class="text-3xl">🔐</span>
-        <h3 class="text-lg font-bold text-gray-800 mt-2">Masuk Panel Admin</h3>
-        <p class="text-xs text-gray-500 mt-1">Gunakan kredensial admin resmi Anda</p>
+        <h3 class="text-lg font-bold text-gray-800 mt-2">Masuk Akun Pengguna</h3>
+        <p class="text-xs text-gray-500 mt-1">Superadmin, Admin, atau Akun Sekolah SIT</p>
       </div>
       <div class="space-y-3">
         <div>
@@ -491,9 +528,54 @@
           <input type="password" id="admin-pass-input" placeholder="Masukkan Password" class="w-full p-2.5 border rounded-lg text-sm">
         </div>
       </div>
-      <button onclick="authenticateAdmin()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 rounded-lg text-sm transition">
+      <button onclick="authenticateUser()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 rounded-lg text-sm transition">
         Verifikasi & Masuk
       </button>
+    </div>
+  </div>
+
+  <!-- Modal Kelola Akun User (Superadmin) -->
+  <div id="modal-user-account" class="fixed inset-0 bg-black/60 flex items-center justify-center p-3 z-50 hidden">
+    <div class="bg-white rounded-2xl max-w-md w-full relative shadow-2xl p-6 space-y-4">
+      <button onclick="closeModal('modal-user-account')" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 font-bold text-lg">&times;</button>
+      <h3 id="modal-user-title" class="text-base font-bold text-gray-800 border-b pb-2">Tambah Akun Pengguna Baru</h3>
+
+      <form id="form-user-account" onsubmit="handleSaveUserAccount(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Username</label>
+          <input type="text" id="usr-username" name="username" required placeholder="Contoh: sdit_permata" class="w-full p-2 border rounded-lg">
+        </div>
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Password</label>
+          <input type="password" id="usr-password" name="password" placeholder="Isi untuk ubah password" class="w-full p-2 border rounded-lg">
+        </div>
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Nama Lengkap Pengguna</label>
+          <input type="text" id="usr-name" name="name" required placeholder="Contoh: Operator SDIT Permata" class="w-full p-2 border rounded-lg">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-bold text-gray-700 mb-1">Role / Peran</label>
+            <select id="usr-role" name="role" required class="w-full p-2 border rounded-lg bg-white">
+              <option value="Sekolah">Sekolah</option>
+              <option value="Admin">Admin</option>
+              <option value="Superadmin">Superadmin</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-gray-700 mb-1">Status</label>
+            <select id="usr-status" name="status" class="w-full p-2 border rounded-lg bg-white">
+              <option value="Aktif">Aktif</option>
+              <option value="Nonaktif">Nonaktif</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Nama Unit Sekolah SIT</label>
+          <input type="text" id="usr-sekolah" name="sekolah" required placeholder="Contoh: SDIT Permata Hati" class="w-full p-2 border rounded-lg">
+        </div>
+        <button type="submit" id="btn-save-usr" class="w-full bg-blue-900 text-white font-bold py-2.5 rounded-lg transition">Simpan Akun</button>
+      </form>
     </div>
   </div>
 
@@ -530,11 +612,14 @@
           </div>
         </div>
 
-        <!-- Pengaturan Dana Disalurkan per Program -->
         <div>
           <label class="block font-bold text-amber-900 mb-1">Dana Disalurkan Kepada Penerima Manfaat (Rp)</label>
           <input type="number" id="prog-disalurkan" name="disalurkan" min="0" placeholder="0" class="w-full p-2 border border-amber-200 bg-amber-50/30 rounded-lg text-xs font-semibold">
-          <p class="text-[10px] text-gray-400 mt-0.5">Digunakan untuk menghitung Sisa Dana Tersedia = Total Terkumpul - Disalurkan.</p>
+        </div>
+
+        <div id="container-prog-sekolah" class="hidden">
+          <label class="block font-bold text-gray-700 mb-1">Unit Sekolah SIT Pengaju</label>
+          <input type="text" id="prog-sekolah" name="sekolah" placeholder="JSIT Wilayah Lampung" class="w-full p-2 border rounded-lg text-xs">
         </div>
 
         <div>
@@ -574,7 +659,7 @@
     </div>
   </div>
 
-  <!-- Modal Transfer Donasi & Bukti Donasi -->
+  <!-- Modal Transfer Donasi -->
   <div id="modal-donation" class="fixed inset-0 bg-black/60 flex items-center justify-center p-2 z-50 hidden">
     <div class="bg-white rounded-2xl max-w-xl w-full max-h-[92vh] overflow-y-auto relative shadow-2xl flex flex-col">
       <button onclick="closeModal('modal-donation')" class="absolute top-3 right-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-full w-8 h-8 flex items-center justify-center font-bold z-10">&times;</button>
@@ -602,7 +687,7 @@
     </div>
   </div>
 
-  <!-- Toast Donasi (HANYA MUNCUL DI BERANDA) -->
+  <!-- Toast Donasi -->
   <div id="thankyou-toast" class="fixed bottom-5 left-5 z-50 max-w-xs bg-blue-900 text-white rounded-2xl shadow-2xl border border-blue-700 p-3.5 transform translate-y-32 opacity-0 transition-all duration-500 pointer-events-none flex items-center gap-3">
     <div class="p-2 bg-blue-800 text-amber-300 rounded-xl text-xl flex-shrink-0">💙</div>
     <div class="text-xs space-y-0.5">
@@ -658,7 +743,15 @@
       setInterval(updateLiveClock, 1000);
       setDailyQuote();
       loadPublicData();
+      updateNavLoginLabel();
     };
+
+    function updateNavLoginLabel() {
+      const lbl = document.getElementById('lbl-nav-login');
+      if (lbl) {
+        lbl.innerText = verifiedAdminAuth ? (verifiedAdminAuth.name || 'Dashboard') : 'Masuk';
+      }
+    }
 
     function updateLiveClock() {
       const now = new Date();
@@ -879,7 +972,6 @@
       document.getElementById('wa-widget-link').href = `https://wa.me/${waNumber}?text=${encodeURIComponent('Halo ' + waName + ', saya ingin bertanya mengenai program donasi KitaBantu.')}`;
     }
 
-    // ================= HERO BANNER SLIDER =================
     function setupHeroHeader(settings) {
       if (!settings) return;
 
@@ -917,14 +1009,13 @@
       }
     }
 
-    // ================= HALAMAN DAFTAR PROGRAM DONASI =================
     function renderListDonasiPageTable(campaigns) {
       const tbody = document.getElementById('list-donasi-page-tbody');
       if (!tbody) return;
       tbody.innerHTML = '';
 
       if (!campaigns || campaigns.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-gray-400">Belum ada program donasi aktif.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-gray-400">Belum ada program donasi aktif.</td></tr>';
         return;
       }
 
@@ -941,6 +1032,7 @@
               </span>
               <span class="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-semibold">${c.category}</span>
             </td>
+            <td class="p-3 font-medium text-gray-600">${c.sekolah || 'JSIT Lampung'}</td>
             <td class="p-3 font-semibold text-gray-700">${formatRupiah(c.target)}</td>
             <td class="p-3 font-bold text-emerald-700">${formatRupiah(c.collected)}</td>
             <td class="p-3">
@@ -959,7 +1051,6 @@
       });
     }
 
-    // ================= TOAST TERIMA KASIH =================
     function startThankYouToastLoop(recentDonations) {
       if (!recentDonations || recentDonations.length === 0) return;
       if (toastTimer) clearInterval(toastTimer);
@@ -1029,7 +1120,6 @@
           const disalurkanVal = c.disalurkan || 0;
           const sisaDanaProgram = Math.max(0, c.collected - disalurkanVal);
 
-          // Siapkan Opsi Dropdown Rekening Pembayaran Dinamis
           let paymentOptionsHtml = '';
           const rawMethods = (globalInitialData && globalInitialData.settings && globalInitialData.settings.PaymentMethods) 
             ? globalInitialData.settings.PaymentMethods 
@@ -1050,8 +1140,11 @@
 
             <div class="p-6 space-y-6">
               <div>
-                <span class="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-bold uppercase">${c.category}</span>
-                <h2 class="text-xl md:text-2xl font-bold text-gray-800 mt-2">${c.title}</h2>
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-bold uppercase">${c.category}</span>
+                  <span class="text-xs bg-amber-100 text-amber-900 px-3 py-1 rounded-full font-bold">🏫 ${c.sekolah || 'JSIT Wilayah Lampung'}</span>
+                </div>
+                <h2 class="text-xl md:text-2xl font-bold text-gray-800">${c.title}</h2>
                 <p class="text-xs text-gray-500 mt-1">${c.description}</p>
               </div>
 
@@ -1121,7 +1214,6 @@
                     </div>
                   </div>
 
-                  <!-- Dropdown Rekening + Icon Copy -->
                   <div>
                     <label class="block font-semibold text-gray-700 mb-1">Pilih Rekening Pembayaran</label>
                     <div class="flex items-center gap-2">
@@ -1202,6 +1294,7 @@
         filtered = filtered.filter(c => 
           c.title.toLowerCase().includes(searchQuery) || 
           c.category.toLowerCase().includes(searchQuery) ||
+          (c.sekolah && c.sekolah.toLowerCase().includes(searchQuery)) ||
           c.description.toLowerCase().includes(searchQuery)
         );
       }
@@ -1239,7 +1332,10 @@
               </div>
 
               <div class="p-4 space-y-2">
-                <span class="text-[10px] bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full font-bold uppercase">${c.category || 'Program'}</span>
+                <div class="flex items-center gap-1">
+                  <span class="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-bold uppercase">${c.category || 'Program'}</span>
+                  <span class="text-[10px] bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full font-bold line-clamp-1">🏫 ${c.sekolah || 'JSIT Lampung'}</span>
+                </div>
                 <h4 class="font-bold text-gray-800 text-sm line-clamp-2 cursor-pointer hover:text-blue-900" onclick="openCampaignDetailPage('${c.id}')">${c.title}</h4>
                 <p class="text-xs text-gray-500 line-clamp-2">${c.description}</p>
                 
@@ -1382,49 +1478,73 @@
       reader.readAsDataURL(file);
     }
 
-    // ================= ADMIN LOGIC & PANEL =================
-    function authenticateAdmin() {
+    // ================= AUTHENTICATION & MULTI-USER LOGIC =================
+    function authenticateUser() {
       const u = document.getElementById('admin-user-input').value;
       const p = document.getElementById('admin-pass-input').value;
 
-      callApi('verifyAdminCredentials', { username: u, password: p })
-        .then(isValid => {
-          if (isValid) {
-            verifiedAdminAuth = { username: u, password: p };
+      callApi('loginUser', { username: u, password: p })
+        .then(res => {
+          if (res.success) {
+            verifiedAdminAuth = { username: u, password: p, name: res.user.name, role: res.user.role, sekolah: res.user.sekolah };
             localStorage.setItem('kitabantu_admin_auth', JSON.stringify(verifiedAdminAuth));
             closeModal('modal-admin-auth');
+            updateNavLoginLabel();
             switchToAdminView();
           } else {
-            showCustomAlert('Username atau Password Salah!', false);
+            showCustomAlert(res.message, false);
           }
         })
         .catch(err => {
-          showCustomAlert('Gagal verifikasi admin: ' + err.message, false);
+          showCustomAlert('Gagal verifikasi login: ' + err.message, false);
         });
     }
 
     function logoutAdmin() {
       verifiedAdminAuth = null;
       localStorage.removeItem('kitabantu_admin_auth');
+      updateNavLoginLabel();
       switchToPublicView();
-      showCustomAlert('Berhasil keluar dari mode admin.');
+      showCustomAlert('Berhasil keluar dari mode pengguna.');
     }
 
     function switchToAdminView() {
       hideAllViews();
       document.getElementById('view-admin').classList.remove('hidden');
+      
+      const roleBadge = document.getElementById('admin-user-role-badge');
+      const nameEl = document.getElementById('admin-user-fullname');
+      const sekolahEl = document.getElementById('admin-user-sekolah');
+
+      if (verifiedAdminAuth) {
+        roleBadge.innerText = verifiedAdminAuth.role || 'ROLE';
+        nameEl.innerText = verifiedAdminAuth.name || verifiedAdminAuth.username;
+        sekolahEl.innerText = verifiedAdminAuth.sekolah || 'SIT';
+
+        // Atur Hak Akses Tampilan Tab
+        const isSuper = verifiedAdminAuth.role === "Superadmin";
+        document.querySelectorAll('.role-restricted-super').forEach(el => {
+          if (isSuper) el.classList.remove('hidden');
+          else el.classList.add('hidden');
+        });
+      }
+
       loadAdminDashboardData();
     }
 
     function switchAdminTab(tabId) {
-      const tabs = ['tab-overview', 'tab-programs', 'tab-header', 'tab-admin-sosmed', 'tab-reports'];
+      const tabs = ['tab-overview', 'tab-programs', 'tab-header', 'tab-admin-sosmed', 'tab-users-mgmt', 'tab-reports'];
       tabs.forEach(t => {
-        document.getElementById(t).classList.add('hidden');
-        document.getElementById('nav-' + t).className = "py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex items-center gap-2";
+        const el = document.getElementById(t);
+        const nav = document.getElementById('nav-' + t);
+        if (el) el.classList.add('hidden');
+        if (nav) nav.className = "py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 items-center gap-2" + (t.includes('super') || t.includes('users') || t.includes('header') || t.includes('sosmed') ? ' role-restricted-super' : '');
       });
 
-      document.getElementById(tabId).classList.remove('hidden');
-      document.getElementById('nav-' + tabId).className = "py-3 px-4 border-b-2 border-blue-600 text-blue-600 flex items-center gap-2";
+      const activeEl = document.getElementById(tabId);
+      const activeNav = document.getElementById('nav-' + tabId);
+      if (activeEl) activeEl.classList.remove('hidden');
+      if (activeNav) activeNav.className = "py-3 px-4 border-b-2 border-blue-600 text-blue-600 flex items-center gap-2";
     }
 
     function loadAdminDashboardData() {
@@ -1455,11 +1575,12 @@
 
           renderAdminRecentDonations(data.donations);
           renderAdminProgramsTable(data.programs);
+          renderUsersTable(data.usersList || []);
           populateReportFilter(data.programs);
           renderReportTable(data.donations);
         })
         .catch(err => {
-          showCustomAlert('Gagal memuat dashboard admin: ' + err.message, false);
+          showCustomAlert('Gagal memuat dashboard: ' + err.message, false);
         });
     }
 
@@ -1509,7 +1630,7 @@
           <tr class="hover:bg-gray-50">
             <td class="p-3"><img src="${p.imageUrl}" class="h-10 w-14 object-cover rounded"></td>
             <td class="p-3 font-semibold text-gray-800">${p.title}</td>
-            <td class="p-3"><span class="bg-gray-100 px-2 py-0.5 rounded text-[10px] font-bold">${p.category}</span></td>
+            <td class="p-3"><span class="bg-amber-100 text-amber-900 px-2 py-0.5 rounded text-[10px] font-bold">${p.sekolah || 'JSIT Lampung'}</span></td>
             <td class="p-3">${formatRupiah(p.target)}</td>
             <td class="p-3 font-bold text-blue-900">${formatRupiah(p.collected)}</td>
             <td class="p-3 font-bold text-emerald-700">${formatRupiah(p.disalurkan || 0)}</td>
@@ -1527,6 +1648,107 @@
           </tr>
         `;
       });
+    }
+
+    function renderUsersTable(users) {
+      const tbody = document.getElementById('admin-table-users');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (!users || users.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-400">Belum ada akun terdaftar.</td></tr>';
+        return;
+      }
+
+      users.forEach(u => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-gray-50">
+            <td class="p-3 font-bold font-mono text-blue-900">${u.username}</td>
+            <td class="p-3 font-semibold text-gray-800">${u.name}</td>
+            <td class="p-3"><span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-[10px] font-bold">${u.role}</span></td>
+            <td class="p-3 font-medium text-gray-600">${u.sekolah}</td>
+            <td class="p-3 text-center">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${u.status === 'Aktif' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${u.status}</span>
+            </td>
+            <td class="p-3 text-center flex items-center justify-center gap-1">
+              <button onclick="openEditUserModal('${u.username}')" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-2.5 py-1 rounded text-[11px]">Edit</button>
+              <button onclick="confirmDeleteUser('${u.username}')" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-2 py-1 rounded text-[11px]">Hapus</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function openAddUserModal() {
+      document.getElementById('modal-user-title').innerText = 'Tambah Akun Pengguna Baru';
+      document.getElementById('form-user-account').reset();
+      document.getElementById('usr-username').readOnly = false;
+      openModal('modal-user-account');
+    }
+
+    function openEditUserModal(username) {
+      if (!globalAdminData || !globalAdminData.usersList) return;
+      const u = globalAdminData.usersList.find(item => item.username === username);
+      if (!u) return;
+
+      document.getElementById('modal-user-title').innerText = 'Edit Akun Pengguna';
+      document.getElementById('usr-username').value = u.username;
+      document.getElementById('usr-username').readOnly = true;
+      document.getElementById('usr-password').value = '';
+      document.getElementById('usr-name').value = u.name;
+      document.getElementById('usr-role').value = u.role;
+      document.getElementById('usr-sekolah').value = u.sekolah;
+      document.getElementById('usr-status').value = u.status || 'Aktif';
+
+      openModal('modal-user-account');
+    }
+
+    function handleSaveUserAccount(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-save-usr');
+      btn.disabled = true; btn.innerText = 'Menyimpan...';
+
+      const payload = {
+        username: document.getElementById('usr-username').value,
+        password: document.getElementById('usr-password').value,
+        name: document.getElementById('usr-name').value,
+        role: document.getElementById('usr-role').value,
+        sekolah: document.getElementById('usr-sekolah').value,
+        status: document.getElementById('usr-status').value
+      };
+
+      callApi('saveUserAccount', { data: payload, auth: verifiedAdminAuth })
+        .then(res => {
+          btn.disabled = false; btn.innerText = 'Simpan Akun';
+          if (res.success) {
+            showCustomAlert(res.message);
+            closeModal('modal-user-account');
+            loadAdminDashboardData();
+          } else {
+            showCustomAlert(res.message, false);
+          }
+        })
+        .catch(err => {
+          btn.disabled = false; btn.innerText = 'Simpan Akun';
+          showCustomAlert('Gagal menyimpan akun: ' + err.message, false);
+        });
+    }
+
+    function confirmDeleteUser(targetUsername) {
+      if (confirm('Apakah Anda yakin ingin menghapus akun pengguna ' + targetUsername + '?')) {
+        callApi('deleteUserAccount', { username: targetUsername, auth: verifiedAdminAuth })
+          .then(res => {
+            if (res.success) {
+              showCustomAlert(res.message);
+              loadAdminDashboardData();
+            } else {
+              showCustomAlert(res.message, false);
+            }
+          })
+          .catch(err => {
+            showCustomAlert('Gagal menghapus akun: ' + err.message, false);
+          });
+      }
     }
 
     function toggleProgramStatus(progId) {
@@ -1551,6 +1773,15 @@
       document.getElementById('prog-id').value = '';
       document.getElementById('prog-disalurkan').value = '0';
       document.getElementById('prog-image-url').value = '';
+
+      const containerSekolah = document.getElementById('container-prog-sekolah');
+      if (verifiedAdminAuth && (verifiedAdminAuth.role === "Superadmin" || verifiedAdminAuth.role === "Admin")) {
+        containerSekolah.classList.remove('hidden');
+        document.getElementById('prog-sekolah').value = verifiedAdminAuth.sekolah || 'JSIT Wilayah Lampung';
+      } else {
+        containerSekolah.classList.add('hidden');
+      }
+
       openModal('modal-add-program');
     }
 
@@ -1569,6 +1800,14 @@
       document.getElementById('prog-deadline').value = program.deadline;
       document.getElementById('prog-description').value = program.description;
       document.getElementById('prog-status').value = program.status;
+
+      const containerSekolah = document.getElementById('container-prog-sekolah');
+      if (verifiedAdminAuth && (verifiedAdminAuth.role === "Superadmin" || verifiedAdminAuth.role === "Admin")) {
+        containerSekolah.classList.remove('hidden');
+        document.getElementById('prog-sekolah').value = program.sekolah || 'JSIT Wilayah Lampung';
+      } else {
+        containerSekolah.classList.add('hidden');
+      }
 
       openModal('modal-add-program');
     }
@@ -1630,6 +1869,7 @@
         category: form.category.value,
         target: form.target.value,
         disalurkan: form.disalurkan.value || 0,
+        sekolah: form.sekolah ? form.sekolah.value : '',
         imageUrl: imageUrl,
         headerText: form.headerText.value,
         deadline: form.deadline.value,
@@ -1778,6 +2018,8 @@
       }
 
       let total = 0;
+      const isSuperOrAdmin = verifiedAdminAuth && (verifiedAdminAuth.role === "Superadmin" || verifiedAdminAuth.role === "Admin");
+
       donations.forEach((d, idx) => {
         total += d.amount;
         const isApproved = String(d.status).toLowerCase() === 'approved' || String(d.status).toLowerCase() === 'berhasil';
@@ -1803,9 +2045,9 @@
                 ${isApproved ? `
                   <button onclick="openReceiptModal('${d.donationId}')" title="Unduh / Cetak Bukti Donasi" class="bg-blue-600 hover:bg-blue-700 text-white p-1 rounded text-[10px] font-bold">📄 Kuitansi</button>
                 ` : `
-                  <button onclick="approveDonationStatus('${d.donationId}')" title="Setujui / Verifikasi Donasi Ini" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-[10px] font-bold">✏️ Approve</button>
+                  ${isSuperOrAdmin ? `<button onclick="approveDonationStatus('${d.donationId}')" title="Setujui / Verifikasi Donasi Ini" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-[10px] font-bold">✏️ Approve</button>` : '<span class="text-gray-400 text-[10px]">Verifikasi Admin</span>'}
                 `}
-                <button onclick="deleteDonationRecord('${d.donationId}')" title="Hapus Data Donasi Ini" class="bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold">🗑️ Hapus</button>
+                ${isSuperOrAdmin ? `<button onclick="deleteDonationRecord('${d.donationId}')" title="Hapus Data Donasi Ini" class="bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold">🗑️ Hapus</button>` : ''}
               </div>
             </td>
           </tr>
