@@ -259,22 +259,8 @@
       </div>
     </div>
 
-    <!-- TAB 2: KELOLA PROGRAM DONASI & PENYALURAN DANA -->
-    <div id="tab-programs" class="bg-white p-5 rounded-2xl border shadow-sm space-y-6 hidden">
-      <!-- Form Input Dana Disalurkan Manual -->
-      <div class="bg-amber-50/50 p-4 rounded-xl border border-amber-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-        <div>
-          <h4 class="font-bold text-xs text-amber-900">Total Dana Disalurkan Kepada Penerima (Rp)</h4>
-          <p class="text-[11px] text-amber-700">Nominal ini digunakan untuk menghitung Sisa Dana Tersedia secara akurat.</p>
-        </div>
-        <div class="flex items-center gap-2 w-full md:w-auto">
-          <input type="number" id="setting-disalurkan" min="0" placeholder="0" class="p-2 border rounded-lg text-xs bg-white w-full md:w-44 font-bold text-gray-800">
-          <button onclick="handleSaveDisalurkanAmount()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-3 py-2 rounded-lg text-xs transition whitespace-nowrap">
-            Simpan Dana Disalurkan
-          </button>
-        </div>
-      </div>
-
+    <!-- TAB 2: KELOLA PROGRAM DONASI -->
+    <div id="tab-programs" class="bg-white p-5 rounded-2xl border shadow-sm space-y-4 hidden">
       <div class="flex justify-between items-center border-b pb-3">
         <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
           <span>📋</span> Daftar & Status Program Donasi
@@ -293,12 +279,13 @@
               <th class="p-3">Kategori</th>
               <th class="p-3">Target</th>
               <th class="p-3">Terkumpul</th>
+              <th class="p-3">Disalurkan</th>
               <th class="p-3 text-center">Status / Aktifkan</th>
               <th class="p-3 text-center">Aksi</th>
             </tr>
           </thead>
           <tbody id="admin-table-programs" class="divide-y">
-            <tr><td colspan="7" class="p-4 text-center text-gray-400">Memuat program...</td></tr>
+            <tr><td colspan="8" class="p-4 text-center text-gray-400">Memuat program...</td></tr>
           </tbody>
         </table>
       </div>
@@ -357,14 +344,13 @@
       </form>
     </div>
 
-    <!-- TAB 4: ADMIN & SOSMED (DIPISAH SESUAI PERMINTAAN) -->
+    <!-- TAB 4: ADMIN & SOSMED -->
     <div id="tab-admin-sosmed" class="bg-white p-6 rounded-2xl border shadow-sm space-y-5 hidden max-w-2xl">
       <h3 class="font-bold text-gray-800 text-sm border-b pb-3 flex items-center gap-2">
         <span>⚙️</span> Pengaturan Kontak Admin & Link Sosial Media
       </h3>
 
       <form id="form-admin-sosmed" onsubmit="handleSaveAdminSosmedSettings(event)" class="space-y-4">
-        <!-- Pengaturan Admin WA -->
         <div class="grid grid-cols-2 gap-3 bg-gray-50 p-3 rounded-xl border">
           <div>
             <label class="block text-xs font-bold text-gray-700 mb-1">Nama Admin WA Konfirmasi</label>
@@ -376,7 +362,6 @@
           </div>
         </div>
 
-        <!-- Pengaturan Link Sosmed Header -->
         <div class="space-y-3">
           <h4 class="font-bold text-xs text-gray-800">Link Sosial Media Header Web:</h4>
           
@@ -545,6 +530,13 @@
           </div>
         </div>
 
+        <!-- Pengaturan Dana Disalurkan per Program -->
+        <div>
+          <label class="block font-bold text-amber-900 mb-1">Dana Disalurkan Kepada Penerima Manfaat (Rp)</label>
+          <input type="number" id="prog-disalurkan" name="disalurkan" min="0" placeholder="0" class="w-full p-2 border border-amber-200 bg-amber-50/30 rounded-lg text-xs font-semibold">
+          <p class="text-[10px] text-gray-400 mt-0.5">Digunakan untuk menghitung Sisa Dana Tersedia = Total Terkumpul - Disalurkan.</p>
+        </div>
+
         <div>
           <label class="block font-bold text-gray-700 mb-1">Upload Gambar Cover / Banner Program</label>
           <input type="file" id="prog-image-file" accept="image/*" class="w-full p-1 border rounded-lg mb-1">
@@ -650,7 +642,6 @@
     let currentHeroIndex = 0;
     let heroTimer = null;
 
-    // Quotes Kebajikan Otomatis
     const donationQuotes = [
       "\"Harta tidak akan berkurang karena sedekah. Mari tebar kebaikan bersama JSIT Lampung hari ini.\"",
       "\"Sedekah itu memadamkan dosa sebagaimana air memadamkan api.\"",
@@ -763,10 +754,19 @@
     function copyTextToClipboard(text) {
       if (!text) return;
       navigator.clipboard.writeText(text).then(() => {
-        showCustomAlert(`Nomor rekening / teks berhasil disalin: ${text}`);
+        showCustomAlert(`Nomor rekening berhasil disalin: ${text}`);
       }).catch(err => {
         showCustomAlert('Gagal menyalin teks.', false);
       });
+    }
+
+    function copySelectedAccount() {
+      const sel = document.getElementById('select-payment-method');
+      if (!sel) return;
+      const val = sel.value;
+      const matchNum = val.match(/\d{8,20}/);
+      const textToCopy = matchNum ? matchNum[0] : val;
+      copyTextToClipboard(textToCopy);
     }
 
     function toggleWaWidget() {
@@ -879,7 +879,7 @@
       document.getElementById('wa-widget-link').href = `https://wa.me/${waNumber}?text=${encodeURIComponent('Halo ' + waName + ', saya ingin bertanya mengenai program donasi KitaBantu.')}`;
     }
 
-    // ================= HERO BANNER SLIDER (MAKS 3 GAMBAR) =================
+    // ================= HERO BANNER SLIDER =================
     function setupHeroHeader(settings) {
       if (!settings) return;
 
@@ -959,7 +959,7 @@
       });
     }
 
-    // ================= TOAST TERIMA KASIH (HANYA MUNCUL DI BERANDA) =================
+    // ================= TOAST TERIMA KASIH =================
     function startThankYouToastLoop(recentDonations) {
       if (!recentDonations || recentDonations.length === 0) return;
       if (toastTimer) clearInterval(toastTimer);
@@ -1026,35 +1026,18 @@
           const c = data.campaign;
           const percent = c.target > 0 ? Math.min(Math.round((c.collected / c.target) * 100), 100) : 0;
           
-          const totalDisalurkan = (globalInitialData && globalInitialData.stats) ? globalInitialData.stats.totalDisalurkan : 0;
-          const sisaDanaProgram = Math.max(0, c.collected - totalDisalurkan);
+          const disalurkanVal = c.disalurkan || 0;
+          const sisaDanaProgram = Math.max(0, c.collected - disalurkanVal);
 
-          // Render Opsi Pembayaran + Tombol Salin/Copy Icon
+          // Siapkan Opsi Dropdown Rekening Pembayaran Dinamis
           let paymentOptionsHtml = '';
-          let paymentListDisplayHtml = '';
           const rawMethods = (globalInitialData && globalInitialData.settings && globalInitialData.settings.PaymentMethods) 
             ? globalInitialData.settings.PaymentMethods 
             : "Transfer BCA - 1234567890 a.n JSIT Lampung\nTransfer Mandiri - 0987654321 a.n JSIT Lampung\nQRIS All Payment";
           
           const methodsArr = rawMethods.split('\n').map(m => m.trim()).filter(m => m !== '');
-          
           methodsArr.forEach(m => {
             paymentOptionsHtml += `<option value="${m}">${m}</option>`;
-
-            // Deteksi Nomor Rekening untuk tombol Copy
-            const matchNum = m.match(/\d{8,20}/);
-            const numOnly = matchNum ? matchNum[0] : '';
-
-            paymentListDisplayHtml += `
-              <div class="flex items-center justify-between bg-white p-2.5 rounded-xl border border-blue-100">
-                <span class="font-semibold text-gray-800">${m}</span>
-                ${numOnly ? `
-                  <button type="button" onclick="copyTextToClipboard('${numOnly}')" title="Salin Nomor Rekening" class="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-900 rounded-lg transition border border-blue-200">
-                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-                  </button>
-                ` : ''}
-              </div>
-            `;
           });
 
           container.innerHTML = `
@@ -1072,23 +1055,27 @@
                 <p class="text-xs text-gray-500 mt-1">${c.description}</p>
               </div>
 
-              <!-- Status Dana Kebajikan Program Ini -->
+              <!-- Status Dana Kebajikan Program Ini (4 Kartu Lengkap) -->
               <div class="bg-blue-50/50 rounded-2xl p-5 border border-blue-100 space-y-4 shadow-sm">
                 <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
                   <span>💰</span> Status Dana Kebajikan Program Ini
                 </h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-                  <div class="bg-white p-3.5 rounded-xl border border-blue-100 shadow-sm flex flex-col justify-between">
-                    <p class="text-gray-500 font-medium">Target Dana</p>
-                    <p class="font-extrabold text-base text-gray-800 mt-1">${formatRupiah(c.target)}</p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 text-xs">
+                  <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
+                    <p class="text-gray-500 font-medium text-[11px]">Target Dana</p>
+                    <p class="font-extrabold text-sm text-gray-800 mt-1">${formatRupiah(c.target)}</p>
                   </div>
-                  <div class="bg-white p-3.5 rounded-xl border border-blue-100 shadow-sm flex flex-col justify-between">
-                    <p class="text-blue-900 font-medium">Total Dana Terkumpul</p>
-                    <p class="font-extrabold text-base text-blue-900 mt-1">${formatRupiah(c.collected)}</p>
+                  <div class="bg-white p-3 rounded-xl border border-blue-100 shadow-sm flex flex-col justify-between">
+                    <p class="text-blue-900 font-medium text-[11px]">Total Terkumpul</p>
+                    <p class="font-extrabold text-sm text-blue-900 mt-1">${formatRupiah(c.collected)}</p>
                   </div>
-                  <div class="bg-white p-3.5 rounded-xl border border-amber-100 shadow-sm flex flex-col justify-between">
-                    <p class="text-amber-900 font-medium">Sisa Dana Tersedia</p>
-                    <p class="font-extrabold text-base text-amber-900 mt-1">${formatRupiah(sisaDanaProgram)}</p>
+                  <div class="bg-white p-3 rounded-xl border border-emerald-100 shadow-sm flex flex-col justify-between">
+                    <p class="text-emerald-900 font-medium text-[11px]">Dana Disalurkan</p>
+                    <p class="font-extrabold text-sm text-emerald-800 mt-1">${formatRupiah(disalurkanVal)}</p>
+                  </div>
+                  <div class="bg-white p-3 rounded-xl border border-amber-100 shadow-sm flex flex-col justify-between">
+                    <p class="text-amber-900 font-medium text-[11px]">Sisa Dana Tersedia</p>
+                    <p class="font-extrabold text-sm text-amber-900 mt-1">${formatRupiah(sisaDanaProgram)}</p>
                   </div>
                 </div>
 
@@ -1103,14 +1090,7 @@
                 </div>
               </div>
 
-              <!-- Daftar Rekening dengan Icon Copy -->
-              <div class="bg-blue-50/30 p-4 rounded-2xl border border-blue-100 space-y-2 text-xs">
-                <p class="font-bold text-gray-800">Daftar Rekening Pembayaran Resmi (Klik Icon Salin):</p>
-                <div class="space-y-2">
-                  ${paymentListDisplayHtml}
-                </div>
-              </div>
-
+              <!-- Form Donasi dengan Dropdown + Tombol Salin/Copy Icon -->
               <div class="bg-white p-6 rounded-2xl border space-y-4 shadow-sm">
                 <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2 border-b pb-2">
                   <span>💳</span> Form Donasi Transfer
@@ -1141,11 +1121,18 @@
                     </div>
                   </div>
 
+                  <!-- Dropdown Rekening + Icon Copy -->
                   <div>
-                    <label class="block font-semibold text-gray-700">Pilih Rekening Pembayaran</label>
-                    <select name="paymentMethod" required class="w-full mt-1 p-2.5 border rounded-xl bg-white font-medium">
-                      ${paymentOptionsHtml}
-                    </select>
+                    <label class="block font-semibold text-gray-700 mb-1">Pilih Rekening Pembayaran</label>
+                    <div class="flex items-center gap-2">
+                      <select id="select-payment-method" name="paymentMethod" required class="w-full p-2.5 border rounded-xl bg-white font-medium text-xs">
+                        ${paymentOptionsHtml}
+                      </select>
+                      <button type="button" onclick="copySelectedAccount()" title="Salin Nomor Rekening Pilihan" class="p-2.5 bg-blue-50 hover:bg-blue-100 text-blue-900 rounded-xl transition border border-blue-200 flex items-center justify-center gap-1 font-bold text-xs flex-shrink-0">
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                        <span class="hidden sm:inline">Salin No. Rek</span>
+                      </button>
+                    </div>
                   </div>
 
                   <div class="flex items-center gap-2">
@@ -1460,7 +1447,6 @@
             document.getElementById('setting-payment-methods').value = data.settings.PaymentMethods || '';
             document.getElementById('setting-admin-wa').value = data.settings.AdminWA || '';
             document.getElementById('setting-admin-name').value = data.settings.AdminWAName || '';
-            document.getElementById('setting-disalurkan').value = data.settings.TotalDisalurkan || 0;
             document.getElementById('setting-link-fb').value = data.settings.LinkFB || '';
             document.getElementById('setting-link-ig').value = data.settings.LinkIG || '';
             document.getElementById('setting-link-yt').value = data.settings.LinkYT || '';
@@ -1513,7 +1499,7 @@
       tbody.innerHTML = '';
 
       if (!programs || programs.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-gray-400">Belum ada program.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-gray-400">Belum ada program.</td></tr>';
         return;
       }
 
@@ -1526,6 +1512,7 @@
             <td class="p-3"><span class="bg-gray-100 px-2 py-0.5 rounded text-[10px] font-bold">${p.category}</span></td>
             <td class="p-3">${formatRupiah(p.target)}</td>
             <td class="p-3 font-bold text-blue-900">${formatRupiah(p.collected)}</td>
+            <td class="p-3 font-bold text-emerald-700">${formatRupiah(p.disalurkan || 0)}</td>
             
             <td class="p-3 text-center">
               <button onclick="toggleProgramStatus('${p.id}')" title="Klik untuk mengubah status" class="px-3 py-1 rounded-lg text-[11px] font-bold transition shadow-sm ${isAktif ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-rose-600 hover:bg-rose-700 text-white'}">
@@ -1540,23 +1527,6 @@
           </tr>
         `;
       });
-    }
-
-    function handleSaveDisalurkanAmount() {
-      const val = document.getElementById('setting-disalurkan').value;
-      callApi('saveDisalurkanAmount', { amount: val, auth: verifiedAdminAuth })
-        .then(res => {
-          if (res.success) {
-            showCustomAlert(res.message);
-            loadAdminDashboardData();
-            loadPublicData();
-          } else {
-            showCustomAlert(res.message, false);
-          }
-        })
-        .catch(err => {
-          showCustomAlert('Gagal menyimpan penyaluran dana: ' + err.message, false);
-        });
     }
 
     function toggleProgramStatus(progId) {
@@ -1579,6 +1549,7 @@
       document.getElementById('modal-program-title').innerText = 'Tambah Program Donasi Baru';
       document.getElementById('form-program').reset();
       document.getElementById('prog-id').value = '';
+      document.getElementById('prog-disalurkan').value = '0';
       document.getElementById('prog-image-url').value = '';
       openModal('modal-add-program');
     }
@@ -1592,6 +1563,7 @@
       document.getElementById('prog-title').value = program.title;
       document.getElementById('prog-category').value = program.category;
       document.getElementById('prog-target').value = program.target;
+      document.getElementById('prog-disalurkan').value = program.disalurkan || 0;
       document.getElementById('prog-image-url').value = program.imageUrl;
       document.getElementById('prog-header-text').value = program.headerText;
       document.getElementById('prog-deadline').value = program.deadline;
@@ -1657,6 +1629,7 @@
         title: form.title.value,
         category: form.category.value,
         target: form.target.value,
+        disalurkan: form.disalurkan.value || 0,
         imageUrl: imageUrl,
         headerText: form.headerText.value,
         deadline: form.deadline.value,
