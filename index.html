@@ -196,6 +196,9 @@
       </button>
 
       <!-- Khusus Superadmin & Admin Pusat -->
+      <button onclick="switchAdminTab('tab-school-history')" id="nav-tab-school-history" class="py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 items-center gap-2 role-restricted-admin">
+        <span>🏫</span> Riwayat Sekolah
+      </button>
       <button onclick="switchAdminTab('tab-header')" id="nav-tab-header" class="py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 items-center gap-2 role-restricted-super">
         <span>🖼️</span> Banner Header Web
       </button>
@@ -297,6 +300,30 @@
             <tr><td colspan="8" class="p-4 text-center text-gray-400">Memuat program...</td></tr>
           </tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- TAB BARU: RIWAYAT SEKOLAH (SUPERADMIN & ADMIN) -->
+    <div id="tab-school-history" class="bg-white p-6 rounded-2xl border shadow-sm space-y-6 hidden">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 gap-3">
+        <div>
+          <h3 class="font-bold text-gray-800 text-base flex items-center gap-2">
+            <span>🏫</span> Riwayat & Total Donasi Per Unit Sekolah
+          </h3>
+          <p class="text-xs text-gray-500 mt-0.5">Pilih sekolah untuk melihat daftar program, transaksi, serta akumulasi total donasi.</p>
+        </div>
+        <div class="w-full sm:w-auto">
+          <select id="select-school-history" onchange="renderSchoolHistory()" class="w-full sm:w-64 p-2.5 border rounded-xl font-bold text-xs bg-amber-50 border-amber-300 text-amber-900">
+            <option value="">-- Pilih Unit Sekolah --</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="school-history-container" class="space-y-6">
+        <div class="text-center py-12 text-gray-400 text-xs border rounded-2xl bg-gray-50/50">
+          <span class="text-3xl block mb-2">🏫</span>
+          Silakan pilih unit sekolah pada menu di atas untuk menampilkan data riwayat.
+        </div>
       </div>
     </div>
 
@@ -534,6 +561,47 @@
       <button onclick="authenticateUser()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 rounded-lg text-sm transition">
         Verifikasi & Masuk
       </button>
+
+      <div class="text-center pt-2 border-t">
+        <button onclick="openRegisterSchoolModal()" class="text-xs text-blue-900 hover:underline font-bold">
+          Belum punya akun? Daftar Akun Sekolah Baru
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Registrasi Akun Sekolah Mandiri -->
+  <div id="modal-register-school" class="fixed inset-0 bg-black/60 flex items-center justify-center p-3 z-50 hidden">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 relative shadow-2xl space-y-4">
+      <button onclick="closeModal('modal-register-school')" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 font-bold">&times;</button>
+      <div class="text-center">
+        <span class="text-3xl">🏫</span>
+        <h3 class="text-lg font-bold text-gray-800 mt-1">Pendaftaran Akun Sekolah</h3>
+        <p class="text-xs text-gray-500 mt-0.5">Buat akun untuk unit sekolah SIT Anda</p>
+      </div>
+
+      <form onsubmit="handleRegisterSchool(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Nama Unit Sekolah / Lembaga</label>
+          <input type="text" id="reg-sekolah" required placeholder="Contoh: SDIT Al-Iman Bandar Lampung" class="w-full p-2.5 border rounded-lg">
+        </div>
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Nama Pengurus / Operator</label>
+          <input type="text" id="reg-name" required placeholder="Contoh: Ustadz Ahmad" class="w-full p-2.5 border rounded-lg">
+        </div>
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Username Login</label>
+          <input type="text" id="reg-username" required placeholder="Contoh: sdit_aliman" class="w-full p-2.5 border rounded-lg">
+        </div>
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Password</label>
+          <input type="password" id="reg-password" required placeholder="Buat kata sandi" class="w-full p-2.5 border rounded-lg">
+        </div>
+
+        <button type="submit" id="btn-submit-reg" class="w-full bg-blue-900 hover:bg-blue-950 text-white font-bold py-2.5 rounded-lg text-sm transition">
+          Daftar Akun Sekarang
+        </button>
+      </form>
     </div>
   </div>
 
@@ -905,6 +973,42 @@
     function closeModal(modalId) {
       const el = document.getElementById(modalId);
       if (el) el.classList.add('hidden');
+    }
+
+    function openRegisterSchoolModal() {
+      closeModal('modal-admin-auth');
+      openModal('modal-register-school');
+    }
+
+    function handleRegisterSchool(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-submit-reg');
+      btn.disabled = true; btn.innerText = 'Memproses Pendaftaran...';
+
+      const payload = {
+        sekolah: document.getElementById('reg-sekolah').value,
+        name: document.getElementById('reg-name').value,
+        username: document.getElementById('reg-username').value,
+        password: document.getElementById('reg-password').value
+      };
+
+      callApi('registerUser', { data: payload })
+        .then(res => {
+          btn.disabled = false; btn.innerText = 'Daftar Akun Sekarang';
+          if (res.success) {
+            showCustomAlert(res.message);
+            closeModal('modal-register-school');
+            openModal('modal-admin-auth');
+            document.getElementById('admin-user-input').value = payload.username;
+            document.getElementById('admin-pass-input').value = payload.password;
+          } else {
+            showCustomAlert(res.message, false);
+          }
+        })
+        .catch(err => {
+          btn.disabled = false; btn.innerText = 'Daftar Akun Sekarang';
+          showCustomAlert('Gagal mendaftar: ' + err.message, false);
+        });
     }
 
     function hideAllViews() {
@@ -1569,7 +1673,7 @@
     }
 
     function switchAdminTab(tabId) {
-      const tabs = ['tab-overview', 'tab-programs', 'tab-header', 'tab-admin-sosmed', 'tab-users-mgmt', 'tab-reports'];
+      const tabs = ['tab-overview', 'tab-programs', 'tab-header', 'tab-admin-sosmed', 'tab-users-mgmt', 'tab-reports', 'tab-school-history'];
       tabs.forEach(t => {
         const el = document.getElementById(t);
         const nav = document.getElementById('nav-' + t);
@@ -1577,7 +1681,7 @@
         if (nav) {
           var restrictedClass = "";
           if (t === 'tab-header' || t === 'tab-admin-sosmed') restrictedClass = ' role-restricted-super';
-          if (t === 'tab-users-mgmt') restrictedClass = ' role-restricted-admin';
+          if (t === 'tab-users-mgmt' || t === 'tab-school-history') restrictedClass = ' role-restricted-admin';
           nav.className = "py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex items-center gap-2" + restrictedClass;
         }
       });
@@ -1588,7 +1692,7 @@
       if (activeNav) {
         var restrictedClass = "";
         if (tabId === 'tab-header' || tabId === 'tab-admin-sosmed') restrictedClass = ' role-restricted-super';
-        if (tabId === 'tab-users-mgmt') restrictedClass = ' role-restricted-admin';
+        if (tabId === 'tab-users-mgmt' || tabId === 'tab-school-history') restrictedClass = ' role-restricted-admin';
         activeNav.className = "py-3 px-4 border-b-2 border-blue-600 text-blue-600 flex items-center gap-2" + restrictedClass;
       }
     }
@@ -1683,10 +1787,174 @@
           renderUsersTable(data.usersList || []);
           populateReportFilter(data.programs);
           renderReportTable(data.donations);
+          populateSchoolHistorySelector(data.schoolNames || []);
         })
         .catch(err => {
           showCustomAlert('Gagal memuat dashboard: ' + err.message, false);
         });
+    }
+
+    function populateSchoolHistorySelector(schools) {
+      const sel = document.getElementById('select-school-history');
+      if (!sel) return;
+      sel.innerHTML = '<option value="">-- Pilih Unit Sekolah --</option>';
+      schools.forEach(s => {
+        sel.innerHTML += `<option value="${s}">${s}</option>`;
+      });
+    }
+
+    function renderSchoolHistory() {
+      const selectedSchool = document.getElementById('select-school-history').value;
+      const container = document.getElementById('school-history-container');
+      if (!container || !globalAdminData) return;
+
+      if (!selectedSchool) {
+        container.innerHTML = `
+          <div class="text-center py-12 text-gray-400 text-xs border rounded-2xl bg-gray-50/50">
+            <span class="text-3xl block mb-2">🏫</span>
+            Silakan pilih unit sekolah pada menu di atas untuk menampilkan data riwayat.
+          </div>
+        `;
+        return;
+      }
+
+      const allProgs = globalAdminData.allPrograms || [];
+      const allDons = globalAdminData.allDonations || [];
+
+      const schoolProgs = allProgs.filter(p => p.sekolah === selectedSchool);
+      const schoolProgTitles = schoolProgs.map(p => p.title);
+      
+      const schoolDons = allDons.filter(d => schoolProgTitles.indexOf(d.program) !== -1);
+
+      let grandTotalCollected = 0;
+      let grandTotalDisalurkan = 0;
+      let grandTotalTarget = 0;
+
+      schoolProgs.forEach(p => {
+        grandTotalTarget += p.target || 0;
+        grandTotalCollected += p.collected || 0;
+        grandTotalDisalurkan += p.disalurkan || 0;
+      });
+
+      let programBreakdownHtml = '';
+      if (schoolProgs.length === 0) {
+        programBreakdownHtml = '<tr><td colspan="6" class="p-4 text-center text-gray-400">Belum ada program donasi yang dibuat oleh sekolah ini.</td></tr>';
+      } else {
+        schoolProgs.forEach((p, idx) => {
+          const percent = p.target > 0 ? Math.min(Math.round((p.collected / p.target) * 100), 100) : 0;
+          programBreakdownHtml += `
+            <tr class="hover:bg-gray-50">
+              <td class="p-2.5 border text-center font-bold text-gray-500">${idx + 1}</td>
+              <td class="p-2.5 border font-bold text-gray-800">${p.title}</td>
+              <td class="p-2.5 border font-semibold text-gray-700">${formatRupiah(p.target)}</td>
+              <td class="p-2.5 border font-extrabold text-blue-900">${formatRupiah(p.collected)}</td>
+              <td class="p-2.5 border font-extrabold text-emerald-700">${formatRupiah(p.disalurkan || 0)}</td>
+              <td class="p-2.5 border">
+                <div class="w-full bg-gray-200 rounded-full h-2 mb-1">
+                  <div class="bg-blue-600 h-2 rounded-full" style="width: ${percent}%"></div>
+                </div>
+                <span class="text-[10px] text-gray-500 font-bold">${percent}%</span>
+              </td>
+            </tr>
+          `;
+        });
+      }
+
+      let donTableHtml = '';
+      if (schoolDons.length === 0) {
+        donTableHtml = '<tr><td colspan="7" class="p-4 text-center text-gray-400">Belum ada riwayat donasi masuk untuk sekolah ini.</td></tr>';
+      } else {
+        schoolDons.forEach((d, idx) => {
+          const isApproved = String(d.status).toLowerCase() === 'approved' || String(d.status).toLowerCase() === 'berhasil';
+          donTableHtml += `
+            <tr class="hover:bg-gray-50">
+              <td class="p-2.5 border text-center font-bold text-gray-500">${idx + 1}</td>
+              <td class="p-2.5 border font-mono font-bold text-blue-900">${d.donationId}</td>
+              <td class="p-2.5 border text-gray-500">${d.date}</td>
+              <td class="p-2.5 border font-semibold text-gray-800">${d.name}</td>
+              <td class="p-2.5 border">${d.program}</td>
+              <td class="p-2.5 border font-extrabold text-emerald-700">${formatRupiah(d.amount)}</td>
+              <td class="p-2.5 border text-center">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isApproved ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                  ${isApproved ? 'Approved' : 'Menunggu'}
+                </span>
+              </td>
+              <td class="p-2.5 border text-center">
+                ${d.proofUrl && d.proofUrl !== '-' ? `<a href="${d.proofUrl}" target="_blank" class="text-blue-600 underline font-bold">Foto Bukti</a>` : '<span class="text-gray-400">-</span>'}
+              </td>
+            </tr>
+          `;
+        });
+      }
+
+      container.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
+          <div class="bg-blue-50 p-4 rounded-xl border border-blue-200">
+            <p class="text-blue-800 font-medium">Unit Sekolah</p>
+            <h4 class="font-extrabold text-sm text-blue-950 mt-1">${selectedSchool}</h4>
+          </div>
+          <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+            <p class="text-gray-500 font-medium">Total Program Dibuat</p>
+            <h4 class="font-extrabold text-base text-gray-800 mt-1">${schoolProgs.length} Program</h4>
+          </div>
+          <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200">
+            <p class="text-emerald-800 font-medium">Grand Total Donasi Diterima</p>
+            <h4 class="font-extrabold text-base text-emerald-900 mt-1">${formatRupiah(grandTotalCollected)}</h4>
+          </div>
+          <div class="bg-amber-50 p-4 rounded-xl border border-amber-200">
+            <p class="text-amber-800 font-medium">Total Dana Disalurkan</p>
+            <h4 class="font-extrabold text-base text-amber-900 mt-1">${formatRupiah(grandTotalDisalurkan)}</h4>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <h4 class="font-bold text-gray-800 text-xs flex items-center gap-1.5">
+            <span>📋</span> Rekap Donasi Per Program (${selectedSchool})
+          </h4>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse border">
+              <thead class="bg-gray-100 text-[11px] font-bold uppercase text-gray-600">
+                <tr>
+                  <th class="p-2.5 border w-10 text-center">No</th>
+                  <th class="p-2.5 border">Nama Program Donasi</th>
+                  <th class="p-2.5 border">Target Dana</th>
+                  <th class="p-2.5 border">Terkumpul</th>
+                  <th class="p-2.5 border">Disalurkan</th>
+                  <th class="p-2.5 border w-32">Pencapaian</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y text-gray-700">
+                ${programBreakdownHtml}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="space-y-3 pt-2">
+          <h4 class="font-bold text-gray-800 text-xs flex items-center gap-1.5">
+            <span>💳</span> Riwayat Transaksi Donasi Masuk & Bukti Transfer
+          </h4>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse border">
+              <thead class="bg-gray-100 text-[11px] font-bold uppercase text-gray-600">
+                <tr>
+                  <th class="p-2.5 border w-10 text-center">No</th>
+                  <th class="p-2.5 border">ID Donasi</th>
+                  <th class="p-2.5 border">Tanggal</th>
+                  <th class="p-2.5 border">Donatur</th>
+                  <th class="p-2.5 border">Program</th>
+                  <th class="p-2.5 border">Nominal</th>
+                  <th class="p-2.5 border text-center">Status</th>
+                  <th class="p-2.5 border text-center">Bukti Transfer</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y text-gray-700">
+                ${donTableHtml}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
     }
 
     function renderAdminRecentDonations(donations) {
