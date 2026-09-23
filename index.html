@@ -35,8 +35,9 @@
           <span>📋</span> <span class="hidden md:inline">List Donasi</span>
         </button>
         
+        <!-- EDITED: Mengubah kata Admin menjadi Login -->
         <button onclick="handleAdminNavClick()" id="btn-nav-admin" title="Login Admin" class="bg-amber-500 hover:bg-amber-600 text-white p-2 md:px-3 md:py-2 rounded-lg font-semibold text-xs md:text-sm transition flex items-center justify-center gap-1">
-          <span>🔐</span> <span class="hidden lg:inline">Admin</span>
+          <span>🔐</span> <span class="hidden lg:inline">Login</span>
         </button>
       </div>
     </div>
@@ -53,71 +54,29 @@
       </div>
     </section>
 
-    <main class="max-w-5xl mx-auto px-4 space-y-8">
-      <div class="bg-white rounded-2xl shadow-sm border p-6 space-y-6">
-        <div class="flex flex-col sm:flex-row justify-between items-center border-b pb-3 gap-2">
-          <h3 id="status-box-title" class="text-lg font-bold text-gray-800">Status Dana Kebajikan</h3>
-          <select id="status-program-selector" onchange="handleProgramFilterChange(this.value)" class="text-xs bg-gray-50 border p-2 rounded-lg font-semibold text-gray-700 max-w-xs w-full sm:w-auto">
-            <option value="ALL">🌐 Semua Program Donasi</option>
-          </select>
-        </div>
+    <main class="max-w-5xl mx-auto px-4 space-y-6">
+      <!-- Grid & Search Program Donasi Publik -->
+      <div id="program-section" class="space-y-4">
+        
+        <!-- Header Bar: Pencarian dan Filter Dropdown -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white p-4 rounded-2xl border shadow-sm">
+          <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+            <span>🎯</span> Program Donasi Aktif
+          </h3>
+          
+          <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+            <!-- Icon Search & Input Pencarian -->
+            <div class="relative flex-grow sm:flex-grow-0 min-w-[180px]">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none text-gray-400 text-xs">🔍</span>
+              <input type="text" id="search-program-input" onkeyup="handleFilterAndSearch()" placeholder="Cari program donasi..." class="w-full text-xs pl-8 pr-3 py-2 bg-gray-50 border rounded-lg focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-600 transition">
+            </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="bg-blue-50/70 rounded-xl p-4 border border-blue-100 flex flex-col justify-between space-y-3">
-            <div class="flex items-center gap-3">
-              <span class="p-2 bg-blue-600 text-white rounded-lg text-lg">💰</span>
-              <div>
-                <p class="text-xs text-blue-900 font-medium">Total Dana Terkumpul</p>
-                <h4 id="stat-collected" class="font-extrabold text-blue-900 text-lg">Rp 0</h4>
-              </div>
-            </div>
-            <div>
-              <div class="w-full bg-blue-200 rounded-full h-2">
-                <div id="stat-progress-collected" class="bg-blue-600 h-2 rounded-full" style="width: 0%"></div>
-              </div>
-              <div class="flex justify-between text-[11px] text-gray-500 mt-1">
-                <span id="stat-target">Target: Rp 0</span>
-                <span id="stat-percent-collected">0%</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="bg-emerald-50/70 rounded-xl p-4 border border-emerald-100 flex flex-col justify-between space-y-3">
-            <div class="flex items-center gap-3">
-              <span class="p-2 bg-emerald-600 text-white rounded-lg text-lg">🌱</span>
-              <div>
-                <p class="text-xs text-emerald-900 font-medium">Dana Disalurkan</p>
-                <h4 id="stat-disalurkan" class="font-extrabold text-emerald-900 text-lg">Rp 0</h4>
-              </div>
-            </div>
-            <div>
-              <div class="w-full bg-emerald-200 rounded-full h-2">
-                <div id="stat-progress-disalurkan" class="bg-emerald-600 h-2 rounded-full" style="width: 0%"></div>
-              </div>
-              <div class="flex justify-between text-[11px] text-gray-500 mt-1">
-                <span>Penyaluran Program</span>
-                <span id="stat-percent-disalurkan">0%</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="bg-amber-50/70 rounded-xl p-4 border border-amber-100 flex flex-col justify-between space-y-3">
-            <div class="flex items-center gap-3">
-              <span class="p-2 bg-amber-500 text-white rounded-lg text-lg">💳</span>
-              <div>
-                <p class="text-xs text-amber-900 font-medium">Sisa Dana Tersedia</p>
-                <h4 id="stat-sisa" class="font-extrabold text-amber-900 text-lg">Rp 0</h4>
-              </div>
-            </div>
-            <p class="text-[11px] text-gray-500 text-left">Dana siap disalurkan ke penerima manfaat.</p>
+            <!-- Dropdown Filter Semua Program -->
+            <select id="status-program-selector" onchange="handleFilterAndSearch()" class="text-xs bg-gray-50 border p-2 rounded-lg font-semibold text-gray-700 max-w-xs w-full sm:w-auto focus:outline-none">
+              <option value="ALL">🌐 Semua Program Donasi</option>
+            </select>
           </div>
         </div>
-      </div>
-
-      <div id="program-section">
-        <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-          <span>🎯</span> Program Donasi Aktif
-        </h3>
         
         <div id="loading-public" class="text-center py-12">
           <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent"></div>
@@ -129,14 +88,13 @@
     </main>
   </div>
 
-  <!-- ================= VIEW 2: HALAMAN DETAIL PROGRAM DONASI TERSENDIRI ================= -->
+  <!-- ================= VIEW 2: HALAMAN DETAIL PROGRAM DONASI ================= -->
   <div id="view-campaign-detail" class="flex-grow max-w-4xl mx-auto px-4 py-8 w-full hidden space-y-6">
     <button onclick="switchToPublicView()" class="bg-white hover:bg-gray-100 text-gray-700 font-semibold text-xs px-4 py-2 rounded-xl border shadow-sm transition flex items-center gap-2">
       <span>←</span> Kembali ke Beranda
     </button>
 
-    <div id="campaign-detail-content" class="bg-white rounded-2xl shadow-sm border overflow-hidden">
-    </div>
+    <div id="campaign-detail-content" class="bg-white rounded-2xl shadow-sm border overflow-hidden"></div>
   </div>
 
   <!-- ================= VIEW 3: ADMIN DASHBOARD PANEL ================= -->
@@ -146,7 +104,7 @@
         <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
           <span>📊</span> Dashboard Admin KitaBantu
         </h2>
-        <p class="text-xs text-gray-500">Kelola program donasi, tombol aktif/nonaktif, dan unduh laporan.</p>
+        <p class="text-xs text-gray-500">Kelola program donasi, header web, dan unduh laporan.</p>
       </div>
       <div class="flex items-center gap-2">
         <button onclick="openCreateProgramModal()" class="bg-blue-900 hover:bg-blue-950 text-white font-semibold text-xs px-4 py-2 rounded-lg transition flex items-center gap-1.5">
@@ -158,15 +116,13 @@
       </div>
     </div>
 
+    <!-- Tab Navigasi Admin (EDITED: Menghilangkan tab Banner Header terpisah) -->
     <div class="flex border-b border-gray-200 bg-white px-4 rounded-t-xl shadow-sm overflow-x-auto text-xs md:text-sm font-semibold">
       <button onclick="switchAdminTab('tab-overview')" id="nav-tab-overview" class="py-3 px-4 border-b-2 border-blue-600 text-blue-600 flex items-center gap-2">
         <span>📈</span> Ringkasan
       </button>
       <button onclick="switchAdminTab('tab-programs')" id="nav-tab-programs" class="py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex items-center gap-2">
-        <span>📋</span> Kelola Program Donasi
-      </button>
-      <button onclick="switchAdminTab('tab-header')" id="nav-tab-header" class="py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex items-center gap-2">
-        <span>🖼️</span> Banner Header Web
+        <span>📋</span> Kelola Program Donasi & Header
       </button>
       <button onclick="switchAdminTab('tab-reports')" id="nav-tab-reports" class="py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex items-center gap-2">
         <span>📄</span> Rekap & Laporan
@@ -234,70 +190,81 @@
       </div>
     </div>
 
-    <!-- TAB 2: KELOLA PROGRAM DONASI -->
-    <div id="tab-programs" class="bg-white p-5 rounded-2xl border shadow-sm space-y-4 hidden">
-      <div class="flex justify-between items-center border-b pb-3">
-        <h3 class="font-bold text-gray-800 text-sm">Daftar & Status Program Donasi</h3>
-        <button onclick="openCreateProgramModal()" class="bg-blue-900 hover:bg-blue-950 text-white font-semibold text-xs px-3 py-1.5 rounded-lg transition">
-          + Tambah Program Baru
-        </button>
+    <!-- TAB 2: KELOLA PROGRAM DONASI & HEADER (EDITED: Peleburan Pengaturan Header ke sini) -->
+    <div id="tab-programs" class="space-y-6 hidden">
+      
+      <!-- Section Peleburan: Form Pengaturan Banner Header Web (Collapsible) -->
+      <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
+        <div onclick="toggleHeaderSection()" class="p-4 bg-gray-50 border-b flex justify-between items-center cursor-pointer hover:bg-gray-100 transition">
+          <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
+            <span>🖼️</span> Pengaturan Banner Header Utama Web
+          </h3>
+          <span id="header-accordion-icon" class="text-xs font-bold text-gray-500">▼ Buka Form</span>
+        </div>
+
+        <div id="header-settings-container" class="p-5 hidden border-t space-y-4">
+          <form id="form-header-settings" onsubmit="handleSaveHeaderSettings(event)" class="space-y-4 max-w-2xl">
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1">Judul Header Utama (Hero Title)</label>
+              <input type="text" id="setting-hero-title" required class="w-full p-2.5 border rounded-lg text-sm">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1">Subteks Deskripsi Header</label>
+              <textarea id="setting-hero-subtext" rows="2" required class="w-full p-2.5 border rounded-lg text-sm"></textarea>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1">Upload Gambar Header Baru</label>
+              <input type="file" id="setting-hero-file" accept="image/*" class="w-full text-xs p-1 border rounded-lg mb-1">
+              <input type="hidden" id="setting-hero-bg-url">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1">Total Dana Disalurkan Manual (Rp)</label>
+              <input type="number" id="setting-disalurkan" min="0" class="w-full p-2.5 border rounded-lg text-sm">
+            </div>
+
+            <button type="submit" id="btn-save-header" class="bg-blue-900 hover:bg-blue-950 text-white font-bold px-4 py-2 rounded-lg text-xs transition">
+              Simpan Perubahan Header
+            </button>
+          </form>
+        </div>
       </div>
 
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs text-gray-600">
-          <thead class="bg-gray-50 uppercase text-[10px] text-gray-500 border-b">
-            <tr>
-              <th class="p-3">Cover</th>
-              <th class="p-3">Judul Program</th>
-              <th class="p-3">Kategori</th>
-              <th class="p-3">Target</th>
-              <th class="p-3">Terkumpul</th>
-              <th class="p-3 text-center">Status / Aktifkan</th>
-              <th class="p-3 text-center">Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="admin-table-programs" class="divide-y">
-            <tr><td colspan="7" class="p-4 text-center text-gray-400">Memuat program...</td></tr>
-          </tbody>
-        </table>
+      <!-- Tabel Daftar Program Donasi -->
+      <div class="bg-white p-5 rounded-2xl border shadow-sm space-y-4">
+        <div class="flex justify-between items-center border-b pb-3">
+          <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
+            <span>📋</span> Daftar & Status Program Donasi
+          </h3>
+          <button onclick="openCreateProgramModal()" class="bg-blue-900 hover:bg-blue-950 text-white font-semibold text-xs px-3 py-1.5 rounded-lg transition">
+            + Tambah Program Baru
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-gray-600">
+            <thead class="bg-gray-50 uppercase text-[10px] text-gray-500 border-b">
+              <tr>
+                <th class="p-3">Cover</th>
+                <th class="p-3">Judul Program</th>
+                <th class="p-3">Kategori</th>
+                <th class="p-3">Target</th>
+                <th class="p-3">Terkumpul</th>
+                <th class="p-3 text-center">Status / Aktifkan</th>
+                <th class="p-3 text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="admin-table-programs" class="divide-y">
+              <tr><td colspan="7" class="p-4 text-center text-gray-400">Memuat program...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-    <!-- TAB 3: HEADER SETTINGS -->
-    <div id="tab-header" class="bg-white p-6 rounded-2xl border shadow-sm space-y-5 hidden max-w-2xl">
-      <h3 class="font-bold text-gray-800 text-sm border-b pb-3 flex items-center gap-2">
-        <span>🖼️</span> Pengaturan Header Tampilan Utama Web
-      </h3>
-
-      <form id="form-header-settings" onsubmit="handleSaveHeaderSettings(event)" class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-gray-700 mb-1">Judul Header Utama (Hero Title)</label>
-          <input type="text" id="setting-hero-title" required class="w-full p-2.5 border rounded-lg text-sm">
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-gray-700 mb-1">Subteks Deskripsi Header</label>
-          <textarea id="setting-hero-subtext" rows="3" required class="w-full p-2.5 border rounded-lg text-sm"></textarea>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-gray-700 mb-1">Upload Gambar Header Baru</label>
-          <input type="file" id="setting-hero-file" accept="image/*" class="w-full text-xs p-1 border rounded-lg mb-1">
-          <input type="hidden" id="setting-hero-bg-url">
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-gray-700 mb-1">Total Dana Disalurkan Manual (Rp)</label>
-          <input type="number" id="setting-disalurkan" min="0" class="w-full p-2.5 border rounded-lg text-sm">
-        </div>
-
-        <button type="submit" id="btn-save-header" class="bg-blue-900 hover:bg-blue-950 text-white font-bold px-5 py-2.5 rounded-lg text-sm transition">
-          Simpan Perubahan Header
-        </button>
-      </form>
-    </div>
-
-    <!-- TAB 4: REKAP LAPORAN -->
+    <!-- TAB 3: REKAP LAPORAN -->
     <div id="tab-reports" class="bg-white p-6 rounded-2xl border shadow-sm space-y-5 hidden">
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-4 gap-3">
         <div>
@@ -499,7 +466,6 @@
     // ==========================================
     // KONFIGURASI WEB APP GOOGLE APPS SCRIPT
     // ==========================================
-    // PASTE URL WEB APP GOOGLE APPS SCRIPT ANDA DI SINI!
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz6JJG_vCVQHsxPz7xnNTLNs_crbVVTna524uWYzlJTuOSz8tLMqCippX2I_iTCFfDXFw/exec";
 
     let globalInitialData = null;
@@ -620,6 +586,19 @@
       }
     }
 
+    // Toggle menu lipat Header Settings di Admin
+    function toggleHeaderSection() {
+      const container = document.getElementById('header-settings-container');
+      const icon = document.getElementById('header-accordion-icon');
+      if (container.classList.contains('hidden')) {
+        container.classList.remove('hidden');
+        icon.innerText = "▲ Tutup Form";
+      } else {
+        container.classList.add('hidden');
+        icon.innerText = "▼ Buka Form";
+      }
+    }
+
     // ================= PUBLIK LOAD & LOGIK =================
     function loadPublicData() {
       const loadingEl = document.getElementById('loading-public');
@@ -655,7 +634,6 @@
           }
 
           populateStatusProgramSelector(res.campaigns || []);
-          renderStats(res.stats || { totalTarget: 0, totalCollected: 0, totalDisalurkan: 0, sisaDana: 0 });
           renderCampaignGrid(res.campaigns || []);
           renderListDonasiModal(res.campaigns || []);
           if (res.recentDonations && res.recentDonations.length > 0) {
@@ -786,27 +764,28 @@
                 <p class="text-xs text-gray-500 mt-1">${c.description}</p>
               </div>
 
-              <div class="bg-gray-50 rounded-2xl p-5 border space-y-4">
+              <!-- EDITED: Status Dana Kebajikan hanya muncul saat program diklik -->
+              <div class="bg-blue-50/50 rounded-2xl p-5 border border-blue-100 space-y-4 shadow-sm">
                 <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
-                  <span>💰</span> Status Dana Program Ini
+                  <span>💰</span> Status Dana Kebajikan Program Ini
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-                  <div class="bg-white p-3 rounded-xl border">
-                    <p class="text-gray-500">Target Dana</p>
-                    <p class="font-bold text-base text-gray-800">${formatRupiah(c.target)}</p>
+                  <div class="bg-white p-3.5 rounded-xl border border-blue-100 shadow-sm flex flex-col justify-between">
+                    <p class="text-gray-500 font-medium">Target Dana</p>
+                    <p class="font-extrabold text-base text-gray-800 mt-1">${formatRupiah(c.target)}</p>
                   </div>
-                  <div class="bg-white p-3 rounded-xl border">
-                    <p class="text-blue-900 font-medium">Dana Terkumpul</p>
-                    <p class="font-extrabold text-base text-blue-900">${formatRupiah(c.collected)}</p>
+                  <div class="bg-white p-3.5 rounded-xl border border-blue-100 shadow-sm flex flex-col justify-between">
+                    <p class="text-blue-900 font-medium">Total Dana Terkumpul</p>
+                    <p class="font-extrabold text-base text-blue-900 mt-1">${formatRupiah(c.collected)}</p>
                   </div>
-                  <div class="bg-white p-3 rounded-xl border">
+                  <div class="bg-white p-3.5 rounded-xl border border-amber-100 shadow-sm flex flex-col justify-between">
                     <p class="text-amber-900 font-medium">Sisa Dana Tersedia</p>
-                    <p class="font-extrabold text-base text-amber-900">${formatRupiah(sisaDanaProgram)}</p>
+                    <p class="font-extrabold text-base text-amber-900 mt-1">${formatRupiah(sisaDanaProgram)}</p>
                   </div>
                 </div>
 
                 <div>
-                  <div class="w-full bg-gray-200 rounded-full h-2.5 mb-1">
+                  <div class="w-full bg-blue-100 rounded-full h-2.5 mb-1">
                     <div class="bg-blue-600 h-2.5 rounded-full" style="width: ${percent}%"></div>
                   </div>
                   <div class="flex justify-between text-xs font-semibold text-gray-600">
@@ -816,7 +795,7 @@
                 </div>
               </div>
 
-              <div class="bg-blue-50/60 p-6 rounded-2xl border border-blue-100 space-y-4">
+              <div class="bg-white p-6 rounded-2xl border space-y-4 shadow-sm">
                 <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2 border-b pb-2">
                   <span>💳</span> Form Donasi Transfer
                 </h3>
@@ -904,44 +883,28 @@
       }
     }
 
-    function handleProgramFilterChange(campaignId) {
-      if (!globalInitialData) return;
+    // EDITED: Kombinasi filter dropdown dan kata kunci pencarian
+    function handleFilterAndSearch() {
+      if (!globalInitialData || !globalInitialData.campaigns) return;
 
-      if (campaignId === 'ALL') {
-        renderStats(globalInitialData.stats);
-        document.getElementById('status-box-title').innerText = "Status Dana Kebajikan";
-      } else {
-        const campaign = globalInitialData.campaigns.find(c => String(c.id) === String(campaignId));
-        if (campaign) {
-          const totalDisalurkan = globalInitialData.stats.totalDisalurkan || 0;
-          const sisa = Math.max(0, campaign.collected - totalDisalurkan);
+      const selectedId = document.getElementById('status-program-selector').value;
+      const searchQuery = (document.getElementById('search-program-input').value || '').toLowerCase().trim();
 
-          renderStats({
-            totalCollected: campaign.collected,
-            totalTarget: campaign.target,
-            totalDisalurkan: totalDisalurkan,
-            sisaDana: sisa
-          });
-          document.getElementById('status-box-title').innerText = "Status Dana: " + campaign.title;
-        }
+      let filtered = globalInitialData.campaigns;
+
+      if (selectedId !== 'ALL') {
+        filtered = filtered.filter(c => String(c.id) === String(selectedId));
       }
-    }
 
-    function renderStats(stats) {
-      if (!stats) return;
-      document.getElementById('stat-collected').innerText = formatRupiah(stats.totalCollected);
-      document.getElementById('stat-target').innerText = 'Target: ' + formatRupiah(stats.totalTarget);
-      
-      const percentCollected = stats.totalTarget > 0 ? Math.min(Math.round((stats.totalCollected / stats.totalTarget) * 100), 100) : 0;
-      document.getElementById('stat-progress-collected').style.width = percentCollected + '%';
-      document.getElementById('stat-percent-collected').innerText = percentCollected + '%';
+      if (searchQuery !== '') {
+        filtered = filtered.filter(c => 
+          c.title.toLowerCase().includes(searchQuery) || 
+          c.category.toLowerCase().includes(searchQuery) ||
+          c.description.toLowerCase().includes(searchQuery)
+        );
+      }
 
-      document.getElementById('stat-disalurkan').innerText = formatRupiah(stats.totalDisalurkan);
-      const percentDisalurkan = stats.totalCollected > 0 ? Math.min(Math.round((stats.totalDisalurkan / stats.totalCollected) * 100), 100) : 0;
-      document.getElementById('stat-progress-disalurkan').style.width = percentDisalurkan + '%';
-      document.getElementById('stat-percent-disalurkan').innerText = percentDisalurkan + '%';
-
-      document.getElementById('stat-sisa').innerText = formatRupiah(stats.sisaDana);
+      renderCampaignGrid(filtered);
     }
 
     function renderCampaignGrid(campaigns) {
@@ -954,7 +917,7 @@
       grid.innerHTML = '';
 
       if (!campaigns || campaigns.length === 0) {
-        grid.innerHTML = '<div class="col-span-full bg-white p-8 rounded-2xl border text-center text-gray-500 space-y-2"><p class="text-2xl">📋</p><p class="font-bold text-gray-700">Belum ada program donasi aktif saat ini.</p><p class="text-xs text-gray-400">Silakan aktifkan status program donasi melalui Panel Admin.</p></div>';
+        grid.innerHTML = '<div class="col-span-full bg-white p-8 rounded-2xl border text-center text-gray-500 space-y-2"><p class="text-2xl">📋</p><p class="font-bold text-gray-700">Tidak ada program donasi yang sesuai.</p><p class="text-xs text-gray-400">Coba ubah kata kunci pencarian atau filter program Anda.</p></div>';
         return;
       }
 
@@ -1124,7 +1087,7 @@
     }
 
     function switchAdminTab(tabId) {
-      const tabs = ['tab-overview', 'tab-programs', 'tab-header', 'tab-reports'];
+      const tabs = ['tab-overview', 'tab-programs', 'tab-reports'];
       tabs.forEach(t => {
         document.getElementById(t).classList.add('hidden');
         document.getElementById('nav-' + t).className = "py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex items-center gap-2";
