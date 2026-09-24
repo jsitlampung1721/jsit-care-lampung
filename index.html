@@ -57,6 +57,11 @@
         <button onclick="switchToListDonasiView()" id="btn-nav-list" title="List Semua Donasi" class="bg-blue-800 hover:bg-blue-700 text-white px-3 py-2 rounded-lg font-semibold text-xs md:text-sm transition flex items-center gap-1.5">
           <span>📋</span> <span class="hidden md:inline">List Donasi</span>
         </button>
+
+        <!-- Tombol Pendaftaran Akun Donatur Langsung di Beranda -->
+        <button onclick="openRegisterDonaturModal()" id="btn-nav-register" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg font-bold text-xs md:text-sm transition flex items-center gap-1.5 shadow-md">
+          <span>📝</span> <span>Daftar Donatur</span>
+        </button>
         
         <button onclick="handleAdminNavClick()" id="btn-nav-admin" title="Login Pengguna" class="bg-amber-500 hover:bg-amber-600 text-white p-2 md:px-3 md:py-2 rounded-lg font-semibold text-xs md:text-sm transition flex items-center justify-center gap-1">
           <span>🔐</span> <span id="lbl-nav-login" class="hidden lg:inline">Masuk</span>
@@ -69,13 +74,23 @@
   <div id="view-public" class="flex-grow space-y-6 pb-12">
     
     <!-- Hero Banner Slider Utama -->
-    <section id="hero-header" class="relative bg-blue-950 text-white py-14 px-4 bg-cover bg-center transition-all duration-700 shadow-inner min-h-[220px] flex items-center justify-center">
-      <div class="max-w-4xl mx-auto text-center space-y-3">
+    <section id="hero-header" class="relative bg-blue-950 text-white py-14 px-4 bg-cover bg-center transition-all duration-700 shadow-inner min-h-[240px] flex items-center justify-center">
+      <div class="max-w-4xl mx-auto text-center space-y-4">
         <span class="bg-blue-600 text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider inline-block">KitaBantu JSIT</span>
         <h2 id="hero-title" class="text-2xl md:text-4xl font-extrabold tracking-tight">KitaBantu Soskem JSIT Lampung</h2>
         <p id="hero-subtext" class="text-gray-200 text-xs md:text-sm max-w-2xl mx-auto leading-relaxed">
           Wujud nyata kepedulian dan keprihatinan sosial bersama JSIT Lampung untuk keberlanjutan kebaikan sesama.
         </p>
+
+        <!-- Call to Action Banner di Beranda -->
+        <div class="pt-2 flex flex-wrap justify-center gap-3">
+          <button onclick="openRegisterDonaturModal()" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs md:text-sm font-extrabold px-5 py-2.5 rounded-xl shadow-lg transition transform hover:scale-105 flex items-center gap-2">
+            <span>👤</span> Buat Akun Donatur Sekarang
+          </button>
+          <button onclick="document.getElementById('program-section').scrollIntoView({behavior: 'smooth'})" class="bg-white/10 hover:bg-white/20 text-white text-xs md:text-sm font-semibold px-4 py-2.5 rounded-xl transition border border-white/30">
+            Lihat Program Donasi
+          </button>
+        </div>
       </div>
     </section>
 
@@ -161,7 +176,7 @@
     <div id="campaign-detail-content" class="bg-white rounded-2xl shadow-sm border overflow-hidden"></div>
   </div>
 
-  <!-- ================= VIEW 4: MULTI-USER DASHBOARD PANEL ================= -->
+  <!-- ================= VIEW 4: DASHBOARD PANEL ================= -->
   <div id="view-admin" class="flex-grow max-w-6xl mx-auto px-4 py-6 w-full space-y-6 hidden">
     <div class="bg-white p-5 rounded-2xl shadow-sm border flex flex-col md:flex-row justify-between md:items-center gap-4">
       <div>
@@ -174,7 +189,7 @@
         <button onclick="openSelfProfileModal()" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold text-xs px-3 py-2 rounded-lg transition flex items-center gap-1">
           <span>⚙️</span> Edit Akun Saya
         </button>
-        <button onclick="openCreateProgramModal()" class="bg-blue-900 hover:bg-blue-950 text-white font-semibold text-xs px-4 py-2 rounded-lg transition flex items-center gap-1.5">
+        <button onclick="openCreateProgramModal()" class="bg-blue-900 hover:bg-blue-950 text-white font-semibold text-xs px-4 py-2 rounded-lg transition flex items-center gap-1.5 role-restricted-admin">
           <span>+</span> Tambah Program Baru
         </button>
         <button onclick="logoutAdmin()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold text-xs px-3 py-2 rounded-lg transition border border-rose-200">
@@ -183,19 +198,17 @@
       </div>
     </div>
 
-    <!-- Tab Navigasi Admin Multi-Role -->
+    <!-- Tab Navigasi Admin & Donatur Multi-Role -->
     <div class="flex border-b border-gray-200 bg-white px-4 rounded-t-xl shadow-sm overflow-x-auto text-xs md:text-sm font-semibold">
       <button onclick="switchAdminTab('tab-overview')" id="nav-tab-overview" class="py-3 px-4 border-b-2 border-blue-600 text-blue-600 flex items-center gap-2">
         <span>📈</span> Ringkasan
       </button>
-      <button onclick="switchAdminTab('tab-programs')" id="nav-tab-programs" class="py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex items-center gap-2">
+      <button onclick="switchAdminTab('tab-programs')" id="nav-tab-programs" class="py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex items-center gap-2 role-restricted-admin">
         <span>📋</span> Kelola Program Donasi
       </button>
       <button onclick="switchAdminTab('tab-reports')" id="nav-tab-reports" class="py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex items-center gap-2">
-        <span>📄</span> Rekap & Laporan
+        <span>📄</span> Rekap & Laporan Donasi
       </button>
-
-      <!-- Khusus Superadmin & Admin Pusat -->
       <button onclick="switchAdminTab('tab-school-history')" id="nav-tab-school-history" class="py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 items-center gap-2 role-restricted-admin">
         <span>🏫</span> Riwayat Sekolah
       </button>
@@ -216,7 +229,7 @@
         <div class="bg-white p-5 rounded-2xl border shadow-sm flex items-center gap-4">
           <div class="p-3 bg-blue-100 text-blue-700 rounded-xl text-2xl">💰</div>
           <div>
-            <p class="text-xs text-gray-500 font-medium">Total Donasi Terkumpul</p>
+            <p id="lbl-card-donasi" class="text-xs text-gray-500 font-medium">Total Donasi Terkumpul</p>
             <h3 id="admin-card-donasi" class="text-lg font-bold text-gray-800">Rp 0</h3>
           </div>
         </div>
@@ -224,7 +237,7 @@
         <div class="bg-white p-5 rounded-2xl border shadow-sm flex items-center gap-4">
           <div class="p-3 bg-emerald-100 text-emerald-700 rounded-xl text-2xl">👥</div>
           <div>
-            <p class="text-xs text-gray-500 font-medium">Total Transaksi Donatur</p>
+            <p id="lbl-card-donatur" class="text-xs text-gray-500 font-medium">Total Transaksi Donatur</p>
             <h3 id="admin-card-donatur" class="text-lg font-bold text-gray-800">0</h3>
           </div>
         </div>
@@ -247,7 +260,7 @@
       </div>
 
       <div class="bg-white rounded-2xl border p-5 shadow-sm space-y-4">
-        <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
+        <h3 id="title-recent-donations" class="font-bold text-gray-800 text-sm flex items-center gap-2">
           <span>🕒</span> Transaksi Donasi Masuk Terbaru
         </h3>
         <div class="overflow-x-auto">
@@ -272,7 +285,7 @@
     </div>
 
     <!-- TAB 2: KELOLA PROGRAM DONASI -->
-    <div id="tab-programs" class="bg-white p-5 rounded-2xl border shadow-sm space-y-4 hidden">
+    <div id="tab-programs" class="bg-white p-5 rounded-2xl border shadow-sm space-y-4 hidden role-restricted-admin">
       <div class="flex justify-between items-center border-b pb-3">
         <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
           <span>📋</span> Daftar & Status Program Donasi
@@ -303,8 +316,8 @@
       </div>
     </div>
 
-    <!-- TAB BARU: RIWAYAT SEKOLAH (SUPERADMIN & ADMIN) -->
-    <div id="tab-school-history" class="bg-white p-6 rounded-2xl border shadow-sm space-y-6 hidden">
+    <!-- TAB RIWAYAT SEKOLAH -->
+    <div id="tab-school-history" class="bg-white p-6 rounded-2xl border shadow-sm space-y-6 hidden role-restricted-admin">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 gap-3">
         <div>
           <h3 class="font-bold text-gray-800 text-base flex items-center gap-2">
@@ -327,8 +340,8 @@
       </div>
     </div>
 
-    <!-- TAB 3: BANNER HEADER WEB -->
-    <div id="tab-header" class="bg-white p-6 rounded-2xl border shadow-sm space-y-5 hidden max-w-2xl">
+    <!-- TAB BANNER HEADER WEB -->
+    <div id="tab-header" class="bg-white p-6 rounded-2xl border shadow-sm space-y-5 hidden max-w-2xl role-restricted-super">
       <h3 class="font-bold text-gray-800 text-sm border-b pb-3 flex items-center gap-2">
         <span>🖼️</span> Pengaturan Banner Header Utama & Rekening Pembayaran
       </h3>
@@ -378,8 +391,8 @@
       </form>
     </div>
 
-    <!-- TAB 4: ADMIN & SOSMED -->
-    <div id="tab-admin-sosmed" class="bg-white p-6 rounded-2xl border shadow-sm space-y-5 hidden max-w-2xl">
+    <!-- TAB ADMIN & SOSMED -->
+    <div id="tab-admin-sosmed" class="bg-white p-6 rounded-2xl border shadow-sm space-y-5 hidden max-w-2xl role-restricted-super">
       <h3 class="font-bold text-gray-800 text-sm border-b pb-3 flex items-center gap-2">
         <span>⚙️</span> Pengaturan Kontak Admin & Link Sosial Media
       </h3>
@@ -426,8 +439,8 @@
       </form>
     </div>
 
-    <!-- TAB 5: KELOLA MULTI-USER -->
-    <div id="tab-users-mgmt" class="bg-white p-6 rounded-2xl border shadow-sm space-y-5 hidden">
+    <!-- TAB KELOLA MULTI-USER -->
+    <div id="tab-users-mgmt" class="bg-white p-6 rounded-2xl border shadow-sm space-y-5 hidden role-restricted-admin">
       <div class="flex justify-between items-center border-b pb-3">
         <div>
           <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
@@ -459,14 +472,14 @@
       </div>
     </div>
 
-    <!-- TAB 6: REKAP & LAPORAN -->
+    <!-- TAB REKAP & LAPORAN -->
     <div id="tab-reports" class="bg-white p-6 rounded-2xl border shadow-sm space-y-5 hidden">
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-4 gap-3">
         <div>
           <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
             <span>📄</span> Rekap Laporan Pertanggungjawaban Program
           </h3>
-          <p class="text-xs text-gray-500">Ubah status verifikasi donasi, unduh bukti, atau ekspor CSV.</p>
+          <p class="text-xs text-gray-500">Lihat riwayat donasi, unduh bukti kuitansi, atau ekspor CSV.</p>
         </div>
         <div class="flex items-center gap-2">
           <button onclick="exportDonationsToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-2 rounded-lg transition flex items-center gap-1">
@@ -517,7 +530,7 @@
     <p>© 2026 KitaBantu Soskem JSIT Lampung. All rights reserved.</p>
   </footer>
 
-  <!-- Floating WhatsApp Widget Pojok Kanan Bawah -->
+  <!-- Floating WhatsApp Widget -->
   <div class="fixed bottom-5 right-5 z-40 flex flex-col items-end gap-2">
     <div id="wa-popup-card" class="bg-white p-3.5 rounded-2xl shadow-2xl border border-emerald-200 hidden max-w-xs text-xs space-y-2">
       <div class="flex justify-between items-center border-b pb-1">
@@ -546,7 +559,7 @@
       <div class="text-center">
         <span class="text-3xl">🔐</span>
         <h3 class="text-lg font-bold text-gray-800 mt-2">Masuk Akun Pengguna</h3>
-        <p class="text-xs text-gray-500 mt-1">Superadmin, Admin, atau Akun Sekolah SIT</p>
+        <p class="text-xs text-gray-500 mt-1">Donatur, Sekolah, Admin, atau Superadmin</p>
       </div>
       <div class="space-y-3">
         <div>
@@ -563,49 +576,74 @@
       </button>
 
       <div class="text-center pt-2 border-t">
-        <button onclick="openRegisterSchoolModal()" class="text-xs text-blue-900 hover:underline font-bold">
-          Belum punya akun? Daftar Akun Sekolah Baru
+        <button onclick="openRegisterDonaturModal()" class="text-xs text-emerald-700 hover:underline font-bold">
+          Belum punya akun? Daftar Akun Donatur Baru
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Modal Registrasi Akun Sekolah Mandiri -->
-  <div id="modal-register-school" class="fixed inset-0 bg-black/60 flex items-center justify-center p-3 z-50 hidden">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-6 relative shadow-2xl space-y-4">
-      <button onclick="closeModal('modal-register-school')" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 font-bold">&times;</button>
+  <!-- MODAL PENDAFTARAN AKUN DONATUR BARU (DENGAN PERINGATAN CATAT PASSSWORD) -->
+  <div id="modal-register-donatur" class="fixed inset-0 bg-black/60 flex items-center justify-center p-3 z-50 hidden">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 relative shadow-2xl space-y-4">
+      <button onclick="closeModal('modal-register-donatur')" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 font-bold text-xl">&times;</button>
       <div class="text-center">
-        <span class="text-3xl">🏫</span>
-        <h3 class="text-lg font-bold text-gray-800 mt-1">Pendaftaran Akun Sekolah</h3>
-        <p class="text-xs text-gray-500 mt-0.5">Buat akun untuk unit sekolah SIT Anda</p>
+        <span class="text-4xl">📝</span>
+        <h3 class="text-lg font-bold text-gray-800 mt-1">Pendaftaran Akun Donatur</h3>
+        <p class="text-xs text-gray-500 mt-0.5">Buat akun untuk memantau riwayat & kuitansi donasi Anda</p>
       </div>
 
-      <form onsubmit="handleRegisterSchool(event)" class="space-y-3 text-xs">
+      <!-- KOTAK PERINGATAN WARN BANNER -->
+      <div class="bg-amber-50 border-l-4 border-amber-500 p-3 rounded-r-xl space-y-1">
+        <p class="text-xs font-bold text-amber-900 flex items-center gap-1">
+          <span>⚠️</span> PERHATIAN SANGAT PENTING:
+        </p>
+        <p class="text-[11px] text-amber-800 leading-relaxed font-medium">
+          MOHON DICATAT DAN DISIMPAN <b>USERNAME</b> SERTA <b>PASSWORD</b> ANDA! Data ini akan digunakan untuk masuk (*login*) dan melihat seluruh riwayat donasi Anda di kemudian hari.
+        </p>
+      </div>
+
+      <form onsubmit="handleRegisterDonatur(event)" class="space-y-3 text-xs">
         <div>
-          <label class="block font-bold text-gray-700 mb-1">Nama Unit Sekolah / Lembaga</label>
-          <input type="text" id="reg-sekolah" required placeholder="Contoh: SDIT Al-Iman Bandar Lampung" class="w-full p-2.5 border rounded-lg">
+          <label class="block font-bold text-gray-700 mb-1">Nama Lengkap Donatur</label>
+          <input type="text" id="reg-donatur-name" required placeholder="Contoh: H. Ahmad Subandi" class="w-full p-2.5 border rounded-lg text-sm">
         </div>
         <div>
-          <label class="block font-bold text-gray-700 mb-1">Nama Pengurus / Operator</label>
-          <input type="text" id="reg-name" required placeholder="Contoh: Ustadz Ahmad" class="w-full p-2.5 border rounded-lg">
+          <label class="block font-bold text-gray-700 mb-1">Buat Username</label>
+          <input type="text" id="reg-donatur-username" required placeholder="Contoh: ahmad_donatur" class="w-full p-2.5 border rounded-lg text-sm">
         </div>
         <div>
-          <label class="block font-bold text-gray-700 mb-1">Username Login</label>
-          <input type="text" id="reg-username" required placeholder="Contoh: sdit_aliman" class="w-full p-2.5 border rounded-lg">
-        </div>
-        <div>
-          <label class="block font-bold text-gray-700 mb-1">Password</label>
-          <input type="password" id="reg-password" required placeholder="Buat kata sandi" class="w-full p-2.5 border rounded-lg">
+          <label class="block font-bold text-gray-700 mb-1">Buat Password</label>
+          <input type="password" id="reg-donatur-password" required placeholder="Buat kata sandi Anda" class="w-full p-2.5 border rounded-lg text-sm">
         </div>
 
-        <button type="submit" id="btn-submit-reg" class="w-full bg-blue-900 hover:bg-blue-950 text-white font-bold py-2.5 rounded-lg text-sm transition">
-          Daftar Akun Sekarang
+        <button type="submit" id="btn-submit-reg-donatur" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md">
+          Daftar Akun Donatur Sekarang
         </button>
       </form>
     </div>
   </div>
 
-  <!-- Modal Ubah Profil Mandiri (Ubah Username & Password Sendiri) -->
+  <!-- MODAL SUKSES REGISTRASI (MENGINGATKAN KEMBALI KREDENSIAL) -->
+  <div id="modal-register-success" class="fixed inset-0 bg-black/60 flex items-center justify-center p-3 z-50 hidden">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 relative shadow-2xl text-center space-y-4">
+      <span class="text-5xl">🎉</span>
+      <h3 class="text-lg font-bold text-gray-800">Akun Donatur Berhasil Dibuat!</h3>
+      
+      <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl text-left text-xs space-y-2">
+        <p class="font-bold text-blue-900 border-b pb-1">📌 SIMPAN & CATAT KREDENSIAL ANDA:</p>
+        <p>Nama Lengkap: <b id="succ-reg-name" class="text-gray-800"></b></p>
+        <p>Username: <b id="succ-reg-user" class="text-blue-900 font-mono"></b></p>
+        <p>Password: <b id="succ-reg-pass" class="text-blue-900 font-mono"></b></p>
+      </div>
+
+      <button onclick="goToLoginAfterRegister()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 rounded-xl text-xs transition">
+        Masuk / Login Sekarang
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal Ubah Profil Mandiri -->
   <div id="modal-self-profile" class="fixed inset-0 bg-black/60 flex items-center justify-center p-3 z-50 hidden">
     <div class="bg-white rounded-2xl max-w-sm w-full relative shadow-2xl p-6 space-y-4">
       <button onclick="closeModal('modal-self-profile')" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 font-bold text-lg">&times;</button>
@@ -655,6 +693,7 @@
           <div>
             <label class="block font-bold text-gray-700 mb-1">Role / Peran</label>
             <select id="usr-role" name="role" required class="w-full p-2 border rounded-lg bg-white">
+              <option value="Donatur">Donatur</option>
               <option value="Sekolah">Sekolah</option>
               <option value="Admin">Admin</option>
               <option value="Superadmin">Superadmin</option>
@@ -669,8 +708,8 @@
           </div>
         </div>
         <div>
-          <label class="block font-bold text-gray-700 mb-1">Nama Unit Sekolah SIT</label>
-          <input type="text" id="usr-sekolah" name="sekolah" required placeholder="Contoh: SDIT Permata Hati" class="w-full p-2 border rounded-lg">
+          <label class="block font-bold text-gray-700 mb-1">Nama Unit / Lembaga</label>
+          <input type="text" id="usr-sekolah" name="sekolah" required placeholder="Contoh: SDIT Permata Hati / Donatur Personal" class="w-full p-2 border rounded-lg">
         </div>
         <button type="submit" id="btn-save-usr" class="w-full bg-blue-900 text-white font-bold py-2.5 rounded-lg transition">Simpan Akun</button>
       </form>
@@ -806,7 +845,7 @@
 
   <!-- Script Logika -->
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz6JJG_vCVQHsxPz7xnNTLNs_crbVVTna524uWYzlJTuOSz8tLMqCippX2I_iTCFfDXFw/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzsR8WUSu1YxQZ39h8MM3pkpa7koZjybfmY8V6zQcBa-Q-N3ZwIUjrw4oY1CQZcZ88ZBw/exec";
 
     let globalInitialData = null;
     let activeCampaignData = null;
@@ -824,6 +863,8 @@
     let heroBgImages = [];
     let currentHeroIndex = 0;
     let heroTimer = null;
+
+    let tempRegisteredUser = null;
 
     const donationQuotes = [
       "\"Harta tidak akan berkurang karena sedekah. Mari tebar kebaikan bersama JSIT Lampung hari ini.\"",
@@ -975,40 +1016,56 @@
       if (el) el.classList.add('hidden');
     }
 
-    function openRegisterSchoolModal() {
+    function openRegisterDonaturModal() {
       closeModal('modal-admin-auth');
-      openModal('modal-register-school');
+      openModal('modal-register-donatur');
     }
 
-    function handleRegisterSchool(e) {
+    function handleRegisterDonatur(e) {
       e.preventDefault();
-      const btn = document.getElementById('btn-submit-reg');
+      const btn = document.getElementById('btn-submit-reg-donatur');
       btn.disabled = true; btn.innerText = 'Memproses Pendaftaran...';
 
+      const name = document.getElementById('reg-donatur-name').value;
+      const username = document.getElementById('reg-donatur-username').value;
+      const password = document.getElementById('reg-donatur-password').value;
+
       const payload = {
-        sekolah: document.getElementById('reg-sekolah').value,
-        name: document.getElementById('reg-name').value,
-        username: document.getElementById('reg-username').value,
-        password: document.getElementById('reg-password').value
+        name: name,
+        username: username,
+        password: password,
+        role: "Donatur",
+        sekolah: "Donatur Personal"
       };
 
       callApi('registerUser', { data: payload })
         .then(res => {
-          btn.disabled = false; btn.innerText = 'Daftar Akun Sekarang';
+          btn.disabled = false; btn.innerText = 'Daftar Akun Donatur Sekarang';
           if (res.success) {
-            showCustomAlert(res.message);
-            closeModal('modal-register-school');
-            openModal('modal-admin-auth');
-            document.getElementById('admin-user-input').value = payload.username;
-            document.getElementById('admin-pass-input').value = payload.password;
+            tempRegisteredUser = { username: username, password: password, name: name };
+            closeModal('modal-register-donatur');
+
+            document.getElementById('succ-reg-name').innerText = name;
+            document.getElementById('succ-reg-user').innerText = username;
+            document.getElementById('succ-reg-pass').innerText = password;
+            openModal('modal-register-success');
           } else {
             showCustomAlert(res.message, false);
           }
         })
         .catch(err => {
-          btn.disabled = false; btn.innerText = 'Daftar Akun Sekarang';
+          btn.disabled = false; btn.innerText = 'Daftar Akun Donatur Sekarang';
           showCustomAlert('Gagal mendaftar: ' + err.message, false);
         });
+    }
+
+    function goToLoginAfterRegister() {
+      closeModal('modal-register-success');
+      openModal('modal-admin-auth');
+      if (tempRegisteredUser) {
+        document.getElementById('admin-user-input').value = tempRegisteredUser.username;
+        document.getElementById('admin-pass-input').value = tempRegisteredUser.password;
+      }
     }
 
     function hideAllViews() {
@@ -1264,6 +1321,8 @@
             paymentOptionsHtml += `<option value="${m}">${m}</option>`;
           });
 
+          const defaultDonorName = (verifiedAdminAuth && verifiedAdminAuth.role === "Donatur") ? verifiedAdminAuth.name : '';
+
           container.innerHTML = `
             <div class="relative">
               <img src="${c.imageUrl}" class="w-full h-64 md:h-80 object-cover">
@@ -1282,7 +1341,6 @@
                 <p class="text-xs text-gray-500 mt-1">${c.description}</p>
               </div>
 
-              <!-- Status Dana Kebajikan Program Ini (4 Kartu Lengkap) -->
               <div class="bg-blue-50/50 rounded-2xl p-5 border border-blue-100 space-y-4 shadow-sm">
                 <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
                   <span>💰</span> Status Dana Kebajikan Program Ini
@@ -1317,7 +1375,6 @@
                 </div>
               </div>
 
-              <!-- Form Donasi dengan Dropdown + Tombol Salin/Copy Icon -->
               <div class="bg-white p-6 rounded-2xl border space-y-4 shadow-sm">
                 <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2 border-b pb-2">
                   <span>💳</span> Form Donasi Transfer
@@ -1340,7 +1397,7 @@
                   <div class="grid grid-cols-2 gap-2">
                     <div>
                       <label class="block font-semibold text-gray-700">Nama Lengkap</label>
-                      <input type="text" name="donorName" placeholder="Nama Donatur" class="w-full mt-1 p-2.5 border rounded-xl">
+                      <input type="text" name="donorName" value="${defaultDonorName}" placeholder="Nama Donatur" class="w-full mt-1 p-2.5 border rounded-xl">
                     </div>
                     <div>
                       <label class="block font-semibold text-gray-700">No. WhatsApp</label>
@@ -1653,10 +1710,11 @@
       if (verifiedAdminAuth) {
         roleBadge.innerText = verifiedAdminAuth.role || 'ROLE';
         nameEl.innerText = verifiedAdminAuth.name || verifiedAdminAuth.username;
-        sekolahEl.innerText = verifiedAdminAuth.sekolah || 'SIT';
+        sekolahEl.innerText = verifiedAdminAuth.sekolah || 'Personal';
 
         const isSuper = verifiedAdminAuth.role === "Superadmin";
         const isSuperOrAdmin = verifiedAdminAuth.role === "Superadmin" || verifiedAdminAuth.role === "Admin";
+        const isDonatur = verifiedAdminAuth.role === "Donatur";
 
         document.querySelectorAll('.role-restricted-super').forEach(el => {
           if (isSuper) el.classList.remove('hidden');
@@ -1667,6 +1725,20 @@
           if (isSuperOrAdmin) el.classList.remove('hidden');
           else el.classList.add('hidden');
         });
+
+        const lblDonasi = document.getElementById('lbl-card-donasi');
+        const lblDonatur = document.getElementById('lbl-card-donatur');
+        const titleRecent = document.getElementById('title-recent-donations');
+
+        if (isDonatur) {
+          if (lblDonasi) lblDonasi.innerText = "Total Donasi Saya";
+          if (lblDonatur) lblDonatur.innerText = "Jumlah Transaksi Saya";
+          if (titleRecent) titleRecent.innerText = "Riwayat Donasi Saya";
+        } else {
+          if (lblDonasi) lblDonasi.innerText = "Total Donasi Terkumpul";
+          if (lblDonatur) lblDonatur.innerText = "Total Transaksi Donatur";
+          if (titleRecent) titleRecent.innerText = "Transaksi Donasi Masuk Terbaru";
+        }
       }
 
       loadAdminDashboardData();
@@ -1681,7 +1753,7 @@
         if (nav) {
           var restrictedClass = "";
           if (t === 'tab-header' || t === 'tab-admin-sosmed') restrictedClass = ' role-restricted-super';
-          if (t === 'tab-users-mgmt' || t === 'tab-school-history') restrictedClass = ' role-restricted-admin';
+          if (t === 'tab-users-mgmt' || t === 'tab-school-history' || t === 'tab-programs') restrictedClass = ' role-restricted-admin';
           nav.className = "py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex items-center gap-2" + restrictedClass;
         }
       });
@@ -1692,7 +1764,7 @@
       if (activeNav) {
         var restrictedClass = "";
         if (tabId === 'tab-header' || tabId === 'tab-admin-sosmed') restrictedClass = ' role-restricted-super';
-        if (tabId === 'tab-users-mgmt' || tabId === 'tab-school-history') restrictedClass = ' role-restricted-admin';
+        if (tabId === 'tab-users-mgmt' || tabId === 'tab-school-history' || tabId === 'tab-programs') restrictedClass = ' role-restricted-admin';
         activeNav.className = "py-3 px-4 border-b-2 border-blue-600 text-blue-600 flex items-center gap-2" + restrictedClass;
       }
     }
@@ -1962,7 +2034,7 @@
       tbody.innerHTML = '';
 
       if (!donations || donations.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-gray-400">Belum ada transaksi.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-gray-400">Belum ada riwayat transaksi.</td></tr>';
         return;
       }
 
@@ -1990,6 +2062,7 @@
 
     function renderAdminProgramsTable(programs) {
       const tbody = document.getElementById('admin-table-programs');
+      if (!tbody) return;
       tbody.innerHTML = '';
 
       if (!programs || programs.length === 0) {
@@ -2512,12 +2585,13 @@
       });
 
       const encodedUri = "data:text/csv;charset=utf-8,%EF%BB%BF" + encodeURIComponent(csvText);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `Laporan_Donasi_${filterVal.replace(/\s+/g, '_')}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const link = document.getElementById("a");
+      const a = document.createElement("a");
+      a.setAttribute("href", encodedUri);
+      a.setAttribute("download", `Laporan_Donasi_${filterVal.replace(/\s+/g, '_')}.csv`);
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     }
 
     function printReport() {
