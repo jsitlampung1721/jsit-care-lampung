@@ -4,7 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>KitaBantu Soskem JSIT Lampung</title>
+
+  <!-- Favicon Resmi dari Google Drive Logo JSIT -->
+  <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1NYK166dwtbJFMNeNznw7EM3QCoHpRDEH=s64">
+  <link rel="shortcut icon" href="https://lh3.googleusercontent.com/d/1NYK166dwtbJFMNeNznw7EM3QCoHpRDEH=s64">
+  <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1NYK166dwtbJFMNeNznw7EM3QCoHpRDEH=s180">
+
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Firebase SDK (App & Cloud Firestore v10 Compat untuk Fast Loading & Real-time) -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
   <style>
     @media print {
       body * { visibility: hidden; }
@@ -18,8 +30,9 @@
   <!-- Top Bar Di Atas Header (Jam & Sosmed) -->
   <div class="bg-blue-950 text-gray-300 text-[11px] py-1.5 px-4 border-b border-blue-800/60">
     <div class="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-1.5">
-      <div class="flex items-center gap-1.5 font-medium text-amber-300">
+      <div class="flex items-center gap-2 font-medium text-amber-300">
         <span>🕒</span> <span id="top-bar-clock">Loading jam digital...</span>
+        <span id="db-engine-badge" class="hidden sm:inline-block bg-emerald-900/80 text-emerald-300 border border-emerald-700/60 px-2 py-0.5 rounded-full text-[9px] font-bold">⚡ Hybrid Engine</span>
       </div>
       <div class="flex items-center gap-3" id="top-bar-sosmed">
         <a id="link-fb" href="#" target="_blank" title="Facebook" class="hover:text-white transition flex items-center gap-1">
@@ -58,7 +71,6 @@
           <span>📋</span> <span class="hidden md:inline">List Donasi</span>
         </button>
 
-        <!-- Tombol Pendaftaran Akun Donatur Langsung di Beranda -->
         <button onclick="openRegisterDonaturModal()" id="btn-nav-register" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg font-bold text-xs md:text-sm transition flex items-center gap-1.5 shadow-md">
           <span>📝</span> <span>Daftar Donatur</span>
         </button>
@@ -82,7 +94,6 @@
           Wujud nyata kepedulian dan keprihatinan sosial bersama JSIT Lampung untuk keberlanjutan kebaikan sesama.
         </p>
 
-        <!-- Call to Action Banner di Beranda -->
         <div class="pt-2 flex flex-wrap justify-center gap-3">
           <button onclick="openRegisterDonaturModal()" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs md:text-sm font-extrabold px-5 py-2.5 rounded-xl shadow-lg transition transform hover:scale-105 flex items-center gap-2">
             <span>👤</span> Buat Akun Donatur Sekarang
@@ -185,7 +196,10 @@
         </h2>
         <p class="text-xs text-gray-500 mt-1">Selamat datang, <b id="admin-user-fullname" class="text-gray-800">User</b> (<span id="admin-user-sekolah">SIT</span>)</p>
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="migrateSheetsToFirebase()" id="btn-migrate-firebase" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs px-3 py-2 rounded-lg transition flex items-center gap-1 role-restricted-super" title="Impor data lama dari Google Sheets ke Firebase">
+          <span>🔄</span> Sinkronisasi Sheets → Firebase
+        </button>
         <button onclick="openSelfProfileModal()" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold text-xs px-3 py-2 rounded-lg transition flex items-center gap-1">
           <span>⚙️</span> Edit Akun Saya
         </button>
@@ -195,6 +209,14 @@
         <button onclick="logoutAdmin()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold text-xs px-3 py-2 rounded-lg transition border border-rose-200">
           Keluar
         </button>
+      </div>
+    </div>
+
+    <!-- Banner Status Koneksi Firebase -->
+    <div id="firebase-status-banner" class="hidden bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl text-xs text-amber-900 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+      <div>
+        <p class="font-bold">⚠️ Konfigurasi Firebase Belum Diisi (Mode Fallback GAS Aktif)</p>
+        <p class="text-[11px] mt-0.5">Website berjalan normal menggunakan Google Apps Script, namun untuk kecepatan loading instan (&lt; 0.5 detik) &amp; real-time, silakan isi <b>FIREBASE_CONFIG</b> pada baris awal script <code>index.html</code>.</p>
       </div>
     </div>
 
@@ -358,7 +380,7 @@
         </div>
 
         <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100 space-y-3">
-          <h4 class="font-bold text-xs text-blue-900">Upload Gambar Hero Slider Banner (Maksimal 3 Gambar)</h4>
+          <h4 class="font-bold text-xs text-blue-900">Upload Gambar Hero Slider Banner (Maksimal 3 Gambar via Google Drive)</h4>
           
           <div>
             <label class="block text-[11px] font-semibold text-gray-700 mb-1">Gambar Slider 1 (Utama)</label>
@@ -571,7 +593,7 @@
           <input type="password" id="admin-pass-input" placeholder="Masukkan Password" class="w-full p-2.5 border rounded-lg text-sm">
         </div>
       </div>
-      <button onclick="authenticateUser()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 rounded-lg text-sm transition">
+      <button onclick="authenticateUser()" id="btn-login-submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 rounded-lg text-sm transition">
         Verifikasi & Masuk
       </button>
 
@@ -583,7 +605,7 @@
     </div>
   </div>
 
-  <!-- MODAL PENDAFTARAN AKUN DONATUR BARU (DENGAN PERINGATAN CATAT PASSSWORD) -->
+  <!-- MODAL PENDAFTARAN AKUN DONATUR BARU -->
   <div id="modal-register-donatur" class="fixed inset-0 bg-black/60 flex items-center justify-center p-3 z-50 hidden">
     <div class="bg-white rounded-2xl max-w-md w-full p-6 relative shadow-2xl space-y-4">
       <button onclick="closeModal('modal-register-donatur')" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 font-bold text-xl">&times;</button>
@@ -593,7 +615,6 @@
         <p class="text-xs text-gray-500 mt-0.5">Buat akun untuk memantau riwayat & kuitansi donasi Anda</p>
       </div>
 
-      <!-- KOTAK PERINGATAN WARN BANNER -->
       <div class="bg-amber-50 border-l-4 border-amber-500 p-3 rounded-r-xl space-y-1">
         <p class="text-xs font-bold text-amber-900 flex items-center gap-1">
           <span>⚠️</span> PERHATIAN SANGAT PENTING:
@@ -624,7 +645,7 @@
     </div>
   </div>
 
-  <!-- MODAL SUKSES REGISTRASI (MENGINGATKAN KEMBALI KREDENSIAL) -->
+  <!-- MODAL SUKSES REGISTRASI -->
   <div id="modal-register-success" class="fixed inset-0 bg-black/60 flex items-center justify-center p-3 z-50 hidden">
     <div class="bg-white rounded-2xl max-w-sm w-full p-6 relative shadow-2xl text-center space-y-4">
       <span class="text-5xl">🎉</span>
@@ -760,7 +781,7 @@
         </div>
 
         <div>
-          <label class="block font-bold text-gray-700 mb-1">Upload Gambar Cover / Banner Program</label>
+          <label class="block font-bold text-gray-700 mb-1">Upload Gambar Cover / Banner Program (Google Drive)</label>
           <input type="file" id="prog-image-file" accept="image/*" class="w-full p-1 border rounded-lg mb-1">
           <input type="hidden" id="prog-image-url" name="imageUrl">
         </div>
@@ -843,9 +864,48 @@
     <p id="alert-message" class="text-sm font-semibold"></p>
   </div>
 
-  <!-- Script Logika -->
+  <!-- =========================================================================
+       KONFIGURASI & LOGIKA HYBRID (FIREBASE FIRESTORE + GAS GOOGLE DRIVE)
+       ========================================================================= -->
   <script>
+    // 1. TEMPELKAN KONFIGURASI WEB APP FIREBASE ANDA DI SINI:
+    // (Ambil dari Firebase Console -> Project Settings -> General -> Your apps -> Web app)
+    const FIREBASE_CONFIG = {
+      apiKey: "ISI_API_KEY_FIREBASE_ANDA",
+      authDomain: "ISI_PROJECT_ID.firebaseapp.com",
+      projectId: "ISI_PROJECT_ID_ANDA",
+      storageBucket: "ISI_PROJECT_ID.appspot.com",
+      messagingSenderId: "ISI_SENDER_ID",
+      appId: "ISI_APP_ID"
+    };
+
+    // 2. URL GOOGLE APPS SCRIPT (Untuk Upload File ke Google Drive & Backup Sheets)
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzsR8WUSu1YxQZ39h8MM3pkpa7koZjybfmY8V6zQcBa-Q-N3ZwIUjrw4oY1CQZcZ88ZBw/exec";
+
+    // Inisialisasi Firebase Firestore
+    let db = null;
+    let useFirebase = false;
+
+    function isFirebaseReady() {
+      return FIREBASE_CONFIG &&
+             FIREBASE_CONFIG.projectId &&
+             !FIREBASE_CONFIG.projectId.includes("ISI_PROJECT_ID");
+    }
+
+    if (isFirebaseReady() && typeof firebase !== "undefined") {
+      try {
+        firebase.initializeApp(FIREBASE_CONFIG);
+        db = firebase.firestore();
+        useFirebase = true;
+        // Aktifkan cache lokal agar halaman berikutnya terbuka < 100ms
+        db.enablePersistence({ synchronizeTabs: true }).catch(function(err) {
+          console.warn("Firestore persistence info:", err.code);
+        });
+      } catch (e) {
+        console.error("Gagal inisialisasi Firebase:", e);
+        useFirebase = false;
+      }
+    }
 
     let globalInitialData = null;
     let activeCampaignData = null;
@@ -863,8 +923,11 @@
     let heroBgImages = [];
     let currentHeroIndex = 0;
     let heroTimer = null;
-
     let tempRegisteredUser = null;
+
+    let unsubscribePrograms = null;
+    let unsubscribeDonations = null;
+    let unsubscribeSettings = null;
 
     const donationQuotes = [
       "\"Harta tidak akan berkurang karena sedekah. Mari tebar kebaikan bersama JSIT Lampung hari ini.\"",
@@ -881,9 +944,28 @@
       updateLiveClock();
       setInterval(updateLiveClock, 1000);
       setDailyQuote();
+      updateEngineIndicator();
       loadPublicData();
       updateNavLoginLabel();
     };
+
+    function updateEngineIndicator() {
+      const badge = document.getElementById('db-engine-badge');
+      const banner = document.getElementById('firebase-status-banner');
+      if (useFirebase) {
+        if (badge) {
+          badge.innerText = "⚡ Firebase Real-time";
+          badge.className = "hidden sm:inline-block bg-emerald-900/90 text-emerald-300 border border-emerald-600/60 px-2 py-0.5 rounded-full text-[9px] font-bold";
+        }
+        if (banner) banner.classList.add('hidden');
+      } else {
+        if (badge) {
+          badge.innerText = "⏳ GAS Fallback Mode";
+          badge.className = "hidden sm:inline-block bg-amber-900/90 text-amber-300 border border-amber-600/60 px-2 py-0.5 rounded-full text-[9px] font-bold";
+        }
+        if (banner) banner.classList.remove('hidden');
+      }
+    }
 
     function updateNavLoginLabel() {
       const lbl = document.getElementById('lbl-nav-login');
@@ -917,24 +999,36 @@
       if (el) el.innerText = donationQuotes[index];
     }
 
-    async function callApi(action, payload = {}) {
+    // Helper memanggil GAS (untuk upload file Google Drive, migrasi data, & backup Sheets)
+    async function callGasApi(action, payload = {}, background = false) {
       if (!SCRIPT_URL || SCRIPT_URL.includes("PASTE_URL_WEB_APP")) {
-        alert("Harap masukkan URL Web App Google Apps Script pada variabel SCRIPT_URL di index.html!");
         throw new Error("SCRIPT_URL belum dikonfigurasi.");
       }
       const bodyData = JSON.stringify({ action: action, ...payload });
-      const response = await fetch(SCRIPT_URL, {
+      const fetchOpts = {
         method: 'POST',
-        headers: {
-          'Content-Type': 'text/plain;charset=utf-8',
-        },
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: bodyData
-      });
+      };
+      if (background) fetchOpts.keepalive = true;
+      const response = await fetch(SCRIPT_URL, fetchOpts);
       return await response.json();
+    }
+
+    // Backup non-blocking ke Google Sheets agar tim keuangan selalu punya arsip spreadsheet
+    function mirrorToGoogleSheets(type, record) {
+      if (!SCRIPT_URL) return;
+      callGasApi('syncBackupFromFirebase', { type: type, record: record }, true).catch(() => {});
     }
 
     function formatRupiah(number) {
       return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(number || 0);
+    }
+
+    function formatDateNowStr() {
+      const d = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     }
 
     function getSisaHariText(deadlineStr) {
@@ -987,7 +1081,7 @@
       if (!text) return;
       navigator.clipboard.writeText(text).then(() => {
         showCustomAlert(`Nomor rekening berhasil disalin: ${text}`);
-      }).catch(err => {
+      }).catch(() => {
         showCustomAlert('Gagal menyalin teks.', false);
       });
     }
@@ -1021,42 +1115,57 @@
       openModal('modal-register-donatur');
     }
 
-    function handleRegisterDonatur(e) {
+    // ================= REGISTRASI DONATUR =================
+    async function handleRegisterDonatur(e) {
       e.preventDefault();
       const btn = document.getElementById('btn-submit-reg-donatur');
       btn.disabled = true; btn.innerText = 'Memproses Pendaftaran...';
 
-      const name = document.getElementById('reg-donatur-name').value;
-      const username = document.getElementById('reg-donatur-username').value;
-      const password = document.getElementById('reg-donatur-password').value;
+      const name = document.getElementById('reg-donatur-name').value.trim();
+      const username = document.getElementById('reg-donatur-username').value.trim();
+      const password = document.getElementById('reg-donatur-password').value.trim();
 
       const payload = {
         name: name,
         username: username,
         password: password,
         role: "Donatur",
-        sekolah: "Donatur Personal"
+        sekolah: "Donatur Personal",
+        status: "Aktif"
       };
 
-      callApi('registerUser', { data: payload })
-        .then(res => {
-          btn.disabled = false; btn.innerText = 'Daftar Akun Donatur Sekarang';
-          if (res.success) {
-            tempRegisteredUser = { username: username, password: password, name: name };
-            closeModal('modal-register-donatur');
-
-            document.getElementById('succ-reg-name').innerText = name;
-            document.getElementById('succ-reg-user').innerText = username;
-            document.getElementById('succ-reg-pass').innerText = password;
-            openModal('modal-register-success');
-          } else {
-            showCustomAlert(res.message, false);
+      try {
+        if (useFirebase) {
+          const userDocRef = db.collection('users').doc(username.toLowerCase());
+          const existing = await userDocRef.get();
+          if (existing.exists) {
+            btn.disabled = false; btn.innerText = 'Daftar Akun Donatur Sekarang';
+            showCustomAlert(`Username '${username}' sudah terdaftar! Harap gunakan username lain.`, false);
+            return;
           }
-        })
-        .catch(err => {
-          btn.disabled = false; btn.innerText = 'Daftar Akun Donatur Sekarang';
-          showCustomAlert('Gagal mendaftar: ' + err.message, false);
-        });
+          await userDocRef.set(payload);
+          mirrorToGoogleSheets('user_registered', payload);
+        } else {
+          const res = await callGasApi('registerUser', { data: payload });
+          if (!res.success) {
+            btn.disabled = false; btn.innerText = 'Daftar Akun Donatur Sekarang';
+            showCustomAlert(res.message, false);
+            return;
+          }
+        }
+
+        btn.disabled = false; btn.innerText = 'Daftar Akun Donatur Sekarang';
+        tempRegisteredUser = { username: username, password: password, name: name };
+        closeModal('modal-register-donatur');
+
+        document.getElementById('succ-reg-name').innerText = name;
+        document.getElementById('succ-reg-user').innerText = username;
+        document.getElementById('succ-reg-pass').innerText = password;
+        openModal('modal-register-success');
+      } catch (err) {
+        btn.disabled = false; btn.innerText = 'Daftar Akun Donatur Sekarang';
+        showCustomAlert('Gagal mendaftar: ' + err.message, false);
+      }
     }
 
     function goToLoginAfterRegister() {
@@ -1098,52 +1207,130 @@
       }
     }
 
-    // ================= PUBLIK LOAD & LOGIK =================
+    // ================= PUBLIK LOAD & REAL-TIME FIREBASE LISTENER =================
+    function getDefaultSettings() {
+      return {
+        HeroTitle: "KitaBantu Soskem JSIT Lampung",
+        HeroSubtext: "Wujud nyata kepedulian dan keprihatinan sosial bersama JSIT Lampung untuk keberlanjutan kebaikan sesama.",
+        HeroBgImage1: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1200",
+        HeroBgImage2: "",
+        HeroBgImage3: "",
+        PaymentMethods: "Transfer BCA - 1234567890 a.n JSIT Lampung\nTransfer Mandiri - 0987654321 a.n JSIT Lampung\nQRIS All Payment",
+        AdminWA: "628123456789",
+        AdminWAName: "Admin Soskem JSIT",
+        LinkFB: "https://facebook.com",
+        LinkIG: "https://instagram.com",
+        LinkYT: "https://youtube.com",
+        LinkTikTok: "https://tiktok.com"
+      };
+    }
+
     function loadPublicData() {
       const loadingEl = document.getElementById('loading-public');
       const gridEl = document.getElementById('campaign-grid');
 
-      if (loadingEl) {
+      if (!globalInitialData && loadingEl) {
         loadingEl.classList.remove('hidden');
-        loadingEl.innerHTML = `
-          <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent"></div>
-          <p class="mt-3 text-gray-500 text-sm">Memuat daftar program donasi...</p>
-        `;
       }
-      if (gridEl) gridEl.classList.add('hidden');
 
-      callApi('getInitialData')
-        .then(function(res) {
-          if (!res) {
-            if (loadingEl) loadingEl.innerHTML = '<p class="text-rose-500 text-xs">Gagal memuat data dari Spreadsheet.</p>';
-            return;
+      if (useFirebase) {
+        if (!globalInitialData) {
+          globalInitialData = { settings: getDefaultSettings(), campaigns: [], recentDonations: [] };
+        }
+
+        // 1. Real-time listener Settings
+        if (unsubscribeSettings) unsubscribeSettings();
+        unsubscribeSettings = db.collection('settings').doc('general').onSnapshot(doc => {
+          const settings = doc.exists ? { ...getDefaultSettings(), ...doc.data() } : getDefaultSettings();
+          if (!doc.exists) {
+            db.collection('settings').doc('general').set(settings).catch(() => {});
           }
-          globalInitialData = res;
+          globalInitialData.settings = settings;
+          setupHeroHeader(settings);
+          updateTopBarSosmed(settings);
+          updateWaWidget(settings);
+        }, err => console.warn("Settings snapshot error:", err));
 
-          setupHeroHeader(res.settings);
-          updateTopBarSosmed(res.settings);
-          updateWaWidget(res.settings);
-          populateStatusProgramSelector(res.campaigns || []);
-          renderCampaignGrid(res.campaigns || []);
-          renderListDonasiPageTable(res.campaigns || []);
-
-          if (res.recentDonations && res.recentDonations.length > 0) {
-            startThankYouToastLoop(res.recentDonations);
-          }
-        })
-        .catch(function(err) {
-          console.error("Gagal memuat data:", err);
+        // 2. Real-time listener Programs Aktif
+        if (unsubscribePrograms) unsubscribePrograms();
+        unsubscribePrograms = db.collection('programs').onSnapshot(snapshot => {
+          const activeCampaigns = [];
+          snapshot.forEach(doc => {
+            const p = { id: doc.id, ...doc.data() };
+            const st = String(p.status || 'Aktif').trim().toLowerCase();
+            if (st === 'aktif' || st === '') {
+              activeCampaigns.push(p);
+            }
+          });
+          globalInitialData.campaigns = activeCampaigns;
+          populateStatusProgramSelector(activeCampaigns);
+          handleFilterAndSearch();
+          renderListDonasiPageTable(activeCampaigns);
+        }, err => {
+          console.error("Programs snapshot error:", err);
           if (loadingEl) {
-            loadingEl.innerHTML = `
-              <div class="text-center py-6 text-rose-600 bg-rose-50 rounded-xl p-4 border border-rose-200">
-                <p class="text-2xl mb-1">⚠️</p>
-                <p class="font-bold text-sm">Gagal memuat program donasi.</p>
-                <p class="text-xs text-gray-500 mt-1">${err.message || err}</p>
-                <button onclick="loadPublicData()" class="mt-3 bg-blue-900 text-white text-xs px-4 py-2 rounded-lg font-bold hover:bg-blue-950 transition">Coba Muat Ulang</button>
-              </div>
-            `;
+            loadingEl.innerHTML = `<p class="text-rose-600 text-xs">Gagal memuat data Firebase: ${err.message}</p>`;
           }
         });
+
+        // 3. Real-time listener Recent Approved Donations (Toast)
+        if (unsubscribeDonations) unsubscribeDonations();
+        unsubscribeDonations = db.collection('donations')
+          .where('status', '==', 'Approved')
+          .limit(15)
+          .onSnapshot(snapshot => {
+            const recent = [];
+            snapshot.forEach(doc => {
+              const d = doc.data();
+              recent.push({
+                donationId: doc.id,
+                name: d.name || "Hamba Allah",
+                amount: Number(d.amount || 0),
+                program: d.program || "",
+                date: d.date || "",
+                status: "Approved"
+              });
+            });
+            globalInitialData.recentDonations = recent;
+            if (recent.length > 0) {
+              startThankYouToastLoop(recent);
+            }
+          }, err => console.warn("Donations toast snapshot:", err));
+
+      } else {
+        // Fallback ke Google Apps Script jika FIREBASE_CONFIG belum diisi
+        callGasApi('getInitialData')
+          .then(function(res) {
+            if (!res) {
+              if (loadingEl) loadingEl.innerHTML = '<p class="text-rose-500 text-xs">Gagal memuat data dari Spreadsheet.</p>';
+              return;
+            }
+            globalInitialData = res;
+            setupHeroHeader(res.settings);
+            updateTopBarSosmed(res.settings);
+            updateWaWidget(res.settings);
+            populateStatusProgramSelector(res.campaigns || []);
+            renderCampaignGrid(res.campaigns || []);
+            renderListDonasiPageTable(res.campaigns || []);
+
+            if (res.recentDonations && res.recentDonations.length > 0) {
+              startThankYouToastLoop(res.recentDonations);
+            }
+          })
+          .catch(function(err) {
+            console.error("Gagal memuat data:", err);
+            if (loadingEl) {
+              loadingEl.innerHTML = `
+                <div class="text-center py-6 text-rose-600 bg-rose-50 rounded-xl p-4 border border-rose-200">
+                  <p class="text-2xl mb-1">⚠️</p>
+                  <p class="font-bold text-sm">Gagal memuat program donasi.</p>
+                  <p class="text-xs text-gray-500 mt-1">${err.message || err}</p>
+                  <button onclick="loadPublicData()" class="mt-3 bg-blue-900 text-white text-xs px-4 py-2 rounded-lg font-bold hover:bg-blue-950 transition">Coba Muat Ulang</button>
+                </div>
+              `;
+            }
+          });
+      }
     }
 
     function updateTopBarSosmed(settings) {
@@ -1255,9 +1442,7 @@
 
       function triggerToast() {
         const publicView = document.getElementById('view-public');
-        if (!publicView || publicView.classList.contains('hidden')) {
-          return;
-        }
+        if (!publicView || publicView.classList.contains('hidden')) return;
 
         const item = recentDonations[currentToastIndex];
         if (!item) return;
@@ -1281,7 +1466,8 @@
       toastTimer = setInterval(triggerToast, 8000);
     }
 
-    function openCampaignDetailPage(campaignId) {
+    // ================= DETAIL PROGRAM & FORM DONASI =================
+    async function openCampaignDetailPage(campaignId) {
       hideAllViews();
       const detailView = document.getElementById('view-campaign-detail');
       const container = document.getElementById('campaign-detail-content');
@@ -1296,177 +1482,211 @@
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
-      callApi('getCampaignDetails', { campaignId: campaignId })
-        .then(data => {
-          if (!data || !data.campaign) {
+      try {
+        let data = null;
+
+        if (useFirebase) {
+          const progDoc = await db.collection('programs').doc(campaignId).get();
+          if (!progDoc.exists) {
             showCustomAlert('Program tidak ditemukan.', false);
             switchToPublicView();
             return;
           }
+          const c = { id: progDoc.id, ...progDoc.data() };
+          const donSnap = await db.collection('donations')
+            .where('program', '==', c.title)
+            .where('status', '==', 'Approved')
+            .get();
 
-          activeCampaignData = data;
-          const c = data.campaign;
-          const percent = c.target > 0 ? Math.min(Math.round((c.collected / c.target) * 100), 100) : 0;
-          
-          const disalurkanVal = c.disalurkan || 0;
-          const sisaDanaProgram = Math.max(0, c.collected - disalurkanVal);
-
-          let paymentOptionsHtml = '';
-          const rawMethods = (globalInitialData && globalInitialData.settings && globalInitialData.settings.PaymentMethods) 
-            ? globalInitialData.settings.PaymentMethods 
-            : "Transfer BCA - 1234567890 a.n JSIT Lampung\nTransfer Mandiri - 0987654321 a.n JSIT Lampung\nQRIS All Payment";
-          
-          const methodsArr = rawMethods.split('\n').map(m => m.trim()).filter(m => m !== '');
-          methodsArr.forEach(m => {
-            paymentOptionsHtml += `<option value="${m}">${m}</option>`;
+          const donors = [];
+          donSnap.forEach(d => {
+            const item = d.data();
+            donors.push({
+              name: item.name || "Hamba Allah",
+              amount: Number(item.amount || 0),
+              message: item.message || "",
+              date: item.date || ""
+            });
           });
+          data = { campaign: c, donors: donors };
+        } else {
+          data = await callGasApi('getCampaignDetails', { campaignId: campaignId });
+        }
 
-          const defaultDonorName = (verifiedAdminAuth && verifiedAdminAuth.role === "Donatur") ? verifiedAdminAuth.name : '';
-
-          container.innerHTML = `
-            <div class="relative">
-              <img src="${c.imageUrl}" class="w-full h-64 md:h-80 object-cover">
-              <span class="absolute top-3 right-3 bg-amber-500 text-white text-xs px-3 py-1 rounded-full font-extrabold shadow-md flex items-center gap-1">
-                ⏳ ${getSisaHariText(c.deadline)}
-              </span>
-            </div>
-
-            <div class="p-6 space-y-6">
-              <div>
-                <div class="flex items-center gap-2 mb-2">
-                  <span class="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-bold uppercase">${c.category}</span>
-                  <span class="text-xs bg-amber-100 text-amber-900 px-3 py-1 rounded-full font-bold">🏫 ${c.sekolah || 'JSIT Wilayah Lampung'}</span>
-                </div>
-                <h2 class="text-xl md:text-2xl font-bold text-gray-800">${c.title}</h2>
-                <p class="text-xs text-gray-500 mt-1">${c.description}</p>
-              </div>
-
-              <div class="bg-blue-50/50 rounded-2xl p-5 border border-blue-100 space-y-4 shadow-sm">
-                <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
-                  <span>💰</span> Status Dana Kebajikan Program Ini
-                </h3>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 text-xs">
-                  <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
-                    <p class="text-gray-500 font-medium text-[11px]">Target Dana</p>
-                    <p class="font-extrabold text-sm text-gray-800 mt-1">${formatRupiah(c.target)}</p>
-                  </div>
-                  <div class="bg-white p-3 rounded-xl border border-blue-100 shadow-sm flex flex-col justify-between">
-                    <p class="text-blue-900 font-medium text-[11px]">Total Terkumpul</p>
-                    <p class="font-extrabold text-sm text-blue-900 mt-1">${formatRupiah(c.collected)}</p>
-                  </div>
-                  <div class="bg-white p-3 rounded-xl border border-emerald-100 shadow-sm flex flex-col justify-between">
-                    <p class="text-emerald-900 font-medium text-[11px]">Dana Disalurkan</p>
-                    <p class="font-extrabold text-sm text-emerald-800 mt-1">${formatRupiah(disalurkanVal)}</p>
-                  </div>
-                  <div class="bg-white p-3 rounded-xl border border-amber-100 shadow-sm flex flex-col justify-between">
-                    <p class="text-amber-900 font-medium text-[11px]">Sisa Dana Tersedia</p>
-                    <p class="font-extrabold text-sm text-amber-900 mt-1">${formatRupiah(sisaDanaProgram)}</p>
-                  </div>
-                </div>
-
-                <div>
-                  <div class="w-full bg-blue-100 rounded-full h-2.5 mb-1">
-                    <div class="bg-blue-600 h-2.5 rounded-full" style="width: ${percent}%"></div>
-                  </div>
-                  <div class="flex justify-between text-xs font-semibold text-gray-600">
-                    <span>Pencapaian Target</span>
-                    <span>${percent}%</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="bg-white p-6 rounded-2xl border space-y-4 shadow-sm">
-                <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2 border-b pb-2">
-                  <span>💳</span> Form Donasi Transfer
-                </h3>
-                
-                <form onsubmit="handlePublicDonationSubmit(event)" class="space-y-3 text-xs">
-                  <input type="hidden" name="campaignId" value="${c.id}">
-                  <div>
-                    <label class="block font-semibold text-gray-700 mb-1">Nominal Cepat</label>
-                    <div class="grid grid-cols-3 gap-2">
-                      <button type="button" onclick="setPresetAmount(20000)" class="bg-white border border-blue-600 text-blue-700 py-2 rounded-xl font-bold hover:bg-blue-50 transition">20Rb</button>
-                      <button type="button" onclick="setPresetAmount(50000)" class="bg-white border border-blue-600 text-blue-700 py-2 rounded-xl font-bold hover:bg-blue-50 transition">50Rb</button>
-                      <button type="button" onclick="setPresetAmount(100000)" class="bg-white border border-blue-600 text-blue-700 py-2 rounded-xl font-bold hover:bg-blue-50 transition">100Rb</button>
-                    </div>
-                  </div>
-                  <div>
-                    <label class="block font-semibold text-gray-700">Nominal Donasi (Rp)</label>
-                    <input type="number" id="input-donation-amount" name="amount" min="10000" required placeholder="Minimal Rp 10.000" class="w-full mt-1 p-2.5 border rounded-xl text-sm">
-                  </div>
-                  <div class="grid grid-cols-2 gap-2">
-                    <div>
-                      <label class="block font-semibold text-gray-700">Nama Lengkap</label>
-                      <input type="text" name="donorName" value="${defaultDonorName}" placeholder="Nama Donatur" class="w-full mt-1 p-2.5 border rounded-xl">
-                    </div>
-                    <div>
-                      <label class="block font-semibold text-gray-700">No. WhatsApp</label>
-                      <input type="tel" name="phone" placeholder="0812345678" required class="w-full mt-1 p-2.5 border rounded-xl">
-                    </div>
-                  </div>
-
-                  <div>
-                    <label class="block font-semibold text-gray-700 mb-1">Pilih Rekening Pembayaran</label>
-                    <div class="flex items-center gap-2">
-                      <select id="select-payment-method" name="paymentMethod" required class="w-full p-2.5 border rounded-xl bg-white font-medium text-xs">
-                        ${paymentOptionsHtml}
-                      </select>
-                      <button type="button" onclick="copySelectedAccount()" title="Salin Nomor Rekening Pilihan" class="p-2.5 bg-blue-50 hover:bg-blue-100 text-blue-900 rounded-xl transition border border-blue-200 flex items-center justify-center gap-1 font-bold text-xs flex-shrink-0">
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-                        <span class="hidden sm:inline">Salin No. Rek</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  <div class="flex items-center gap-2">
-                    <input type="checkbox" name="isAnonymous" id="isAnon">
-                    <label for="isAnon" class="text-gray-600">Sembunyikan nama donatur (Hamba Allah)</label>
-                  </div>
-                  <div>
-                    <label class="block font-semibold text-gray-700">Pesan / Doa Terbaik</label>
-                    <textarea name="message" rows="2" placeholder="Tuliskan doa terbaik Anda..." class="w-full mt-1 p-2.5 border rounded-xl"></textarea>
-                  </div>
-                  <button type="submit" id="btn-public-donation" class="w-full bg-blue-900 text-white font-bold py-3 rounded-xl hover:bg-blue-950 transition text-sm shadow-md">
-                    Lanjut Pembayaran
-                  </button>
-                </form>
-              </div>
-
-              <div class="space-y-3 pt-2">
-                <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2 border-b pb-2">
-                  <span>💬</span> Doa & Dukungan Donatur Terverifikasi (${data.donors.length})
-                </h3>
-                
-                <div class="space-y-2 max-h-60 overflow-y-auto">
-                  ${data.donors.length > 0 ? data.donors.map(d => `
-                    <div class="bg-gray-50 p-3 rounded-xl border text-xs">
-                      <div class="flex justify-between font-bold text-gray-800">
-                        <span>${d.name}</span>
-                        <span class="text-emerald-700">${formatRupiah(d.amount)}</span>
-                      </div>
-                      ${d.message ? `<p class="italic text-gray-600 mt-1">"${d.message}"</p>` : ''}
-                    </div>
-                  `).join('') : '<p class="text-xs text-gray-400 italic text-center py-4">Belum ada doa tertulis untuk program ini.</p>'}
-                </div>
-              </div>
-            </div>
-          `;
-        })
-        .catch(err => {
-          showCustomAlert('Gagal mengambil data: ' + err.message, false);
+        if (!data || !data.campaign) {
+          showCustomAlert('Program tidak ditemukan.', false);
           switchToPublicView();
-        });
+          return;
+        }
+
+        activeCampaignData = data;
+        renderCampaignDetailHTML(container, data);
+      } catch (err) {
+        showCustomAlert('Gagal mengambil data: ' + err.message, false);
+        switchToPublicView();
+      }
+    }
+
+    function renderCampaignDetailHTML(container, data) {
+      const c = data.campaign;
+      const percent = c.target > 0 ? Math.min(Math.round((c.collected / c.target) * 100), 100) : 0;
+      const disalurkanVal = Number(c.disalurkan || 0);
+      const sisaDanaProgram = Math.max(0, Number(c.collected || 0) - disalurkanVal);
+
+      let paymentOptionsHtml = '';
+      const rawMethods = (globalInitialData && globalInitialData.settings && globalInitialData.settings.PaymentMethods) 
+        ? globalInitialData.settings.PaymentMethods 
+        : "Transfer BCA - 1234567890 a.n JSIT Lampung\nTransfer Mandiri - 0987654321 a.n JSIT Lampung\nQRIS All Payment";
+      
+      const methodsArr = rawMethods.split('\n').map(m => m.trim()).filter(m => m !== '');
+      methodsArr.forEach(m => {
+        paymentOptionsHtml += `<option value="${m}">${m}</option>`;
+      });
+
+      const defaultDonorName = (verifiedAdminAuth && verifiedAdminAuth.role === "Donatur") ? verifiedAdminAuth.name : '';
+
+      container.innerHTML = `
+        <div class="relative">
+          <img src="${c.imageUrl || 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600'}" class="w-full h-64 md:h-80 object-cover">
+          <span class="absolute top-3 right-3 bg-amber-500 text-white text-xs px-3 py-1 rounded-full font-extrabold shadow-md flex items-center gap-1">
+            ⏳ ${getSisaHariText(c.deadline)}
+          </span>
+        </div>
+
+        <div class="p-6 space-y-6">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-bold uppercase">${c.category}</span>
+              <span class="text-xs bg-amber-100 text-amber-900 px-3 py-1 rounded-full font-bold">🏫 ${c.sekolah || 'JSIT Wilayah Lampung'}</span>
+            </div>
+            <h2 class="text-xl md:text-2xl font-bold text-gray-800">${c.title}</h2>
+            <p class="text-xs text-gray-500 mt-1 leading-relaxed">${c.description}</p>
+          </div>
+
+          <div class="bg-blue-50/50 rounded-2xl p-5 border border-blue-100 space-y-4 shadow-sm">
+            <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
+              <span>💰</span> Status Dana Kebajikan Program Ini
+            </h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 text-xs">
+              <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
+                <p class="text-gray-500 font-medium text-[11px]">Target Dana</p>
+                <p class="font-extrabold text-sm text-gray-800 mt-1">${formatRupiah(c.target)}</p>
+              </div>
+              <div class="bg-white p-3 rounded-xl border border-blue-100 shadow-sm flex flex-col justify-between">
+                <p class="text-blue-900 font-medium text-[11px]">Total Terkumpul</p>
+                <p class="font-extrabold text-sm text-blue-900 mt-1">${formatRupiah(c.collected)}</p>
+              </div>
+              <div class="bg-white p-3 rounded-xl border border-emerald-100 shadow-sm flex flex-col justify-between">
+                <p class="text-emerald-900 font-medium text-[11px]">Dana Disalurkan</p>
+                <p class="font-extrabold text-sm text-emerald-800 mt-1">${formatRupiah(disalurkanVal)}</p>
+              </div>
+              <div class="bg-white p-3 rounded-xl border border-amber-100 shadow-sm flex flex-col justify-between">
+                <p class="text-amber-900 font-medium text-[11px]">Sisa Dana Tersedia</p>
+                <p class="font-extrabold text-sm text-amber-900 mt-1">${formatRupiah(sisaDanaProgram)}</p>
+              </div>
+            </div>
+
+            <div>
+              <div class="w-full bg-blue-100 rounded-full h-2.5 mb-1">
+                <div class="bg-blue-600 h-2.5 rounded-full" style="width: ${percent}%"></div>
+              </div>
+              <div class="flex justify-between text-xs font-semibold text-gray-600">
+                <span>Pencapaian Target</span>
+                <span>${percent}%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-2xl border space-y-4 shadow-sm">
+            <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2 border-b pb-2">
+              <span>💳</span> Form Donasi Transfer
+            </h3>
+            
+            <form onsubmit="handlePublicDonationSubmit(event)" class="space-y-3 text-xs">
+              <input type="hidden" name="campaignId" value="${c.id}">
+              <input type="hidden" name="programTitle" value="${c.title}">
+              <div>
+                <label class="block font-semibold text-gray-700 mb-1">Nominal Cepat</label>
+                <div class="grid grid-cols-3 gap-2">
+                  <button type="button" onclick="setPresetAmount(20000)" class="bg-white border border-blue-600 text-blue-700 py-2 rounded-xl font-bold hover:bg-blue-50 transition">20Rb</button>
+                  <button type="button" onclick="setPresetAmount(50000)" class="bg-white border border-blue-600 text-blue-700 py-2 rounded-xl font-bold hover:bg-blue-50 transition">50Rb</button>
+                  <button type="button" onclick="setPresetAmount(100000)" class="bg-white border border-blue-600 text-blue-700 py-2 rounded-xl font-bold hover:bg-blue-50 transition">100Rb</button>
+                </div>
+              </div>
+              <div>
+                <label class="block font-semibold text-gray-700">Nominal Donasi (Rp)</label>
+                <input type="number" id="input-donation-amount" name="amount" min="10000" required placeholder="Minimal Rp 10.000" class="w-full mt-1 p-2.5 border rounded-xl text-sm">
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block font-semibold text-gray-700">Nama Lengkap</label>
+                  <input type="text" name="donorName" value="${defaultDonorName}" placeholder="Nama Donatur" class="w-full mt-1 p-2.5 border rounded-xl">
+                </div>
+                <div>
+                  <label class="block font-semibold text-gray-700">No. WhatsApp</label>
+                  <input type="tel" name="phone" placeholder="0812345678" required class="w-full mt-1 p-2.5 border rounded-xl">
+                </div>
+              </div>
+
+              <div>
+                <label class="block font-semibold text-gray-700 mb-1">Pilih Rekening Pembayaran</label>
+                <div class="flex items-center gap-2">
+                  <select id="select-payment-method" name="paymentMethod" required class="w-full p-2.5 border rounded-xl bg-white font-medium text-xs">
+                    ${paymentOptionsHtml}
+                  </select>
+                  <button type="button" onclick="copySelectedAccount()" title="Salin Nomor Rekening Pilihan" class="p-2.5 bg-blue-50 hover:bg-blue-100 text-blue-900 rounded-xl transition border border-blue-200 flex items-center justify-center gap-1 font-bold text-xs flex-shrink-0">
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                    <span class="hidden sm:inline">Salin No. Rek</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <input type="checkbox" name="isAnonymous" id="isAnon">
+                <label for="isAnon" class="text-gray-600">Sembunyikan nama donatur (Hamba Allah)</label>
+              </div>
+              <div>
+                <label class="block font-semibold text-gray-700">Pesan / Doa Terbaik</label>
+                <textarea name="message" rows="2" placeholder="Tuliskan doa terbaik Anda..." class="w-full mt-1 p-2.5 border rounded-xl"></textarea>
+              </div>
+              <button type="submit" id="btn-public-donation" class="w-full bg-blue-900 text-white font-bold py-3 rounded-xl hover:bg-blue-950 transition text-sm shadow-md">
+                Lanjut Pembayaran
+              </button>
+            </form>
+          </div>
+
+          <div class="space-y-3 pt-2">
+            <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2 border-b pb-2">
+              <span>💬</span> Doa & Dukungan Donatur Terverifikasi (${data.donors.length})
+            </h3>
+            
+            <div class="space-y-2 max-h-60 overflow-y-auto">
+              ${data.donors.length > 0 ? data.donors.map(d => `
+                <div class="bg-gray-50 p-3 rounded-xl border text-xs">
+                  <div class="flex justify-between font-bold text-gray-800">
+                    <span>${d.name}</span>
+                    <span class="text-emerald-700">${formatRupiah(d.amount)}</span>
+                  </div>
+                  ${d.message ? `<p class="italic text-gray-600 mt-1">"${d.message}"</p>` : ''}
+                </div>
+              `).join('') : '<p class="text-xs text-gray-400 italic text-center py-4">Belum ada doa tertulis untuk program ini.</p>'}
+            </div>
+          </div>
+        </div>
+      `;
     }
 
     function populateStatusProgramSelector(campaigns) {
       const sel = document.getElementById('status-program-selector');
       if (!sel) return;
+      const currentVal = sel.value || 'ALL';
       sel.innerHTML = '<option value="ALL">🌐 Semua Program Donasi</option>';
       if (campaigns && campaigns.length > 0) {
         campaigns.forEach(c => {
           sel.innerHTML += `<option value="${c.id}">🎯 ${c.title}</option>`;
         });
       }
+      sel.value = currentVal;
     }
 
     function handleFilterAndSearch() {
@@ -1554,60 +1774,108 @@
 
     function setPresetAmount(val) { document.getElementById('input-donation-amount').value = val; }
 
-    function handlePublicDonationSubmit(e) {
+    // ================= SUBMIT DONASI (FAST FIREBASE + DRIVE UPLOAD) =================
+    async function handlePublicDonationSubmit(e) {
       e.preventDefault();
       const btn = document.getElementById('btn-public-donation');
       btn.disabled = true; btn.innerText = 'Memproses...';
 
       const form = e.target;
-      const payload = {
-        campaignId: form.campaignId.value,
-        amount: form.amount.value,
-        donorName: form.donorName.value,
-        phone: form.phone.value,
-        paymentMethod: form.paymentMethod.value,
-        isAnonymous: form.isAnonymous.checked,
-        message: form.message.value
-      };
+      const campaignId = form.campaignId.value;
+      const programTitle = form.programTitle.value;
+      const amount = Number(form.amount.value || 0);
+      const rawPhone = form.phone.value || '';
+      const phone = rawPhone.replace(/^0/, '62').replace(/[^0-9]/g, '');
+      const donorName = form.isAnonymous.checked ? "Hamba Allah" : (form.donorName.value.trim() || "Hamba Allah");
+      const paymentMethod = form.paymentMethod.value;
+      const message = form.message.value || "-";
 
-      callApi('processDonation', { form: payload })
-        .then(res => {
-          if (res.success) {
-            openModal('modal-donation');
-            const content = document.getElementById('modal-donation-content');
-            content.innerHTML = `
-              <div class="text-center py-4 space-y-3 text-xs">
-                <span class="text-4xl">🎉</span>
-                <h3 class="text-base font-bold text-gray-800">Donasi Berhasil Dikirim!</h3>
-                <span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full font-bold inline-block">Status: Menunggu Verifikasi</span>
-                <p class="text-gray-600">ID Transaksi: <b class="text-blue-900">${res.donationId}</b></p>
+      try {
+        let res = null;
 
-                <div class="bg-blue-50 p-3 rounded-lg text-left border border-blue-200 space-y-1">
-                  <p><strong>Nama Donatur:</strong> ${res.donorName}</p>
-                  <p><strong>Nominal Transfer:</strong> ${formatRupiah(res.amount)}</p>
-                  <p><strong>Metode Pembayaran:</strong> ${res.paymentMethod}</p>
-                  <p><strong>Program:</strong> ${res.programTitle}</p>
-                </div>
+        if (useFirebase) {
+          const donationId = "DON-" + new Date().getTime().toString().slice(-6);
+          const dateStr = formatDateNowStr();
+          const settings = (globalInitialData && globalInitialData.settings) ? globalInitialData.settings : getDefaultSettings();
 
-                <div class="border-t pt-3 text-left space-y-3">
-                  <label class="block font-bold text-gray-700">1. Unggah Bukti Transfer:</label>
-                  <input type="file" id="proof-file" accept="image/*" class="w-full p-1 border rounded">
-                  <button onclick="submitTransferProof('${res.donationId}', '${res.donorName}', '${res.amount}', '${res.programTitle}', '${res.adminWA}', '${res.adminWAName}')" id="btn-upload-proof" class="w-full bg-blue-900 text-white font-bold py-2.5 rounded-xl hover:bg-blue-950 transition">
-                    Kirim Bukti Pembayaran
-                  </button>
-                </div>
+          const donationRecord = {
+            donationId: donationId,
+            date: dateStr,
+            timestamp: Date.now(),
+            name: donorName,
+            phone: phone,
+            email: "-",
+            campaignId: campaignId,
+            program: programTitle,
+            amount: amount,
+            message: message,
+            paymentMethod: paymentMethod,
+            status: "Menunggu Verifikasi",
+            proofUrl: "-"
+          };
+
+          await db.collection('donations').doc(donationId).set(donationRecord);
+          // Backup otomatis ke Google Sheets di latar belakang
+          mirrorToGoogleSheets('donation_created', donationRecord);
+
+          res = {
+            success: true,
+            donationId: donationId,
+            amount: amount,
+            donorName: donorName,
+            paymentMethod: paymentMethod,
+            programTitle: programTitle,
+            adminWA: settings.AdminWA || "628123456789",
+            adminWAName: settings.AdminWAName || "Admin Soskem JSIT"
+          };
+        } else {
+          const payload = {
+            campaignId: campaignId,
+            amount: amount,
+            donorName: form.donorName.value,
+            phone: rawPhone,
+            paymentMethod: paymentMethod,
+            isAnonymous: form.isAnonymous.checked,
+            message: message
+          };
+          res = await callGasApi('processDonation', { form: payload });
+        }
+
+        btn.disabled = false; btn.innerText = 'Lanjut Pembayaran';
+
+        if (res && res.success) {
+          openModal('modal-donation');
+          const content = document.getElementById('modal-donation-content');
+          content.innerHTML = `
+            <div class="text-center py-4 space-y-3 text-xs">
+              <span class="text-4xl">🎉</span>
+              <h3 class="text-base font-bold text-gray-800">Donasi Berhasil Dikirim!</h3>
+              <span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full font-bold inline-block">Status: Menunggu Verifikasi</span>
+              <p class="text-gray-600">ID Transaksi: <b class="text-blue-900">${res.donationId}</b></p>
+
+              <div class="bg-blue-50 p-3 rounded-lg text-left border border-blue-200 space-y-1">
+                <p><strong>Nama Donatur:</strong> ${res.donorName}</p>
+                <p><strong>Nominal Transfer:</strong> ${formatRupiah(res.amount)}</p>
+                <p><strong>Metode Pembayaran:</strong> ${res.paymentMethod}</p>
+                <p><strong>Program:</strong> ${res.programTitle}</p>
               </div>
-            `;
-            loadPublicData();
-          } else {
-            showCustomAlert('Gagal: ' + res.message, false);
-            btn.disabled = false; btn.innerText = 'Lanjut Pembayaran';
-          }
-        })
-        .catch(err => {
-          showCustomAlert('Gagal memproses donasi: ' + err.message, false);
-          btn.disabled = false; btn.innerText = 'Lanjut Pembayaran';
-        });
+
+              <div class="border-t pt-3 text-left space-y-3">
+                <label class="block font-bold text-gray-700">1. Unggah Bukti Transfer (Ke Google Drive):</label>
+                <input type="file" id="proof-file" accept="image/*" class="w-full p-1 border rounded">
+                <button onclick="submitTransferProof('${res.donationId}', '${res.donorName}', '${res.amount}', '${res.programTitle}', '${res.adminWA}', '${res.adminWAName}')" id="btn-upload-proof" class="w-full bg-blue-900 text-white font-bold py-2.5 rounded-xl hover:bg-blue-950 transition">
+                  Kirim Bukti Pembayaran
+                </button>
+              </div>
+            </div>
+          `;
+        } else {
+          showCustomAlert('Gagal: ' + (res ? res.message : 'Unknown error'), false);
+        }
+      } catch (err) {
+        showCustomAlert('Gagal memproses donasi: ' + err.message, false);
+        btn.disabled = false; btn.innerText = 'Lanjut Pembayaran';
+      }
     }
 
     function submitTransferProof(donationId, donorName, amount, programTitle, adminWA, adminWAName) {
@@ -1620,62 +1888,143 @@
       const file = fileInput.files[0];
       const reader = new FileReader();
       const btn = document.getElementById('btn-upload-proof');
-      btn.disabled = true; btn.innerText = 'Mengunggah...';
+      btn.disabled = true; btn.innerText = 'Mengunggah ke Google Drive...';
 
-      reader.onload = function(evt) {
+      reader.onload = async function(evt) {
         const fileData = { fileName: file.name, mimeType: file.type, data: evt.target.result };
-        callApi('uploadProof', { donationId: donationId, fileData: fileData })
-          .then(res => {
-            if (res.success) {
-              const waNumber = res.adminWA || adminWA || '628123456789';
-              const waName = res.adminWAName || adminWAName || 'Admin KitaBantu';
-              const messageText = `Halo ${waName}, saya ingin mengonfirmasi donasi:\n- ID Transaksi: ${donationId}\n- Nama: ${donorName}\n- Nominal: ${formatRupiah(amount)}\n- Program: ${programTitle}\nMohon dilakukan verifikasi. Terima kasih!`;
-              const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(messageText)}`;
-
-              const content = document.getElementById('modal-donation-content');
-              content.innerHTML = `
-                <div class="text-center py-6 space-y-4 text-xs">
-                  <span class="text-5xl">✅</span>
-                  <h3 class="text-lg font-bold text-gray-800">Bukti Transfer Berhasil Diunggah!</h3>
-                  <p class="text-gray-600 leading-relaxed">
-                    Donasi Anda saat ini berstatus <b class="text-amber-600">Menunggu Verifikasi</b>.<br>
-                    Silakan hubungi WhatsApp Admin untuk percepatan proses verifikasi:
-                  </p>
-
-                  <div class="bg-emerald-50 p-4 rounded-2xl border border-emerald-200 text-emerald-900 font-medium">
-                    <p class="text-xs">Pengelola Verifikasi:</p>
-                    <p class="font-extrabold text-sm">${waName} (${waNumber})</p>
-                  </div>
-
-                  <a href="${waUrl}" target="_blank" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 text-sm shadow-md">
-                    <span>💬</span> Konfirmasi via WhatsApp ${waName}
-                  </a>
-
-                  <button onclick="closeModal('modal-donation')" class="w-full bg-gray-200 text-gray-700 font-bold py-2 rounded-xl hover:bg-gray-300 text-xs">
-                    Tutup Halaman Ini
-                  </button>
-                </div>
-              `;
-            } else {
-              showCustomAlert('Gagal: ' + res.message, false);
-              btn.disabled = false; btn.innerText = 'Kirim Bukti Pembayaran';
+        try {
+          const res = await callGasApi('uploadProof', { donationId: donationId, fileData: fileData });
+          if (res.success) {
+            if (useFirebase && res.url) {
+              await db.collection('donations').doc(donationId).update({ proofUrl: res.url });
             }
-          })
-          .catch(err => {
-            showCustomAlert('Gagal mengunggah bukti: ' + err.message, false);
+
+            const waNumber = res.adminWA || adminWA || '628123456789';
+            const waName = res.adminWAName || adminWAName || 'Admin KitaBantu';
+            const messageText = `Halo ${waName}, saya ingin mengonfirmasi donasi:\n- ID Transaksi: ${donationId}\n- Nama: ${donorName}\n- Nominal: ${formatRupiah(amount)}\n- Program: ${programTitle}\nMohon dilakukan verifikasi. Terima kasih!`;
+            const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(messageText)}`;
+
+            const content = document.getElementById('modal-donation-content');
+            content.innerHTML = `
+              <div class="text-center py-6 space-y-4 text-xs">
+                <span class="text-5xl">✅</span>
+                <h3 class="text-lg font-bold text-gray-800">Bukti Transfer Berhasil Diunggah!</h3>
+                <p class="text-gray-600 leading-relaxed">
+                  Donasi Anda saat ini berstatus <b class="text-amber-600">Menunggu Verifikasi</b>.<br>
+                  Silakan hubungi WhatsApp Admin untuk percepatan proses verifikasi:
+                </p>
+
+                <div class="bg-emerald-50 p-4 rounded-2xl border border-emerald-200 text-emerald-900 font-medium">
+                  <p class="text-xs">Pengelola Verifikasi:</p>
+                  <p class="font-extrabold text-sm">${waName} (${waNumber})</p>
+                </div>
+
+                <a href="${waUrl}" target="_blank" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 text-sm shadow-md">
+                  <span>💬</span> Konfirmasi via WhatsApp ${waName}
+                </a>
+
+                <button onclick="closeModal('modal-donation')" class="w-full bg-gray-200 text-gray-700 font-bold py-2 rounded-xl hover:bg-gray-300 text-xs">
+                  Tutup Halaman Ini
+                </button>
+              </div>
+            `;
+          } else {
+            showCustomAlert('Gagal: ' + res.message, false);
             btn.disabled = false; btn.innerText = 'Kirim Bukti Pembayaran';
-          });
+          }
+        } catch (err) {
+          showCustomAlert('Gagal mengunggah bukti: ' + err.message, false);
+          btn.disabled = false; btn.innerText = 'Kirim Bukti Pembayaran';
+        }
       };
       reader.readAsDataURL(file);
     }
 
     // ================= AUTHENTICATION & MULTI-USER LOGIC =================
-    function authenticateUser() {
-      const u = document.getElementById('admin-user-input').value;
-      const p = document.getElementById('admin-pass-input').value;
+    async function authenticateUser() {
+      const u = document.getElementById('admin-user-input').value.trim();
+      const p = document.getElementById('admin-pass-input').value.trim();
+      const btn = document.getElementById('btn-login-submit');
 
-      callApi('loginUser', { username: u, password: p })
-        .then(res => {
+      if (!u || !p) {
+        showCustomAlert('Username dan Password wajib diisi!', false);
+        return;
+      }
+
+      btn.disabled = true; btn.innerText = 'Memverifikasi...';
+
+      try {
+        if (useFirebase) {
+          // Pastikan Superadmin default tersedia jika database Firebase masih kosong
+          const usersSnap = await db.collection('users').limit(1).get();
+          if (usersSnap.empty) {
+            await db.collection('users').doc('superadmin').set({
+              username: "superadmin",
+              password: "soskem2630",
+              name: "Superadmin Wilayah",
+              role: "Superadmin",
+              sekolah: "JSIT Wilayah Lampung",
+              status: "Aktif"
+            });
+          }
+
+          const doc = await db.collection('users').doc(u.toLowerCase()).get();
+          if (doc.exists) {
+            const userData = doc.data();
+            if (String(userData.password) === p) {
+              if (String(userData.status || 'Aktif').toLowerCase() !== 'aktif') {
+                btn.disabled = false; btn.innerText = 'Verifikasi & Masuk';
+                showCustomAlert('Akun Anda saat ini dinonaktifkan.', false);
+                return;
+              }
+              verifiedAdminAuth = {
+                username: userData.username,
+                password: p,
+                name: userData.name,
+                role: userData.role,
+                sekolah: userData.sekolah
+              };
+              localStorage.setItem('kitabantu_admin_auth', JSON.stringify(verifiedAdminAuth));
+              btn.disabled = false; btn.innerText = 'Verifikasi & Masuk';
+              closeModal('modal-admin-auth');
+              updateNavLoginLabel();
+              switchToAdminView();
+              return;
+            }
+          }
+
+          // Fallback cek ke GAS jika akun lama belum dimigrasi ke Firebase
+          const gasRes = await callGasApi('loginUser', { username: u, password: p });
+          if (gasRes && gasRes.success) {
+            const userObj = {
+              username: gasRes.user.username,
+              password: p,
+              name: gasRes.user.name,
+              role: gasRes.user.role,
+              sekolah: gasRes.user.sekolah,
+              status: "Aktif"
+            };
+            await db.collection('users').doc(u.toLowerCase()).set(userObj);
+            verifiedAdminAuth = {
+              username: userObj.username,
+              password: p,
+              name: userObj.name,
+              role: userObj.role,
+              sekolah: userObj.sekolah
+            };
+            localStorage.setItem('kitabantu_admin_auth', JSON.stringify(verifiedAdminAuth));
+            btn.disabled = false; btn.innerText = 'Verifikasi & Masuk';
+            closeModal('modal-admin-auth');
+            updateNavLoginLabel();
+            switchToAdminView();
+            return;
+          }
+
+          btn.disabled = false; btn.innerText = 'Verifikasi & Masuk';
+          showCustomAlert('Username atau Password salah!', false);
+        } else {
+          const res = await callGasApi('loginUser', { username: u, password: p });
+          btn.disabled = false; btn.innerText = 'Verifikasi & Masuk';
           if (res.success) {
             verifiedAdminAuth = { username: u, password: p, name: res.user.name, role: res.user.role, sekolah: res.user.sekolah };
             localStorage.setItem('kitabantu_admin_auth', JSON.stringify(verifiedAdminAuth));
@@ -1685,10 +2034,11 @@
           } else {
             showCustomAlert(res.message, false);
           }
-        })
-        .catch(err => {
-          showCustomAlert('Gagal verifikasi login: ' + err.message, false);
-        });
+        }
+      } catch (err) {
+        btn.disabled = false; btn.innerText = 'Verifikasi & Masuk';
+        showCustomAlert('Gagal verifikasi login: ' + err.message, false);
+      }
     }
 
     function logoutAdmin() {
@@ -1769,6 +2119,66 @@
       }
     }
 
+    // ================= MIGRASI SEKALI KLIK (SHEETS -> FIREBASE) =================
+    async function migrateSheetsToFirebase() {
+      if (!useFirebase) {
+        showCustomAlert('Isi FIREBASE_CONFIG terlebih dahulu sebelum melakukan migrasi!', false);
+        return;
+      }
+      if (!confirm('Impor seluruh data (Program, Donasi, Pengaturan, dan Pengguna) dari Google Sheets ke Firebase Firestore?')) return;
+
+      const btn = document.getElementById('btn-migrate-firebase');
+      btn.disabled = true; btn.innerText = '⏳ Mengimpor Data...';
+
+      try {
+        const res = await callGasApi('exportAllForFirebase', { auth: verifiedAdminAuth });
+        if (!res || !res.success) {
+          btn.disabled = false; btn.innerText = '🔄 Sinkronisasi Sheets → Firebase';
+          showCustomAlert(res ? res.message : 'Gagal mengambil data Sheets.', false);
+          return;
+        }
+
+        const batch = db.batch();
+
+        // 1. Settings
+        if (res.settings) {
+          batch.set(db.collection('settings').doc('general'), res.settings, { merge: true });
+        }
+
+        // 2. Users
+        (res.users || []).forEach(u => {
+          if (u.username) {
+            batch.set(db.collection('users').doc(u.username.toLowerCase()), u, { merge: true });
+          }
+        });
+
+        // 3. Programs
+        (res.programs || []).forEach(p => {
+          if (p.id) {
+            batch.set(db.collection('programs').doc(p.id), p, { merge: true });
+          }
+        });
+
+        // 4. Donations
+        (res.donations || []).forEach(d => {
+          if (d.donationId) {
+            batch.set(db.collection('donations').doc(d.donationId), {
+              ...d,
+              timestamp: Date.now()
+            }, { merge: true });
+          }
+        });
+
+        await batch.commit();
+        btn.disabled = false; btn.innerText = '🔄 Sinkronisasi Sheets → Firebase';
+        showCustomAlert(`Migrasi selesai! ${(res.programs || []).length} program & ${(res.donations || []).length} transaksi tersinkron ke Firebase.`);
+        loadAdminDashboardData();
+      } catch (err) {
+        btn.disabled = false; btn.innerText = '🔄 Sinkronisasi Sheets → Firebase';
+        showCustomAlert('Gagal migrasi: ' + err.message, false);
+      }
+    }
+
     function openSelfProfileModal() {
       if (!verifiedAdminAuth) return;
       document.getElementById('self-username').value = verifiedAdminAuth.username;
@@ -1776,26 +2186,56 @@
       openModal('modal-self-profile');
     }
 
-    function handleSaveSelfProfile(e) {
+    async function handleSaveSelfProfile(e) {
       e.preventDefault();
       const btn = document.getElementById('btn-save-self-profile');
       btn.disabled = true; btn.innerText = 'Menyimpan...';
 
-      const newUsername = document.getElementById('self-username').value;
-      const newPassword = document.getElementById('self-password').value;
+      const newUsername = document.getElementById('self-username').value.trim();
+      const newPassword = document.getElementById('self-password').value.trim();
 
-      const payload = {
-        newUsername: newUsername,
-        newPassword: newPassword
-      };
+      try {
+        if (useFirebase) {
+          const oldKey = verifiedAdminAuth.username.toLowerCase();
+          const newKey = newUsername.toLowerCase();
 
-      callApi('updateSelfProfile', { data: payload, auth: verifiedAdminAuth })
-        .then(res => {
+          if (newKey !== oldKey) {
+            const checkDoc = await db.collection('users').doc(newKey).get();
+            if (checkDoc.exists) {
+              btn.disabled = false; btn.innerText = 'Simpan Perubahan';
+              showCustomAlert(`Username '${newUsername}' sudah digunakan oleh akun lain!`, false);
+              return;
+            }
+          }
+
+          const updatedPassword = newPassword !== "" ? newPassword : verifiedAdminAuth.password;
+          const updatedObj = {
+            username: newUsername,
+            password: updatedPassword,
+            name: verifiedAdminAuth.name,
+            role: verifiedAdminAuth.role,
+            sekolah: verifiedAdminAuth.sekolah,
+            status: "Aktif"
+          };
+
+          await db.collection('users').doc(newKey).set(updatedObj);
+          if (newKey !== oldKey) {
+            await db.collection('users').doc(oldKey).delete();
+          }
+
+          verifiedAdminAuth = updatedObj;
+          localStorage.setItem('kitabantu_admin_auth', JSON.stringify(verifiedAdminAuth));
+          btn.disabled = false; btn.innerText = 'Simpan Perubahan';
+          showCustomAlert('Profil akun berhasil diperbarui!');
+          closeModal('modal-self-profile');
+          updateNavLoginLabel();
+          switchToAdminView();
+        } else {
+          const res = await callGasApi('updateSelfProfile', { data: { newUsername, newPassword }, auth: verifiedAdminAuth });
           btn.disabled = false; btn.innerText = 'Simpan Perubahan';
           if (res.success) {
             showCustomAlert(res.message);
             closeModal('modal-self-profile');
-
             verifiedAdminAuth = res.updatedUser;
             localStorage.setItem('kitabantu_admin_auth', JSON.stringify(verifiedAdminAuth));
             updateNavLoginLabel();
@@ -1803,67 +2243,212 @@
           } else {
             showCustomAlert(res.message, false);
           }
-        })
-        .catch(err => {
-          btn.disabled = false; btn.innerText = 'Simpan Perubahan';
-          showCustomAlert('Gagal memperbarui profil: ' + err.message, false);
-        });
+        }
+      } catch (err) {
+        btn.disabled = false; btn.innerText = 'Simpan Perubahan';
+        showCustomAlert('Gagal memperbarui profil: ' + err.message, false);
+      }
     }
 
-    function resetPasswordByAdminAction(targetUsername) {
+    async function resetPasswordByAdminAction(targetUsername) {
       const newPass = prompt(`Masukkan Password Baru untuk akun "${targetUsername}":`);
       if (!newPass || newPass.trim() === '') return;
 
-      callApi('resetPasswordByAdmin', { targetUsername: targetUsername, newPassword: newPass.trim(), auth: verifiedAdminAuth })
-        .then(res => {
+      try {
+        if (useFirebase) {
+          await db.collection('users').doc(targetUsername.toLowerCase()).update({ password: newPass.trim() });
+          showCustomAlert(`Password untuk akun '${targetUsername}' berhasil di-reset!`);
+          loadAdminDashboardData();
+        } else {
+          const res = await callGasApi('resetPasswordByAdmin', { targetUsername: targetUsername, newPassword: newPass.trim(), auth: verifiedAdminAuth });
           if (res.success) {
             showCustomAlert(res.message);
             loadAdminDashboardData();
           } else {
             showCustomAlert(res.message, false);
           }
-        })
-        .catch(err => {
-          showCustomAlert('Gagal reset password: ' + err.message, false);
-        });
+        }
+      } catch (err) {
+        showCustomAlert('Gagal reset password: ' + err.message, false);
+      }
     }
 
-    function loadAdminDashboardData() {
-      callApi('getDashboardData', { auth: verifiedAdminAuth })
-        .then(data => {
-          if (!data) return;
-          globalAdminData = data;
+    // ================= LOAD DASHBOARD DATA (FIREBASE / GAS) =================
+    async function loadAdminDashboardData() {
+      try {
+        let data = null;
 
-          document.getElementById('admin-card-donasi').innerText = formatRupiah(data.stats.totalDonasi);
-          document.getElementById('admin-card-donatur').innerText = data.stats.totalDonatur;
-          document.getElementById('admin-card-program').innerText = data.stats.totalProgram;
-          document.getElementById('admin-card-sisa').innerText = formatRupiah(data.stats.sisaDana);
+        if (useFirebase) {
+          const [settingsDoc, progSnap, donSnap, userSnap] = await Promise.all([
+            db.collection('settings').doc('general').get(),
+            db.collection('programs').get(),
+            db.collection('donations').get(),
+            db.collection('users').get()
+          ]);
 
-          if (data.settings) {
-            document.getElementById('setting-hero-title').value = data.settings.HeroTitle || '';
-            document.getElementById('setting-hero-subtext').value = data.settings.HeroSubtext || '';
-            document.getElementById('setting-hero-bg-url1').value = data.settings.HeroBgImage1 || '';
-            document.getElementById('setting-hero-bg-url2').value = data.settings.HeroBgImage2 || '';
-            document.getElementById('setting-hero-bg-url3').value = data.settings.HeroBgImage3 || '';
-            document.getElementById('setting-payment-methods').value = data.settings.PaymentMethods || '';
-            document.getElementById('setting-admin-wa').value = data.settings.AdminWA || '';
-            document.getElementById('setting-admin-name').value = data.settings.AdminWAName || '';
-            document.getElementById('setting-link-fb').value = data.settings.LinkFB || '';
-            document.getElementById('setting-link-ig').value = data.settings.LinkIG || '';
-            document.getElementById('setting-link-yt').value = data.settings.LinkYT || '';
-            document.getElementById('setting-link-tiktok').value = data.settings.LinkTikTok || '';
-          }
+          const settings = settingsDoc.exists ? { ...getDefaultSettings(), ...settingsDoc.data() } : getDefaultSettings();
+          const user = verifiedAdminAuth;
 
-          renderAdminRecentDonations(data.donations);
-          renderAdminProgramsTable(data.programs);
-          renderUsersTable(data.usersList || []);
-          populateReportFilter(data.programs);
-          renderReportTable(data.donations);
-          populateSchoolHistorySelector(data.schoolNames || []);
-        })
-        .catch(err => {
-          showCustomAlert('Gagal memuat dashboard: ' + err.message, false);
-        });
+          const allPrograms = [];
+          const userPrograms = [];
+          let totalTarget = 0;
+          let totalCollected = 0;
+          let totalDisalurkan = 0;
+
+          progSnap.forEach(doc => {
+            const p = doc.data();
+            const target = Number(p.target || 0);
+            const collected = Number(p.collected || 0);
+            const disalurkan = Number(p.disalurkan || 0);
+            const sekolahProg = String(p.sekolah || "JSIT Wilayah Lampung");
+
+            const progObj = {
+              id: doc.id,
+              title: String(p.title || ""),
+              category: String(p.category || ""),
+              description: String(p.description || ""),
+              target: target,
+              collected: collected,
+              disalurkan: disalurkan,
+              imageUrl: String(p.imageUrl || ""),
+              headerText: String(p.headerText || ""),
+              status: String(p.status || "Aktif"),
+              deadline: String(p.deadline || ""),
+              sekolah: sekolahProg
+            };
+
+            allPrograms.push(progObj);
+
+            if (user.role === "Sekolah") {
+              if (sekolahProg === user.sekolah) {
+                totalTarget += target;
+                totalCollected += collected;
+                totalDisalurkan += disalurkan;
+                userPrograms.push(progObj);
+              }
+            } else {
+              totalTarget += target;
+              totalCollected += collected;
+              totalDisalurkan += disalurkan;
+              userPrograms.push(progObj);
+            }
+          });
+
+          const allDonations = [];
+          const userDonations = [];
+          let myTotalDonated = 0;
+
+          donSnap.forEach(doc => {
+            const d = doc.data();
+            const donObj = {
+              donationId: doc.id,
+              date: String(d.date || ""),
+              timestamp: Number(d.timestamp || 0),
+              name: String(d.name || ""),
+              phone: String(d.phone || ""),
+              email: String(d.email || "-"),
+              program: String(d.program || ""),
+              amount: Number(d.amount || 0),
+              message: String(d.message || ""),
+              paymentMethod: String(d.paymentMethod || ""),
+              status: String(d.status || "Menunggu Verifikasi"),
+              proofUrl: String(d.proofUrl || "-")
+            };
+
+            allDonations.push(donObj);
+
+            if (user.role === "Donatur") {
+              if (donObj.name.toLowerCase() === user.name.toLowerCase() || donObj.name.toLowerCase() === user.username.toLowerCase()) {
+                userDonations.push(donObj);
+                if (donObj.status.toLowerCase() === "approved" || donObj.status.toLowerCase() === "berhasil") {
+                  myTotalDonated += donObj.amount;
+                }
+              }
+            } else if (user.role === "Sekolah") {
+              const matchProg = userPrograms.find(p => p.title === donObj.program);
+              if (matchProg) userDonations.push(donObj);
+            } else {
+              userDonations.push(donObj);
+            }
+          });
+
+          // Urutkan transaksi terbaru di atas
+          allDonations.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+          userDonations.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+          const usersList = [];
+          const schoolNames = [];
+
+          userSnap.forEach(doc => {
+            const u = doc.data();
+            const uRole = String(u.role || "Donatur");
+            const uSekolah = String(u.sekolah || "");
+            usersList.push({
+              username: String(u.username || doc.id),
+              name: String(u.name || ""),
+              role: uRole,
+              sekolah: uSekolah,
+              status: String(u.status || "Aktif")
+            });
+            if (uSekolah && schoolNames.indexOf(uSekolah) === -1 && uRole === "Sekolah") {
+              schoolNames.push(uSekolah);
+            }
+          });
+
+          data = {
+            user: user,
+            settings: settings,
+            stats: {
+              totalDonasi: (user.role === "Donatur") ? myTotalDonated : totalCollected,
+              totalTarget: totalTarget,
+              totalDonatur: userDonations.length,
+              totalProgram: userPrograms.length,
+              totalDisalurkan: totalDisalurkan,
+              sisaDana: Math.max(0, totalCollected - totalDisalurkan)
+            },
+            programs: userPrograms,
+            donations: userDonations,
+            allPrograms: allPrograms,
+            allDonations: allDonations,
+            usersList: usersList,
+            schoolNames: schoolNames
+          };
+        } else {
+          data = await callGasApi('getDashboardData', { auth: verifiedAdminAuth });
+        }
+
+        if (!data) return;
+        globalAdminData = data;
+
+        document.getElementById('admin-card-donasi').innerText = formatRupiah(data.stats.totalDonasi);
+        document.getElementById('admin-card-donatur').innerText = data.stats.totalDonatur;
+        document.getElementById('admin-card-program').innerText = data.stats.totalProgram;
+        document.getElementById('admin-card-sisa').innerText = formatRupiah(data.stats.sisaDana);
+
+        if (data.settings) {
+          document.getElementById('setting-hero-title').value = data.settings.HeroTitle || '';
+          document.getElementById('setting-hero-subtext').value = data.settings.HeroSubtext || '';
+          document.getElementById('setting-hero-bg-url1').value = data.settings.HeroBgImage1 || '';
+          document.getElementById('setting-hero-bg-url2').value = data.settings.HeroBgImage2 || '';
+          document.getElementById('setting-hero-bg-url3').value = data.settings.HeroBgImage3 || '';
+          document.getElementById('setting-payment-methods').value = data.settings.PaymentMethods || '';
+          document.getElementById('setting-admin-wa').value = data.settings.AdminWA || '';
+          document.getElementById('setting-admin-name').value = data.settings.AdminWAName || '';
+          document.getElementById('setting-link-fb').value = data.settings.LinkFB || '';
+          document.getElementById('setting-link-ig').value = data.settings.LinkIG || '';
+          document.getElementById('setting-link-yt').value = data.settings.LinkYT || '';
+          document.getElementById('setting-link-tiktok').value = data.settings.LinkTikTok || '';
+        }
+
+        renderAdminRecentDonations(data.donations);
+        renderAdminProgramsTable(data.programs);
+        renderUsersTable(data.usersList || []);
+        populateReportFilter(data.programs);
+        renderReportTable(data.donations);
+        populateSchoolHistorySelector(data.schoolNames || []);
+      } catch (err) {
+        showCustomAlert('Gagal memuat dashboard: ' + err.message, false);
+      }
     }
 
     function populateSchoolHistorySelector(schools) {
@@ -1895,15 +2480,12 @@
 
       const schoolProgs = allProgs.filter(p => p.sekolah === selectedSchool);
       const schoolProgTitles = schoolProgs.map(p => p.title);
-      
       const schoolDons = allDons.filter(d => schoolProgTitles.indexOf(d.program) !== -1);
 
       let grandTotalCollected = 0;
       let grandTotalDisalurkan = 0;
-      let grandTotalTarget = 0;
 
       schoolProgs.forEach(p => {
-        grandTotalTarget += p.target || 0;
         grandTotalCollected += p.collected || 0;
         grandTotalDisalurkan += p.disalurkan || 0;
       });
@@ -1934,7 +2516,7 @@
 
       let donTableHtml = '';
       if (schoolDons.length === 0) {
-        donTableHtml = '<tr><td colspan="7" class="p-4 text-center text-gray-400">Belum ada riwayat donasi masuk untuk sekolah ini.</td></tr>';
+        donTableHtml = '<tr><td colspan="8" class="p-4 text-center text-gray-400">Belum ada riwayat donasi masuk untuk sekolah ini.</td></tr>';
       } else {
         schoolDons.forEach((d, idx) => {
           const isApproved = String(d.status).toLowerCase() === 'approved' || String(d.status).toLowerCase() === 'berhasil';
@@ -1995,9 +2577,7 @@
                   <th class="p-2.5 border w-32">Pencapaian</th>
                 </tr>
               </thead>
-              <tbody class="divide-y text-gray-700">
-                ${programBreakdownHtml}
-              </tbody>
+              <tbody class="divide-y text-gray-700">${programBreakdownHtml}</tbody>
             </table>
           </div>
         </div>
@@ -2020,9 +2600,7 @@
                   <th class="p-2.5 border text-center">Bukti Transfer</th>
                 </tr>
               </thead>
-              <tbody class="divide-y text-gray-700">
-                ${donTableHtml}
-              </tbody>
+              <tbody class="divide-y text-gray-700">${donTableHtml}</tbody>
             </table>
           </div>
         </div>
@@ -2074,7 +2652,7 @@
         const isAktif = String(p.status).trim().toLowerCase() === 'aktif';
         tbody.innerHTML += `
           <tr class="hover:bg-gray-50">
-            <td class="p-3"><img src="${p.imageUrl}" class="h-10 w-14 object-cover rounded"></td>
+            <td class="p-3"><img src="${p.imageUrl || 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600'}" class="h-10 w-14 object-cover rounded"></td>
             <td class="p-3 font-semibold text-gray-800">${p.title}</td>
             <td class="p-3"><span class="bg-amber-100 text-amber-900 px-2 py-0.5 rounded text-[10px] font-bold">${p.sekolah || 'JSIT Lampung'}</span></td>
             <td class="p-3">${formatRupiah(p.target)}</td>
@@ -2154,22 +2732,38 @@
       openModal('modal-user-account');
     }
 
-    function handleSaveUserAccount(e) {
+    async function handleSaveUserAccount(e) {
       e.preventDefault();
       const btn = document.getElementById('btn-save-usr');
       btn.disabled = true; btn.innerText = 'Menyimpan...';
 
+      const username = document.getElementById('usr-username').value.trim();
+      const password = document.getElementById('usr-password').value.trim();
       const payload = {
-        username: document.getElementById('usr-username').value,
-        password: document.getElementById('usr-password').value,
-        name: document.getElementById('usr-name').value,
+        username: username,
+        name: document.getElementById('usr-name').value.trim(),
         role: document.getElementById('usr-role').value,
-        sekolah: document.getElementById('usr-sekolah').value,
+        sekolah: document.getElementById('usr-sekolah').value.trim(),
         status: document.getElementById('usr-status').value
       };
 
-      callApi('saveUserAccount', { data: payload, auth: verifiedAdminAuth })
-        .then(res => {
+      try {
+        if (useFirebase) {
+          const docRef = db.collection('users').doc(username.toLowerCase());
+          const existing = await docRef.get();
+          if (existing.exists) {
+            payload.password = password || existing.data().password;
+          } else {
+            payload.password = password || "123456";
+          }
+          await docRef.set(payload, { merge: true });
+          btn.disabled = false; btn.innerText = 'Simpan Akun';
+          showCustomAlert(`Akun ${username} berhasil disimpan!`);
+          closeModal('modal-user-account');
+          loadAdminDashboardData();
+        } else {
+          payload.password = password;
+          const res = await callGasApi('saveUserAccount', { data: payload, auth: verifiedAdminAuth });
           btn.disabled = false; btn.innerText = 'Simpan Akun';
           if (res.success) {
             showCustomAlert(res.message);
@@ -2178,33 +2772,45 @@
           } else {
             showCustomAlert(res.message, false);
           }
-        })
-        .catch(err => {
-          btn.disabled = false; btn.innerText = 'Simpan Akun';
-          showCustomAlert('Gagal menyimpan akun: ' + err.message, false);
-        });
-    }
-
-    function confirmDeleteUser(targetUsername) {
-      if (confirm('Apakah Anda yakin ingin menghapus akun pengguna ' + targetUsername + '?')) {
-        callApi('deleteUserAccount', { username: targetUsername, auth: verifiedAdminAuth })
-          .then(res => {
-            if (res.success) {
-              showCustomAlert(res.message);
-              loadAdminDashboardData();
-            } else {
-              showCustomAlert(res.message, false);
-            }
-          })
-          .catch(err => {
-            showCustomAlert('Gagal menghapus akun: ' + err.message, false);
-          });
+        }
+      } catch (err) {
+        btn.disabled = false; btn.innerText = 'Simpan Akun';
+        showCustomAlert('Gagal menyimpan akun: ' + err.message, false);
       }
     }
 
-    function toggleProgramStatus(progId) {
-      callApi('toggleProgramStatusByAdmin', { progId: progId, auth: verifiedAdminAuth })
-        .then(res => {
+    async function confirmDeleteUser(targetUsername) {
+      if (!confirm('Apakah Anda yakin ingin menghapus akun pengguna ' + targetUsername + '?')) return;
+      try {
+        if (useFirebase) {
+          await db.collection('users').doc(targetUsername.toLowerCase()).delete();
+          showCustomAlert(`Akun ${targetUsername} berhasil dihapus!`);
+          loadAdminDashboardData();
+        } else {
+          const res = await callGasApi('deleteUserAccount', { username: targetUsername, auth: verifiedAdminAuth });
+          if (res.success) {
+            showCustomAlert(res.message);
+            loadAdminDashboardData();
+          } else {
+            showCustomAlert(res.message, false);
+          }
+        }
+      } catch (err) {
+        showCustomAlert('Gagal menghapus akun: ' + err.message, false);
+      }
+    }
+
+    async function toggleProgramStatus(progId) {
+      try {
+        if (useFirebase) {
+          const prog = globalAdminData.programs.find(p => String(p.id) === String(progId));
+          if (!prog) return;
+          const newStatus = String(prog.status).toLowerCase() === 'aktif' ? 'Nonaktif' : 'Aktif';
+          await db.collection('programs').doc(progId).update({ status: newStatus });
+          showCustomAlert(`Status program diubah menjadi: ${newStatus}`);
+          loadAdminDashboardData();
+        } else {
+          const res = await callGasApi('toggleProgramStatusByAdmin', { progId: progId, auth: verifiedAdminAuth });
           if (res.success) {
             showCustomAlert(res.message);
             loadAdminDashboardData();
@@ -2212,10 +2818,10 @@
           } else {
             showCustomAlert(res.message, false);
           }
-        })
-        .catch(err => {
-          showCustomAlert('Gagal mengubah status: ' + err.message, false);
-        });
+        }
+      } catch (err) {
+        showCustomAlert('Gagal mengubah status: ' + err.message, false);
+      }
     }
 
     function openCreateProgramModal() {
@@ -2263,21 +2869,25 @@
       openModal('modal-add-program');
     }
 
-    function confirmDeleteProgram(progId) {
-      if (confirm('Apakah Anda yakin ingin menghapus program donasi ini?')) {
-        callApi('deleteProgramByAdmin', { progId: progId, auth: verifiedAdminAuth })
-          .then(res => {
-            if (res.success) {
-              showCustomAlert(res.message);
-              loadAdminDashboardData();
-              loadPublicData();
-            } else {
-              showCustomAlert(res.message, false);
-            }
-          })
-          .catch(err => {
-            showCustomAlert('Gagal menghapus program: ' + err.message, false);
-          });
+    async function confirmDeleteProgram(progId) {
+      if (!confirm('Apakah Anda yakin ingin menghapus program donasi ini?')) return;
+      try {
+        if (useFirebase) {
+          await db.collection('programs').doc(progId).delete();
+          showCustomAlert('Program berhasil dihapus!');
+          loadAdminDashboardData();
+        } else {
+          const res = await callGasApi('deleteProgramByAdmin', { progId: progId, auth: verifiedAdminAuth });
+          if (res.success) {
+            showCustomAlert(res.message);
+            loadAdminDashboardData();
+            loadPublicData();
+          } else {
+            showCustomAlert(res.message, false);
+          }
+        }
+      } catch (err) {
+        showCustomAlert('Gagal menghapus program: ' + err.message, false);
       }
     }
 
@@ -2293,7 +2903,7 @@
         const reader = new FileReader();
         reader.onload = function(evt) {
           const fileData = { fileName: file.name, mimeType: file.type, data: evt.target.result };
-          callApi('uploadImageToDrive', { fileData: fileData })
+          callGasApi('uploadImageToDrive', { fileData: fileData })
             .then(imgRes => {
               if (imgRes.success) {
                 submitProgramPayload(e.target, imgRes.url);
@@ -2313,23 +2923,47 @@
       }
     }
 
-    function submitProgramPayload(form, imageUrl) {
+    async function submitProgramPayload(form, imageUrl) {
+      const sekolahPengaju = verifiedAdminAuth.role === "Sekolah"
+        ? verifiedAdminAuth.sekolah
+        : ((form.sekolah && form.sekolah.value) || verifiedAdminAuth.sekolah || "JSIT Wilayah Lampung");
+
+      const existingId = form.id.value.trim();
+      const progId = existingId || ("PROG-" + new Date().getTime().toString().slice(-5));
+
       const payload = {
-        id: form.id.value,
-        title: form.title.value,
+        id: progId,
+        title: form.title.value.trim(),
         category: form.category.value,
-        target: form.target.value,
-        disalurkan: form.disalurkan.value || 0,
-        sekolah: form.sekolah ? form.sekolah.value : '',
-        imageUrl: imageUrl,
-        headerText: form.headerText.value,
-        deadline: form.deadline.value,
-        description: form.description.value,
-        status: form.status.value
+        target: Number(form.target.value || 0),
+        disalurkan: Number(form.disalurkan.value || 0),
+        sekolah: sekolahPengaju,
+        imageUrl: imageUrl || "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600",
+        headerText: form.headerText.value || form.title.value.trim(),
+        deadline: form.deadline.value || "",
+        description: form.description.value.trim(),
+        status: form.status.value || "Aktif"
       };
 
-      callApi('saveCampaignByAdmin', { data: payload, auth: verifiedAdminAuth })
-        .then(res => {
+      try {
+        if (useFirebase) {
+          const docRef = db.collection('programs').doc(progId);
+          if (existingId) {
+            await docRef.set(payload, { merge: true });
+          } else {
+            payload.collected = 0;
+            await docRef.set(payload);
+          }
+
+          const btn = document.getElementById('btn-save-prog');
+          btn.disabled = false; btn.innerText = 'Simpan Program';
+          showCustomAlert(existingId ? 'Program berhasil diperbarui!' : 'Program baru berhasil ditambahkan!');
+          form.reset();
+          closeModal('modal-add-program');
+          loadAdminDashboardData();
+        } else {
+          payload.id = existingId;
+          const res = await callGasApi('saveCampaignByAdmin', { data: payload, auth: verifiedAdminAuth });
           const btn = document.getElementById('btn-save-prog');
           btn.disabled = false; btn.innerText = 'Simpan Program';
           if (res.success) {
@@ -2341,12 +2975,12 @@
           } else {
             showCustomAlert(res.message, false);
           }
-        })
-        .catch(err => {
-          const btn = document.getElementById('btn-save-prog');
-          btn.disabled = false; btn.innerText = 'Simpan Program';
-          showCustomAlert('Gagal menyimpan program: ' + err.message, false);
-        });
+        }
+      } catch (err) {
+        const btn = document.getElementById('btn-save-prog');
+        btn.disabled = false; btn.innerText = 'Simpan Program';
+        showCustomAlert('Gagal menyimpan program: ' + err.message, false);
+      }
     }
 
     async function uploadHeroFileIfSelected(fileInputId, hiddenUrlId) {
@@ -2357,7 +2991,7 @@
           const reader = new FileReader();
           reader.onload = function(evt) {
             const fileData = { fileName: file.name, mimeType: file.type, data: evt.target.result };
-            callApi('uploadImageToDrive', { fileData: fileData })
+            callGasApi('uploadImageToDrive', { fileData: fileData })
               .then(imgRes => {
                 if (imgRes.success) resolve(imgRes.url);
                 else resolve(document.getElementById(hiddenUrlId).value);
@@ -2380,24 +3014,37 @@
         const url2 = await uploadHeroFileIfSelected('setting-hero-file2', 'setting-hero-bg-url2');
         const url3 = await uploadHeroFileIfSelected('setting-hero-file3', 'setting-hero-bg-url3');
 
-        const payload = {
-          heroTitle: document.getElementById('setting-hero-title').value,
-          heroSubtext: document.getElementById('setting-hero-subtext').value,
-          heroBgImage1: url1,
-          heroBgImage2: url2,
-          heroBgImage3: url3,
-          paymentMethods: document.getElementById('setting-payment-methods').value
-        };
+        if (useFirebase) {
+          await db.collection('settings').doc('general').set({
+            HeroTitle: document.getElementById('setting-hero-title').value,
+            HeroSubtext: document.getElementById('setting-hero-subtext').value,
+            HeroBgImage1: url1,
+            HeroBgImage2: url2,
+            HeroBgImage3: url3,
+            PaymentMethods: document.getElementById('setting-payment-methods').value
+          }, { merge: true });
 
-        const res = await callApi('saveHeaderSettings', { data: payload, auth: verifiedAdminAuth });
-        btn.disabled = false; btn.innerText = 'Simpan Banner Header & Metode Pembayaran';
-        
-        if (res.success) {
-          showCustomAlert(res.message);
+          btn.disabled = false; btn.innerText = 'Simpan Banner Header & Metode Pembayaran';
+          showCustomAlert('Pengaturan banner header & metode pembayaran berhasil diperbarui!');
           loadAdminDashboardData();
-          loadPublicData();
         } else {
-          showCustomAlert(res.message, false);
+          const payload = {
+            heroTitle: document.getElementById('setting-hero-title').value,
+            heroSubtext: document.getElementById('setting-hero-subtext').value,
+            heroBgImage1: url1,
+            heroBgImage2: url2,
+            heroBgImage3: url3,
+            paymentMethods: document.getElementById('setting-payment-methods').value
+          };
+          const res = await callGasApi('saveHeaderSettings', { data: payload, auth: verifiedAdminAuth });
+          btn.disabled = false; btn.innerText = 'Simpan Banner Header & Metode Pembayaran';
+          if (res.success) {
+            showCustomAlert(res.message);
+            loadAdminDashboardData();
+            loadPublicData();
+          } else {
+            showCustomAlert(res.message, false);
+          }
         }
       } catch (err) {
         btn.disabled = false; btn.innerText = 'Simpan Banner Header & Metode Pembayaran';
@@ -2405,22 +3052,35 @@
       }
     }
 
-    function handleSaveAdminSosmedSettings(e) {
+    async function handleSaveAdminSosmedSettings(e) {
       e.preventDefault();
       const btn = document.getElementById('btn-save-admin-sosmed');
       btn.disabled = true; btn.innerText = 'Menyimpan Kontak & Sosmed...';
 
-      const payload = {
-        adminWA: document.getElementById('setting-admin-wa').value,
-        adminWAName: document.getElementById('setting-admin-name').value,
-        linkFB: document.getElementById('setting-link-fb').value,
-        linkIG: document.getElementById('setting-link-ig').value,
-        linkYT: document.getElementById('setting-link-yt').value,
-        linkTikTok: document.getElementById('setting-link-tiktok').value
-      };
+      try {
+        if (useFirebase) {
+          await db.collection('settings').doc('general').set({
+            AdminWA: document.getElementById('setting-admin-wa').value,
+            AdminWAName: document.getElementById('setting-admin-name').value,
+            LinkFB: document.getElementById('setting-link-fb').value,
+            LinkIG: document.getElementById('setting-link-ig').value,
+            LinkYT: document.getElementById('setting-link-yt').value,
+            LinkTikTok: document.getElementById('setting-link-tiktok').value
+          }, { merge: true });
 
-      callApi('saveAdminSosmedSettings', { data: payload, auth: verifiedAdminAuth })
-        .then(res => {
+          btn.disabled = false; btn.innerText = 'Simpan Kontak Admin & Sosial Media';
+          showCustomAlert('Pengaturan Admin & Sosial Media berhasil diperbarui!');
+          loadAdminDashboardData();
+        } else {
+          const payload = {
+            adminWA: document.getElementById('setting-admin-wa').value,
+            adminWAName: document.getElementById('setting-admin-name').value,
+            linkFB: document.getElementById('setting-link-fb').value,
+            linkIG: document.getElementById('setting-link-ig').value,
+            linkYT: document.getElementById('setting-link-yt').value,
+            linkTikTok: document.getElementById('setting-link-tiktok').value
+          };
+          const res = await callGasApi('saveAdminSosmedSettings', { data: payload, auth: verifiedAdminAuth });
           btn.disabled = false; btn.innerText = 'Simpan Kontak Admin & Sosial Media';
           if (res.success) {
             showCustomAlert(res.message);
@@ -2429,11 +3089,11 @@
           } else {
             showCustomAlert(res.message, false);
           }
-        })
-        .catch(err => {
-          btn.disabled = false; btn.innerText = 'Simpan Kontak Admin & Sosial Media';
-          showCustomAlert('Gagal menyimpan sosmed: ' + err.message, false);
-        });
+        }
+      } catch (err) {
+        btn.disabled = false; btn.innerText = 'Simpan Kontak Admin & Sosial Media';
+        showCustomAlert('Gagal menyimpan sosmed: ' + err.message, false);
+      }
     }
 
     // ================= LAPORAN, EXPORT & AKSI EDIT STATUS =================
@@ -2514,39 +3174,75 @@
       `;
     }
 
-    function approveDonationStatus(donationId) {
-      if (confirm('Verifikasi dan setujui (Approve) transaksi donasi ini? Nominal akan otomatis ditambahkan ke total terkumpul program.')) {
-        callApi('updateDonationStatusByAdmin', { donationId: donationId, newStatus: 'Approved', auth: verifiedAdminAuth })
-          .then(res => {
-            if (res.success) {
-              showCustomAlert(res.message);
-              loadAdminDashboardData();
-              loadPublicData();
-            } else {
-              showCustomAlert(res.message, false);
+    async function approveDonationStatus(donationId) {
+      if (!confirm('Verifikasi dan setujui (Approve) transaksi donasi ini? Nominal akan otomatis ditambahkan ke total terkumpul program.')) return;
+
+      try {
+        if (useFirebase) {
+          const donRef = db.collection('donations').doc(donationId);
+          let approvedRecord = null;
+
+          await db.runTransaction(async (transaction) => {
+            const donDoc = await transaction.get(donRef);
+            if (!donDoc.exists) throw new Error("Transaksi tidak ditemukan.");
+            const donData = donDoc.data();
+            if (donData.status === 'Approved') return;
+
+            transaction.update(donRef, { status: 'Approved' });
+            approvedRecord = { donationId: donationId, program: donData.program, amount: donData.amount };
+
+            // Cari program yang sesuai untuk ditambahkan nominalnya secara atomik
+            const matchingProg = (globalAdminData.allPrograms || []).find(p => p.title === donData.program);
+            if (matchingProg) {
+              const progRef = db.collection('programs').doc(matchingProg.id);
+              const progDoc = await transaction.get(progRef);
+              if (progDoc.exists) {
+                const currentCollected = Number(progDoc.data().collected || 0);
+                transaction.update(progRef, { collected: currentCollected + Number(donData.amount || 0) });
+              }
             }
-          })
-          .catch(err => {
-            showCustomAlert('Gagal update status: ' + err.message, false);
           });
+
+          if (approvedRecord) {
+            mirrorToGoogleSheets('donation_approved', approvedRecord);
+          }
+
+          showCustomAlert(`Status donasi ${donationId} berhasil diubah ke: Approved`);
+          loadAdminDashboardData();
+        } else {
+          const res = await callGasApi('updateDonationStatusByAdmin', { donationId: donationId, newStatus: 'Approved', auth: verifiedAdminAuth });
+          if (res.success) {
+            showCustomAlert(res.message);
+            loadAdminDashboardData();
+            loadPublicData();
+          } else {
+            showCustomAlert(res.message, false);
+          }
+        }
+      } catch (err) {
+        showCustomAlert('Gagal update status: ' + err.message, false);
       }
     }
 
-    function deleteDonationRecord(donationId) {
-      if (confirm('Apakah Anda yakin ingin menghapus transaksi donasi ini?')) {
-        callApi('deleteDonationByAdmin', { donationId: donationId, auth: verifiedAdminAuth })
-          .then(res => {
-            if (res.success) {
-              showCustomAlert(res.message);
-              loadAdminDashboardData();
-              loadPublicData();
-            } else {
-              showCustomAlert(res.message, false);
-            }
-          })
-          .catch(err => {
-            showCustomAlert('Gagal menghapus donasi: ' + err.message, false);
-          });
+    async function deleteDonationRecord(donationId) {
+      if (!confirm('Apakah Anda yakin ingin menghapus transaksi donasi ini?')) return;
+      try {
+        if (useFirebase) {
+          await db.collection('donations').doc(donationId).delete();
+          showCustomAlert('Data donasi berhasil dihapus!');
+          loadAdminDashboardData();
+        } else {
+          const res = await callGasApi('deleteDonationByAdmin', { donationId: donationId, auth: verifiedAdminAuth });
+          if (res.success) {
+            showCustomAlert(res.message);
+            loadAdminDashboardData();
+            loadPublicData();
+          } else {
+            showCustomAlert(res.message, false);
+          }
+        }
+      } catch (err) {
+        showCustomAlert('Gagal menghapus donasi: ' + err.message, false);
       }
     }
 
@@ -2585,7 +3281,6 @@
       });
 
       const encodedUri = "data:text/csv;charset=utf-8,%EF%BB%BF" + encodeURIComponent(csvText);
-      const link = document.getElementById("a");
       const a = document.createElement("a");
       a.setAttribute("href", encodedUri);
       a.setAttribute("download", `Laporan_Donasi_${filterVal.replace(/\s+/g, '_')}.csv`);
