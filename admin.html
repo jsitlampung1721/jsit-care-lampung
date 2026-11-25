@@ -10,7 +10,9 @@
   <link rel="shortcut icon" href="https://lh3.googleusercontent.com/d/1NYK166dwtbJFMNeNznw7EM3QCoHpRDEH=s64">
   <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1NYK166dwtbJFMNeNznw7EM3QCoHpRDEH=s180">
 
-  <!-- Google Fonts: Plus Jakarta Sans -->
+  <!-- Preconnect untuk mempercepat koneksi ke Firebase & Google Fonts -->
+  <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -136,7 +138,7 @@
           </svg>
         </button>
 
-        <a href="index.html" class="flex items-center gap-2.5 cursor-pointer group">
+        <a href="index.html" onmouseenter="prefetchPage('index.html')" class="flex items-center gap-2.5 cursor-pointer group">
           <img src="https://lh3.googleusercontent.com/d/1NYK166dwtbJFMNeNznw7EM3QCoHpRDEH" alt="Logo JSIT" class="h-9 sm:h-10 w-auto object-contain bg-white/15 p-1 rounded-xl group-hover:scale-105 transition">
           <div>
             <h1 class="text-sm sm:text-base md:text-lg font-extrabold leading-tight tracking-tight">KitaBantu</h1>
@@ -146,7 +148,7 @@
       </div>
 
       <div class="flex items-center gap-1.5 sm:gap-2">
-        <a href="index.html" class="bg-blue-800/80 hover:bg-blue-700 dark:bg-slate-800 dark:hover:bg-slate-700 text-white px-2.5 sm:px-3 py-2 rounded-xl font-semibold text-xs md:text-sm transition flex items-center gap-1.5">
+        <a href="index.html" onmouseenter="prefetchPage('index.html')" class="bg-blue-800/80 hover:bg-blue-700 dark:bg-slate-800 dark:hover:bg-slate-700 text-white px-2.5 sm:px-3 py-2 rounded-xl font-semibold text-xs md:text-sm transition flex items-center gap-1.5">
           <span>🏠</span> <span class="hidden md:inline">Beranda Publik</span>
         </a>
         <button onclick="logoutAdmin()" class="bg-rose-600 hover:bg-rose-500 text-white px-2.5 sm:px-3.5 py-2 rounded-xl font-extrabold text-xs md:text-sm transition flex items-center gap-1.5 shadow-sm">
@@ -816,8 +818,43 @@
       setInterval(updateLiveClock, 1000);
       updateEngineIndicator();
       initAdminSessionUI();
+
+      // 1. RENDER INSTAN DARI CACHE PER AKUN (< 50ms)
+      hydrateAdminFromCache();
+
+      // 2. VERIFIKASI SESI DI LATAR BELAKANG (NON-BLOCKING)
+      verifySessionBackground();
+
+      // 3. MUAT DATA TERBARU DARI FIRESTORE / GAS
       loadAdminDashboardData();
     };
+
+    function getAdminCacheKey() {
+      return 'admin_dash_' + (verifiedAdminAuth ? verifiedAdminAuth.username.toLowerCase() : 'guest');
+    }
+
+    function hydrateAdminFromCache() {
+      const cached = loadFastCache(getAdminCacheKey());
+      if (cached) {
+        applyDashboardPayloadToUI(cached);
+      }
+    }
+
+    async function verifySessionBackground() {
+      if (!useFirebase || !verifiedAdminAuth) return;
+      try {
+        const doc = await db.collection('users').doc(verifiedAdminAuth.username.toLowerCase()).get();
+        if (doc.exists) {
+          const u = doc.data();
+          if (String(u.status || 'Aktif').toLowerCase() !== 'aktif') {
+            alert('Sesi Anda berakhir karena akun telah dinonaktifkan.');
+            logoutAdmin();
+          }
+        }
+      } catch (e) {
+        // Abaikan jika offline sementara
+      }
+    }
 
     function initSidebarState() {
       const sidebar = document.getElementById('admin-sidebar');
@@ -874,6 +911,7 @@
     }
 
     function logoutAdmin() {
+      clearFastCache(getAdminCacheKey());
       verifiedAdminAuth = null;
       localStorage.removeItem('kitabantu_admin_auth');
       window.location.href = 'index.html';
@@ -1016,6 +1054,7 @@
         });
 
         await batch.commit();
+        clearFastCache();
         btn.disabled = false; btn.innerHTML = '<span>🔄</span> <span>Sinkron Sheets → Firebase</span>';
         showCustomAlert(`Migrasi selesai! ${(res.programs || []).length} program & ${(res.donations || []).length} transaksi tersinkron ke Firebase.`);
         loadAdminDashboardData();
@@ -1117,20 +1156,27 @@
       }
     }
 
+    // QUERY HEMAT & SPESIFIK ROLE
     async function loadAdminDashboardData() {
       try {
         let data = null;
 
         if (useFirebase) {
-          const [settingsDoc, progSnap, donSnap, userSnap] = await Promise.all([
+          const user = verifiedAdminAuth;
+          const isDonatur = user.role === "Donatur";
+
+          // Hanya tarik koleksi users jika bukan Donatur (hemat kuota baca)
+          const donQuery = db.collection('donations').limit(150);
+          const promises = [
             db.collection('settings').doc('general').get(),
             db.collection('programs').get(),
-            db.collection('donations').get(),
-            db.collection('users').get()
-          ]);
+            donQuery.get(),
+            isDonatur ? Promise.resolve(null) : db.collection('users').get()
+          ];
+
+          const [settingsDoc, progSnap, donSnap, userSnap] = await Promise.all(promises);
 
           const settings = settingsDoc.exists ? { ...getDefaultSettings(), ...settingsDoc.data() } : getDefaultSettings();
-          const user = verifiedAdminAuth;
 
           const allPrograms = [];
           const userPrograms = [];
@@ -1200,7 +1246,7 @@
 
             allDonations.push(donObj);
 
-            if (user.role === "Donatur") {
+            if (isDonatur) {
               if (donObj.name.toLowerCase() === user.name.toLowerCase() || donObj.name.toLowerCase() === user.username.toLowerCase()) {
                 userDonations.push(donObj);
                 if (donObj.status.toLowerCase() === "approved" || donObj.status.toLowerCase() === "berhasil") {
@@ -1221,27 +1267,29 @@
           const usersList = [];
           const schoolNames = [];
 
-          userSnap.forEach(doc => {
-            const u = doc.data();
-            const uRole = String(u.role || "Donatur");
-            const uSekolah = String(u.sekolah || "");
-            usersList.push({
-              username: String(u.username || doc.id),
-              name: String(u.name || ""),
-              role: uRole,
-              sekolah: uSekolah,
-              status: String(u.status || "Aktif")
+          if (userSnap) {
+            userSnap.forEach(doc => {
+              const u = doc.data();
+              const uRole = String(u.role || "Donatur");
+              const uSekolah = String(u.sekolah || "");
+              usersList.push({
+                username: String(u.username || doc.id),
+                name: String(u.name || ""),
+                role: uRole,
+                sekolah: uSekolah,
+                status: String(u.status || "Aktif")
+              });
+              if (uSekolah && schoolNames.indexOf(uSekolah) === -1 && uRole === "Sekolah") {
+                schoolNames.push(uSekolah);
+              }
             });
-            if (uSekolah && schoolNames.indexOf(uSekolah) === -1 && uRole === "Sekolah") {
-              schoolNames.push(uSekolah);
-            }
-          });
+          }
 
           data = {
             user: user,
             settings: settings,
             stats: {
-              totalDonasi: (user.role === "Donatur") ? myTotalDonated : totalCollected,
+              totalDonasi: isDonatur ? myTotalDonated : totalCollected,
               totalTarget: totalTarget,
               totalDonatur: userDonations.length,
               totalProgram: userPrograms.length,
@@ -1260,49 +1308,61 @@
         }
 
         if (!data) return;
-        globalAdminData = data;
 
-        updateTopBarSosmed(data.settings);
-        updateWaWidget(data.settings);
-
-        document.getElementById('admin-card-donasi').innerText = formatRupiah(data.stats.totalDonasi);
-        document.getElementById('admin-card-donatur').innerText = data.stats.totalDonatur;
-        document.getElementById('admin-card-program').innerText = data.stats.totalProgram;
-        document.getElementById('admin-card-sisa').innerText = formatRupiah(data.stats.sisaDana);
-
-        if (data.settings) {
-          document.getElementById('setting-hero-title').value = data.settings.HeroTitle || '';
-          document.getElementById('setting-hero-subtext').value = data.settings.HeroSubtext || '';
-          document.getElementById('setting-hero-bg-url1').value = data.settings.HeroBgImage1 || '';
-          document.getElementById('setting-hero-bg-url2').value = data.settings.HeroBgImage2 || '';
-          document.getElementById('setting-hero-bg-url3').value = data.settings.HeroBgImage3 || '';
-          document.getElementById('setting-payment-methods').value = data.settings.PaymentMethods || '';
-          document.getElementById('setting-admin-wa').value = data.settings.AdminWA || '';
-          document.getElementById('setting-admin-name').value = data.settings.AdminWAName || '';
-          document.getElementById('setting-link-fb').value = data.settings.LinkFB || '';
-          document.getElementById('setting-link-ig').value = data.settings.LinkIG || '';
-          document.getElementById('setting-link-yt').value = data.settings.LinkYT || '';
-          document.getElementById('setting-link-tiktok').value = data.settings.LinkTikTok || '';
-        }
-
-        renderAdminRecentDonations(data.donations);
-        renderAdminProgramsTable(data.programs);
-        renderUsersTable(data.usersList || []);
-        populateReportFilter(data.programs);
-        renderReportTable(data.donations);
-        populateSchoolHistorySelector(data.schoolNames || []);
+        // Simpan ke cache cepat per akun
+        saveFastCache(getAdminCacheKey(), data);
+        applyDashboardPayloadToUI(data);
       } catch (err) {
-        showCustomAlert('Gagal memuat dashboard: ' + err.message, false);
+        if (!globalAdminData) {
+          showCustomAlert('Gagal memuat dashboard: ' + err.message, false);
+        }
       }
+    }
+
+    function applyDashboardPayloadToUI(data) {
+      if (!data) return;
+      globalAdminData = data;
+
+      updateTopBarSosmed(data.settings);
+      updateWaWidget(data.settings);
+
+      document.getElementById('admin-card-donasi').innerText = formatRupiah(data.stats.totalDonasi);
+      document.getElementById('admin-card-donatur').innerText = data.stats.totalDonatur;
+      document.getElementById('admin-card-program').innerText = data.stats.totalProgram;
+      document.getElementById('admin-card-sisa').innerText = formatRupiah(data.stats.sisaDana);
+
+      if (data.settings) {
+        document.getElementById('setting-hero-title').value = data.settings.HeroTitle || '';
+        document.getElementById('setting-hero-subtext').value = data.settings.HeroSubtext || '';
+        document.getElementById('setting-hero-bg-url1').value = data.settings.HeroBgImage1 || '';
+        document.getElementById('setting-hero-bg-url2').value = data.settings.HeroBgImage2 || '';
+        document.getElementById('setting-hero-bg-url3').value = data.settings.HeroBgImage3 || '';
+        document.getElementById('setting-payment-methods').value = data.settings.PaymentMethods || '';
+        document.getElementById('setting-admin-wa').value = data.settings.AdminWA || '';
+        document.getElementById('setting-admin-name').value = data.settings.AdminWAName || '';
+        document.getElementById('setting-link-fb').value = data.settings.LinkFB || '';
+        document.getElementById('setting-link-ig').value = data.settings.LinkIG || '';
+        document.getElementById('setting-link-yt').value = data.settings.LinkYT || '';
+        document.getElementById('setting-link-tiktok').value = data.settings.LinkTikTok || '';
+      }
+
+      renderAdminRecentDonations(data.donations);
+      renderAdminProgramsTable(data.programs);
+      renderUsersTable(data.usersList || []);
+      populateReportFilter(data.programs);
+      renderReportTable(data.donations);
+      populateSchoolHistorySelector(data.schoolNames || []);
     }
 
     function populateSchoolHistorySelector(schools) {
       const sel = document.getElementById('select-school-history');
       if (!sel) return;
+      const prevVal = sel.value;
       sel.innerHTML = '<option value="">-- Pilih Unit Sekolah --</option>';
       schools.forEach(s => {
         sel.innerHTML += `<option value="${s}">${s}</option>`;
       });
+      if (prevVal) sel.value = prevVal;
     }
 
     function renderSchoolHistory() {
@@ -1497,7 +1557,7 @@
         const isAktif = String(p.status).trim().toLowerCase() === 'aktif';
         tbody.innerHTML += `
           <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-            <td class="p-3"><img src="${p.imageUrl || 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600'}" class="h-10 w-14 object-cover rounded-lg"></td>
+            <td class="p-3"><img src="${p.imageUrl || 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600'}" loading="lazy" class="h-10 w-14 object-cover rounded-lg"></td>
             <td class="p-3 font-bold text-slate-800 dark:text-white">${p.title}</td>
             <td class="p-3"><span class="bg-amber-100 dark:bg-amber-950/70 text-amber-900 dark:text-amber-300 px-2.5 py-0.5 rounded-full text-[10px] font-bold">${p.sekolah || 'JSIT Lampung'}</span></td>
             <td class="p-3">${formatRupiah(p.target)}</td>
@@ -1656,11 +1716,13 @@
           if (!prog) return;
           const newStatus = String(prog.status).toLowerCase() === 'aktif' ? 'Nonaktif' : 'Aktif';
           await db.collection('programs').doc(progId).update({ status: newStatus });
+          clearFastCache('public_campaigns');
           showCustomAlert(`Status program diubah menjadi: ${newStatus}`);
           loadAdminDashboardData();
         } else {
           const res = await callGasApi('toggleProgramStatusByAdmin', { progId: progId, auth: verifiedAdminAuth });
           if (res.success) {
+            clearFastCache('public_campaigns');
             showCustomAlert(res.message);
             loadAdminDashboardData();
           } else {
@@ -1722,11 +1784,13 @@
       try {
         if (useFirebase) {
           await db.collection('programs').doc(progId).delete();
+          clearFastCache('public_campaigns');
           showCustomAlert('Program berhasil dihapus!');
           loadAdminDashboardData();
         } else {
           const res = await callGasApi('deleteProgramByAdmin', { progId: progId, auth: verifiedAdminAuth });
           if (res.success) {
+            clearFastCache('public_campaigns');
             showCustomAlert(res.message);
             loadAdminDashboardData();
           } else {
@@ -1802,6 +1866,7 @@
             await docRef.set(payload);
           }
 
+          clearFastCache('public_campaigns');
           const btn = document.getElementById('btn-save-prog');
           btn.disabled = false; btn.innerText = 'Simpan Program';
           showCustomAlert(existingId ? 'Program berhasil diperbarui!' : 'Program baru berhasil ditambahkan!');
@@ -1814,6 +1879,7 @@
           const btn = document.getElementById('btn-save-prog');
           btn.disabled = false; btn.innerText = 'Simpan Program';
           if (res.success) {
+            clearFastCache('public_campaigns');
             showCustomAlert(res.message);
             form.reset();
             closeModal('modal-add-program');
@@ -1870,6 +1936,7 @@
             PaymentMethods: document.getElementById('setting-payment-methods').value
           }, { merge: true });
 
+          clearFastCache('public_settings');
           btn.disabled = false; btn.innerText = 'Simpan Banner Header & Metode Pembayaran';
           showCustomAlert('Pengaturan banner header & metode pembayaran berhasil diperbarui!');
           loadAdminDashboardData();
@@ -1885,6 +1952,7 @@
           const res = await callGasApi('saveHeaderSettings', { data: payload, auth: verifiedAdminAuth });
           btn.disabled = false; btn.innerText = 'Simpan Banner Header & Metode Pembayaran';
           if (res.success) {
+            clearFastCache('public_settings');
             showCustomAlert(res.message);
             loadAdminDashboardData();
           } else {
@@ -1913,6 +1981,7 @@
             LinkTikTok: document.getElementById('setting-link-tiktok').value
           }, { merge: true });
 
+          clearFastCache('public_settings');
           btn.disabled = false; btn.innerText = 'Simpan Kontak Admin & Sosial Media';
           showCustomAlert('Pengaturan Admin & Sosial Media berhasil diperbarui!');
           loadAdminDashboardData();
@@ -1928,6 +1997,7 @@
           const res = await callGasApi('saveAdminSosmedSettings', { data: payload, auth: verifiedAdminAuth });
           btn.disabled = false; btn.innerText = 'Simpan Kontak Admin & Sosial Media';
           if (res.success) {
+            clearFastCache('public_settings');
             showCustomAlert(res.message);
             loadAdminDashboardData();
           } else {
@@ -1943,10 +2013,12 @@
     function populateReportFilter(programs) {
       const filterSelect = document.getElementById('report-program-filter');
       if (!filterSelect) return;
+      const prevVal = filterSelect.value || 'ALL';
       filterSelect.innerHTML = '<option value="ALL">-- Semua Program Donasi --</option>';
       programs.forEach(p => {
         filterSelect.innerHTML += `<option value="${p.title}">${p.title}</option>`;
       });
+      filterSelect.value = prevVal;
     }
 
     function filterReportTable() {
@@ -2049,11 +2121,15 @@
             mirrorToGoogleSheets('donation_approved', approvedRecord);
           }
 
+          clearFastCache('public_campaigns');
+          clearFastCache('public_recent_donations');
           showCustomAlert(`Status donasi ${donationId} berhasil diubah ke: Approved`);
           loadAdminDashboardData();
         } else {
           const res = await callGasApi('updateDonationStatusByAdmin', { donationId: donationId, newStatus: 'Approved', auth: verifiedAdminAuth });
           if (res.success) {
+            clearFastCache('public_campaigns');
+            clearFastCache('public_recent_donations');
             showCustomAlert(res.message);
             loadAdminDashboardData();
           } else {
