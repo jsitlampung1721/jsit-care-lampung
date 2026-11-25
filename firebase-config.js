@@ -1,5 +1,5 @@
 // =========================================================================
-// FIREBASE-CONFIG.JS - Konfigurasi & Utilitas Bersama (Publik & Admin)
+// FIREBASE-CONFIG.JS - Konfigurasi, Fast Cache & Utilitas Bersama
 // =========================================================================
 
 // 1. KONFIGURASI WEB APP FIREBASE:
@@ -12,7 +12,7 @@ const FIREBASE_CONFIG = {
   appId: "1:91062042548:web:183be266999e441a973ce1"
 };
 
-// 2. URL GOOGLE APPS SCRIPT (Untuk Upload File ke Google Drive & Backup Sheets)
+// 2. URL GOOGLE APPS SCRIPT (Upload File ke Google Drive & Backup Sheets)
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzsR8WUSu1YxQZ39h8MM3pkpa7koZjybfmY8V6zQcBa-Q-N3ZwIUjrw4oY1CQZcZ88ZBw/exec";
 
 // Inisialisasi Firebase Firestore
@@ -47,6 +47,53 @@ try {
   verifiedAdminAuth = JSON.parse(localStorage.getItem('kitabantu_admin_auth')) || null;
 } catch (e) {
   verifiedAdminAuth = null;
+}
+
+// ================= MESIN FAST CACHE (STALE-WHILE-REVALIDATE) =================
+function saveFastCache(key, data) {
+  try {
+    const payload = {
+      ts: Date.now(),
+      data: data
+    };
+    localStorage.setItem('kb_cache_' + key, JSON.stringify(payload));
+  } catch (e) {
+    // Abaikan jika kuota localStorage penuh
+  }
+}
+
+function loadFastCache(key, maxAgeMs = 1000 * 60 * 60 * 24) {
+  try {
+    const raw = localStorage.getItem('kb_cache_' + key);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || !parsed.data) return null;
+    if (maxAgeMs && (Date.now() - parsed.ts > maxAgeMs)) return null;
+    return parsed.data;
+  } catch (e) {
+    return null;
+  }
+}
+
+function clearFastCache(key) {
+  try {
+    if (key) {
+      localStorage.removeItem('kb_cache_' + key);
+    } else {
+      Object.keys(localStorage).forEach(k => {
+        if (k.startsWith('kb_cache_')) localStorage.removeItem(k);
+      });
+    }
+  } catch (e) {}
+}
+
+// Prefetch halaman tujuan agar perpindahan halaman terasa instan
+function prefetchPage(url) {
+  if (document.querySelector(`link[rel="prefetch"][href="${url}"]`)) return;
+  const link = document.createElement('link');
+  link.rel = 'prefetch';
+  link.href = url;
+  document.head.appendChild(link);
 }
 
 const donationQuotes = [
@@ -114,7 +161,7 @@ function updateEngineIndicator() {
   const banner = document.getElementById('firebase-status-banner');
   if (useFirebase) {
     if (badge) {
-      badge.innerText = "⚡ Firebase Real-time";
+      badge.innerText = "⚡ Firebase Fast Cache";
       badge.className = "hidden sm:inline-block bg-emerald-900/90 text-emerald-300 border border-emerald-600/60 px-2 py-0.5 rounded-full text-[9px] font-bold";
     }
     if (banner) banner.classList.add('hidden');
