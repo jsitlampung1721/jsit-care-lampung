@@ -10,7 +10,9 @@
   <link rel="shortcut icon" href="https://lh3.googleusercontent.com/d/1NYK166dwtbJFMNeNznw7EM3QCoHpRDEH=s64">
   <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1NYK166dwtbJFMNeNznw7EM3QCoHpRDEH=s180">
 
-  <!-- Google Fonts: Plus Jakarta Sans untuk tampilan modern & bersih -->
+  <!-- Preconnect untuk mempercepat koneksi ke Firebase & Google Fonts -->
+  <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -30,7 +32,7 @@
     };
   </script>
 
-  <!-- Firebase SDK (App & Cloud Firestore v10 Compat untuk Fast Loading & Real-time) -->
+  <!-- Firebase SDK (App & Cloud Firestore v10 Compat) -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 
@@ -56,7 +58,7 @@
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans min-h-screen flex flex-col relative transition-colors duration-300">
 
-  <!-- Top Bar Di Atas Header (Jam, Status Engine, Mode Gelap & Sosmed) -->
+  <!-- Top Bar Di Atas Header -->
   <div class="bg-blue-950 dark:bg-slate-900 text-slate-300 text-[11px] py-1.5 px-4 border-b border-blue-800/60 dark:border-slate-800">
     <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
       <div class="flex items-center gap-2 font-medium text-amber-300">
@@ -113,7 +115,7 @@
           <span>📝</span> <span class="hidden sm:inline">Daftar Donatur</span><span class="sm:hidden">Daftar</span>
         </button>
 
-        <button onclick="handleAdminNavClick()" id="btn-nav-admin" title="Masuk / Dashboard" class="bg-amber-500 hover:bg-amber-400 text-slate-950 px-2.5 sm:px-3.5 py-2 rounded-xl font-extrabold text-xs md:text-sm transition flex items-center justify-center gap-1.5 shadow-sm">
+        <button onclick="handleAdminNavClick()" onmouseenter="prefetchPage('admin.html')" id="btn-nav-admin" title="Masuk / Dashboard" class="bg-amber-500 hover:bg-amber-400 text-slate-950 px-2.5 sm:px-3.5 py-2 rounded-xl font-extrabold text-xs md:text-sm transition flex items-center justify-center gap-1.5 shadow-sm">
           <span>🔐</span> <span id="lbl-nav-login" class="hidden sm:inline max-w-[110px] truncate">Masuk</span>
         </button>
       </div>
@@ -259,8 +261,8 @@
 
   <!-- Modal User Auth Login Multi-User -->
   <div id="modal-admin-auth" class="fixed inset-0 bg-slate-950/65 backdrop-blur-xs flex items-center justify-center p-3 z-50 hidden">
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-sm w-full p-6 relative shadow-2xl space-y-4">
-      <button onclick="closeModal('modal-admin-auth')" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 dark:hover:text-white font-bold text-lg">&times;</button>
+    <form onsubmit="event.preventDefault(); authenticateUser();" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-sm w-full p-6 relative shadow-2xl space-y-4">
+      <button type="button" onclick="closeModal('modal-admin-auth')" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 dark:hover:text-white font-bold text-lg">&times;</button>
       <div class="text-center">
         <span class="text-3xl">🔐</span>
         <h3 class="text-lg font-extrabold text-slate-800 dark:text-white mt-2">Masuk Akun Pengguna</h3>
@@ -269,23 +271,23 @@
       <div class="space-y-3">
         <div>
           <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Username</label>
-          <input type="text" id="admin-user-input" placeholder="Masukkan Username" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600">
+          <input type="text" id="admin-user-input" autocomplete="username" placeholder="Masukkan Username" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600">
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Password</label>
-          <input type="password" id="admin-pass-input" placeholder="Masukkan Password" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600">
+          <input type="password" id="admin-pass-input" autocomplete="current-password" placeholder="Masukkan Password" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600">
         </div>
       </div>
-      <button onclick="authenticateUser()" id="btn-login-submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold py-2.5 rounded-xl text-sm transition shadow-sm">
+      <button type="submit" id="btn-login-submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold py-2.5 rounded-xl text-sm transition shadow-sm">
         Verifikasi &amp; Masuk
       </button>
 
       <div class="text-center pt-2 border-t border-slate-100 dark:border-slate-800">
-        <button onclick="openRegisterDonaturModal()" class="text-xs text-emerald-700 dark:text-emerald-400 hover:underline font-bold">
+        <button type="button" onclick="openRegisterDonaturModal()" class="text-xs text-emerald-700 dark:text-emerald-400 hover:underline font-bold">
           Belum punya akun? Daftar Akun Donatur Baru
         </button>
       </div>
-    </div>
+    </form>
   </div>
 
   <!-- MODAL PENDAFTARAN AKUN DONATUR BARU -->
@@ -395,9 +397,47 @@
       setInterval(updateLiveClock, 1000);
       setDailyQuote();
       updateEngineIndicator();
-      loadPublicData();
       updateNavLoginLabel();
+
+      // 1. RENDER INSTAN DARI CACHE LOKAL (< 50ms) SEBELUM JARINGAN SELESAI
+      hydrateFromLocalCache();
+
+      // 2. SINKRON REAL-TIME DI LATAR BELAKANG
+      loadPublicData();
+
+      // 3. PREFETCH DASHBOARD JIKA SUDAH PUNYA SESI LOGIN
+      if (verifiedAdminAuth) {
+        prefetchPage('admin.html');
+      }
     };
+
+    function hydrateFromLocalCache() {
+      const cachedSettings = loadFastCache('public_settings');
+      const cachedCampaigns = loadFastCache('public_campaigns');
+      const cachedRecent = loadFastCache('public_recent_donations');
+
+      if (cachedSettings || cachedCampaigns) {
+        globalInitialData = {
+          settings: cachedSettings || getDefaultSettings(),
+          campaigns: cachedCampaigns || [],
+          recentDonations: cachedRecent || []
+        };
+
+        setupHeroHeader(globalInitialData.settings);
+        updateTopBarSosmed(globalInitialData.settings);
+        updateWaWidget(globalInitialData.settings);
+
+        if (cachedCampaigns && cachedCampaigns.length > 0) {
+          populateStatusProgramSelector(cachedCampaigns);
+          handleFilterAndSearch();
+          renderListDonasiPageTable(cachedCampaigns);
+        }
+
+        if (cachedRecent && cachedRecent.length > 0) {
+          startThankYouToastLoop(cachedRecent);
+        }
+      }
+    }
 
     function updateNavLoginLabel() {
       const lbl = document.getElementById('lbl-nav-login');
@@ -497,10 +537,13 @@
       if (verifiedAdminAuth) {
         window.location.href = 'admin.html';
       } else {
+        prefetchPage('admin.html');
         openModal('modal-admin-auth');
+        setTimeout(() => document.getElementById('admin-user-input')?.focus(), 100);
       }
     }
 
+    // ALUR LOGIN CEPAT: Cek 1 Dokumen Firestore Dulu -> Langsung Redirect
     async function authenticateUser() {
       const u = document.getElementById('admin-user-input').value.trim();
       const p = document.getElementById('admin-pass-input').value.trim();
@@ -511,23 +554,14 @@
         return;
       }
 
-      btn.disabled = true; btn.innerText = 'Memverifikasi...';
+      btn.disabled = true; btn.innerText = '⚡ Memverifikasi...';
 
       try {
         if (useFirebase) {
-          const usersSnap = await db.collection('users').limit(1).get();
-          if (usersSnap.empty) {
-            await db.collection('users').doc('superadmin').set({
-              username: "superadmin",
-              password: "soskem2630",
-              name: "Superadmin Wilayah",
-              role: "Superadmin",
-              sekolah: "JSIT Wilayah Lampung",
-              status: "Aktif"
-            });
-          }
+          const userKey = u.toLowerCase();
+          const doc = await db.collection('users').doc(userKey).get();
 
-          const doc = await db.collection('users').doc(u.toLowerCase()).get();
+          // 1. Jalur Ekspres Firestore (Instan < 300ms)
           if (doc.exists) {
             const userData = doc.data();
             if (String(userData.password) === p) {
@@ -544,11 +578,34 @@
                 sekolah: userData.sekolah
               };
               localStorage.setItem('kitabantu_admin_auth', JSON.stringify(verifiedAdminAuth));
-              window.location.href = 'admin.html';
+              window.location.replace('admin.html');
+              return;
+            } else {
+              btn.disabled = false; btn.innerText = 'Verifikasi & Masuk';
+              showCustomAlert('Password yang Anda masukkan salah!', false);
               return;
             }
           }
 
+          // 2. Seed otomatis jika login superadmin awal dan DB kosong
+          if (userKey === 'superadmin' && p === 'soskem2630') {
+            const defaultSuper = {
+              username: "superadmin",
+              password: "soskem2630",
+              name: "Superadmin Wilayah",
+              role: "Superadmin",
+              sekolah: "JSIT Wilayah Lampung",
+              status: "Aktif"
+            };
+            await db.collection('users').doc('superadmin').set(defaultSuper);
+            verifiedAdminAuth = defaultSuper;
+            localStorage.setItem('kitabantu_admin_auth', JSON.stringify(verifiedAdminAuth));
+            window.location.replace('admin.html');
+            return;
+          }
+
+          // 3. Jalur Fallback Google Apps Script (hanya jika akun belum tersinkron ke Firestore)
+          btn.innerText = '⏳ Sinkronisasi Akun...';
           const gasRes = await callGasApi('loginUser', { username: u, password: p });
           if (gasRes && gasRes.success) {
             const userObj = {
@@ -559,28 +616,22 @@
               sekolah: gasRes.user.sekolah,
               status: "Aktif"
             };
-            await db.collection('users').doc(u.toLowerCase()).set(userObj);
-            verifiedAdminAuth = {
-              username: userObj.username,
-              password: p,
-              name: userObj.name,
-              role: userObj.role,
-              sekolah: userObj.sekolah
-            };
+            await db.collection('users').doc(userKey).set(userObj);
+            verifiedAdminAuth = userObj;
             localStorage.setItem('kitabantu_admin_auth', JSON.stringify(verifiedAdminAuth));
-            window.location.href = 'admin.html';
+            window.location.replace('admin.html');
             return;
           }
 
           btn.disabled = false; btn.innerText = 'Verifikasi & Masuk';
-          showCustomAlert('Username atau Password salah!', false);
+          showCustomAlert('Username tidak ditemukan atau password salah!', false);
         } else {
           const res = await callGasApi('loginUser', { username: u, password: p });
           btn.disabled = false; btn.innerText = 'Verifikasi & Masuk';
           if (res.success) {
             verifiedAdminAuth = { username: u, password: p, name: res.user.name, role: res.user.role, sekolah: res.user.sekolah };
             localStorage.setItem('kitabantu_admin_auth', JSON.stringify(verifiedAdminAuth));
-            window.location.href = 'admin.html';
+            window.location.replace('admin.html');
           } else {
             showCustomAlert(res.message, false);
           }
@@ -594,7 +645,7 @@
     function loadPublicData() {
       const loadingEl = document.getElementById('loading-public');
 
-      if (!globalInitialData && loadingEl) {
+      if ((!globalInitialData || !globalInitialData.campaigns || globalInitialData.campaigns.length === 0) && loadingEl) {
         loadingEl.classList.remove('hidden');
       }
 
@@ -610,6 +661,7 @@
             db.collection('settings').doc('general').set(settings).catch(() => {});
           }
           globalInitialData.settings = settings;
+          saveFastCache('public_settings', settings);
           setupHeroHeader(settings);
           updateTopBarSosmed(settings);
           updateWaWidget(settings);
@@ -626,12 +678,13 @@
             }
           });
           globalInitialData.campaigns = activeCampaigns;
+          saveFastCache('public_campaigns', activeCampaigns);
           populateStatusProgramSelector(activeCampaigns);
           handleFilterAndSearch();
           renderListDonasiPageTable(activeCampaigns);
         }, err => {
           console.error("Programs snapshot error:", err);
-          if (loadingEl) {
+          if (loadingEl && (!globalInitialData.campaigns || globalInitialData.campaigns.length === 0)) {
             loadingEl.innerHTML = `<p class="text-rose-600 text-xs">Gagal memuat data Firebase: ${err.message}</p>`;
           }
         });
@@ -639,7 +692,7 @@
         if (unsubscribeDonations) unsubscribeDonations();
         unsubscribeDonations = db.collection('donations')
           .where('status', '==', 'Approved')
-          .limit(15)
+          .limit(12)
           .onSnapshot(snapshot => {
             const recent = [];
             snapshot.forEach(doc => {
@@ -654,6 +707,7 @@
               });
             });
             globalInitialData.recentDonations = recent;
+            saveFastCache('public_recent_donations', recent);
             if (recent.length > 0) {
               startThankYouToastLoop(recent);
             }
@@ -667,6 +721,10 @@
               return;
             }
             globalInitialData = res;
+            saveFastCache('public_settings', res.settings);
+            saveFastCache('public_campaigns', res.campaigns || []);
+            saveFastCache('public_recent_donations', res.recentDonations || []);
+
             setupHeroHeader(res.settings);
             updateTopBarSosmed(res.settings);
             updateWaWidget(res.settings);
@@ -680,7 +738,7 @@
           })
           .catch(function(err) {
             console.error("Gagal memuat data:", err);
-            if (loadingEl) {
+            if (loadingEl && (!globalInitialData || !globalInitialData.campaigns.length)) {
               loadingEl.innerHTML = `
                 <div class="text-center py-6 text-rose-600 bg-rose-50 dark:bg-rose-950/50 rounded-2xl p-4 border border-rose-200 dark:border-rose-800">
                   <p class="text-2xl mb-1">⚠️</p>
@@ -816,12 +874,21 @@
       const container = document.getElementById('campaign-detail-content');
       detailView.classList.remove('hidden');
 
-      container.innerHTML = `
-        <div class="text-center py-16">
-          <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent"></div>
-          <p class="mt-3 text-slate-500 text-xs">Memuat detail program donasi...</p>
-        </div>
-      `;
+      // Render cepat dari data campaign yang sudah ada di memori sambil memuat doa donatur
+      const cachedProg = (globalInitialData && globalInitialData.campaigns)
+        ? globalInitialData.campaigns.find(item => String(item.id) === String(campaignId))
+        : null;
+
+      if (cachedProg) {
+        renderCampaignDetailHTML(container, { campaign: cachedProg, donors: [] });
+      } else {
+        container.innerHTML = `
+          <div class="text-center py-16">
+            <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent"></div>
+            <p class="mt-3 text-slate-500 text-xs">Memuat detail program donasi...</p>
+          </div>
+        `;
+      }
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -839,6 +906,7 @@
           const donSnap = await db.collection('donations')
             .where('program', '==', c.title)
             .where('status', '==', 'Approved')
+            .limit(50)
             .get();
 
           const donors = [];
@@ -865,8 +933,10 @@
         activeCampaignData = data;
         renderCampaignDetailHTML(container, data);
       } catch (err) {
-        showCustomAlert('Gagal mengambil data: ' + err.message, false);
-        switchToPublicView();
+        if (!cachedProg) {
+          showCustomAlert('Gagal mengambil data: ' + err.message, false);
+          switchToPublicView();
+        }
       }
     }
 
@@ -1070,15 +1140,16 @@
         return;
       }
 
-      campaigns.forEach(c => {
+      campaigns.forEach((c, idx) => {
         const percent = c.target > 0 ? Math.min(Math.round((c.collected / c.target) * 100), 100) : 0;
         const sisaHari = getSisaHariText(c.deadline);
+        const loadingAttr = idx < 3 ? 'eager' : 'lazy';
 
         grid.innerHTML += `
           <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800 overflow-hidden flex flex-col justify-between hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group">
             <div>
               <div class="relative cursor-pointer overflow-hidden" onclick="openCampaignDetailPage('${c.id}')">
-                <img src="${c.imageUrl || 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600'}" class="h-44 w-full object-cover group-hover:scale-105 transition duration-500" alt="${c.title}">
+                <img src="${c.imageUrl || 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600'}" loading="${loadingAttr}" decoding="async" class="h-44 w-full object-cover group-hover:scale-105 transition duration-500" alt="${c.title}">
 
                 <span class="absolute top-2.5 right-2.5 bg-amber-500/95 backdrop-blur-xs text-slate-950 text-[11px] px-2.5 py-1 rounded-full font-extrabold shadow-md flex items-center gap-1">
                   ⏳ ${sisaHari}
