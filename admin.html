@@ -1,0 +1,2137 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - KitaBantu Soskem JSIT Lampung</title>
+
+  <!-- Favicon Resmi dari Google Drive Logo JSIT -->
+  <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1NYK166dwtbJFMNeNznw7EM3QCoHpRDEH=s64">
+  <link rel="shortcut icon" href="https://lh3.googleusercontent.com/d/1NYK166dwtbJFMNeNznw7EM3QCoHpRDEH=s64">
+  <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1NYK166dwtbJFMNeNznw7EM3QCoHpRDEH=s180">
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Firebase SDK (App & Cloud Firestore v10 Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
+  <!-- Konfigurasi & Utilitas Bersama -->
+  <script src="firebase-config.js"></script>
+
+  <style>
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.5);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(100, 116, 139, 0.8);
+    }
+
+    @media (min-width: 1024px) {
+      #admin-sidebar.sidebar-expanded {
+        width: 16.5rem;
+      }
+      #admin-sidebar.sidebar-collapsed {
+        width: 4.85rem;
+      }
+      #admin-sidebar.sidebar-collapsed .sidebar-label,
+      #admin-sidebar.sidebar-collapsed .sidebar-user-details,
+      #admin-sidebar.sidebar-collapsed .sidebar-section-title {
+        display: none;
+      }
+      #admin-sidebar.sidebar-collapsed .sidebar-nav-item {
+        justify-content: center;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+      }
+      #admin-sidebar.sidebar-collapsed .sidebar-user-box {
+        justify-content: center;
+        padding: 0.65rem;
+      }
+    }
+
+    @media print {
+      body * { visibility: hidden; }
+      #admin-sidebar, #admin-sidebar-backdrop, header, footer, .no-print { display: none !important; }
+      #printable-report-area, #printable-report-area *, #printable-receipt-area, #printable-receipt-area * { visibility: visible; }
+      #printable-report-area, #printable-receipt-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: #ffffff !important;
+        color: #111827 !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans min-h-screen flex flex-col relative transition-colors duration-300">
+
+  <!-- Top Bar Di Atas Header -->
+  <div class="bg-blue-950 dark:bg-slate-900 text-slate-300 text-[11px] py-1.5 px-4 border-b border-blue-800/60 dark:border-slate-800 no-print">
+    <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
+      <div class="flex items-center gap-2 font-medium text-amber-300">
+        <span>🕒</span>
+        <span id="top-bar-clock" class="tracking-tight">Memuat jam digital...</span>
+        <span id="db-engine-badge" class="hidden sm:inline-block bg-emerald-900/80 text-emerald-300 border border-emerald-700/60 px-2 py-0.5 rounded-full text-[9px] font-bold">⚡ Hybrid Engine</span>
+      </div>
+
+      <div class="flex items-center gap-3" id="top-bar-sosmed">
+        <button onclick="toggleThemeMode()" id="btn-theme-toggle" title="Ganti Mode Terang / Gelap" class="flex items-center gap-1 bg-white/10 hover:bg-white/20 text-slate-200 px-2 py-0.5 rounded-full text-[10px] font-semibold transition">
+          <span id="theme-icon">🌙</span>
+          <span id="theme-label" class="hidden sm:inline">Mode Gelap</span>
+        </button>
+
+        <span class="text-slate-600 hidden sm:inline">|</span>
+
+        <a id="link-fb" href="#" target="_blank" title="Facebook" class="hover:text-white transition flex items-center gap-1">
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        </a>
+        <a id="link-ig" href="#" target="_blank" title="Instagram" class="hover:text-white transition flex items-center gap-1">
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        </a>
+        <a id="link-yt" href="#" target="_blank" title="YouTube" class="hover:text-white transition flex items-center gap-1">
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        </a>
+        <a id="link-tiktok" href="#" target="_blank" title="TikTok" class="hover:text-white transition flex items-center gap-1">
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.98-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.29-3.14 1.72-6.22 4.7-7.23 1.01-.35 2.09-.45 3.14-.38v4.02c-.52-.08-1.07-.04-1.57.11-.84.23-1.57.82-1.92 1.61-.41.87-.36 1.94.13 2.76.47.8 1.34 1.32 2.27 1.38 1.05.08 2.11-.32 2.78-1.13.51-.61.78-1.4.77-2.2.02-4.78 0-9.56.01-14.34z"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header Navbar Sticky -->
+  <header class="bg-blue-900/95 dark:bg-slate-900/95 backdrop-blur-md text-white shadow-md sticky top-0 z-40 border-b border-blue-800/50 dark:border-slate-800 no-print">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 flex justify-between items-center gap-2">
+      <div class="flex items-center gap-2.5">
+        <button onclick="toggleAdminSidebar()" id="header-hamburger-btn" title="Buka / Ciutkan Menu Dashboard" class="p-2 rounded-xl bg-blue-800/90 hover:bg-blue-700 dark:bg-slate-800 dark:hover:bg-slate-700 text-white transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-amber-400">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+
+        <a href="index.html" class="flex items-center gap-2.5 cursor-pointer group">
+          <img src="https://lh3.googleusercontent.com/d/1NYK166dwtbJFMNeNznw7EM3QCoHpRDEH" alt="Logo JSIT" class="h-9 sm:h-10 w-auto object-contain bg-white/15 p-1 rounded-xl group-hover:scale-105 transition">
+          <div>
+            <h1 class="text-sm sm:text-base md:text-lg font-extrabold leading-tight tracking-tight">KitaBantu</h1>
+            <p class="text-[10px] md:text-xs text-blue-200 dark:text-slate-400">Soskem JSIT Lampung</p>
+          </div>
+        </a>
+      </div>
+
+      <div class="flex items-center gap-1.5 sm:gap-2">
+        <a href="index.html" class="bg-blue-800/80 hover:bg-blue-700 dark:bg-slate-800 dark:hover:bg-slate-700 text-white px-2.5 sm:px-3 py-2 rounded-xl font-semibold text-xs md:text-sm transition flex items-center gap-1.5">
+          <span>🏠</span> <span class="hidden md:inline">Beranda Publik</span>
+        </a>
+        <button onclick="logoutAdmin()" class="bg-rose-600 hover:bg-rose-500 text-white px-2.5 sm:px-3.5 py-2 rounded-xl font-extrabold text-xs md:text-sm transition flex items-center gap-1.5 shadow-sm">
+          <span>🚪</span> <span class="hidden sm:inline">Keluar</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= DASHBOARD PANEL DENGAN SIDEBAR HAMBURGER KIRI ================= -->
+  <div id="view-admin" class="flex-grow w-full">
+    <div class="max-w-7xl mx-auto flex min-h-[calc(100vh-120px)] relative">
+
+      <!-- Backdrop Gelap untuk Sidebar Mobile/Tablet -->
+      <div id="admin-sidebar-backdrop" onclick="closeMobileSidebar()" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-40 lg:hidden hidden transition-opacity"></div>
+
+      <!-- MENU SAMPING KIRI -->
+      <aside id="admin-sidebar" class="sidebar-expanded fixed lg:sticky top-0 lg:top-[60px] left-0 z-50 lg:z-30 h-screen lg:h-[calc(100vh-60px)] w-72 bg-white dark:bg-slate-900 border-r border-slate-200/90 dark:border-slate-800 shadow-2xl lg:shadow-none flex flex-col justify-between transform -translate-x-full lg:translate-x-0 transition-all duration-300 ease-in-out overflow-y-auto overflow-x-hidden no-print">
+
+        <div class="p-3 space-y-4">
+          <div class="flex items-center justify-between px-2 pt-1 pb-2 border-b border-slate-100 dark:border-slate-800">
+            <div class="flex items-center gap-2.5 overflow-hidden">
+              <button onclick="toggleAdminSidebar()" title="Perlebar / Ciutkan Sidebar" class="p-2 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-blue-900 dark:text-amber-400 transition flex-shrink-0 focus:outline-none">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+              </button>
+              <span class="sidebar-label font-extrabold text-xs uppercase tracking-wider text-slate-700 dark:text-slate-200 whitespace-nowrap">Menu Navigasi</span>
+            </div>
+
+            <button onclick="closeMobileSidebar()" class="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white font-bold text-lg">
+              &times;
+            </button>
+          </div>
+
+          <div class="sidebar-user-box bg-gradient-to-br from-blue-900 to-blue-950 dark:from-slate-800 dark:to-slate-950 text-white p-3 rounded-2xl flex items-center gap-3 shadow-sm border border-blue-800/50 dark:border-slate-700">
+            <div class="w-9 h-9 rounded-xl bg-amber-400 text-blue-950 font-extrabold text-sm flex items-center justify-center flex-shrink-0 shadow-xs">
+              👤
+            </div>
+            <div class="sidebar-user-details min-w-0 flex-1">
+              <p id="sidebar-user-name" class="text-xs font-extrabold truncate">Pengguna</p>
+              <span id="sidebar-user-role" class="inline-block mt-0.5 text-[10px] bg-white/15 text-amber-300 px-2 py-0.5 rounded-full font-bold uppercase tracking-wide">Role</span>
+            </div>
+          </div>
+
+          <nav class="space-y-1.5" aria-label="Menu Dashboard">
+            <p class="sidebar-section-title px-3 text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500 pt-1 pb-0.5">Utama</p>
+
+            <button onclick="switchAdminTab('tab-overview')" id="nav-tab-overview" title="Ringkasan" class="sidebar-nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold bg-blue-900 text-white shadow-sm transition-all">
+              <span class="w-8 h-8 rounded-lg bg-white/15 flex items-center justify-center text-base flex-shrink-0">📈</span>
+              <span class="sidebar-label truncate">Ringkasan</span>
+            </button>
+
+            <button onclick="switchAdminTab('tab-programs')" id="nav-tab-programs" title="Kelola Program Donasi" class="sidebar-nav-item role-restricted-admin w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+              <span class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-base flex-shrink-0">📋</span>
+              <span class="sidebar-label truncate">Kelola Program Donasi</span>
+            </button>
+
+            <button onclick="switchAdminTab('tab-reports')" id="nav-tab-reports" title="Rekap & Laporan Donasi" class="sidebar-nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+              <span class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-base flex-shrink-0">📄</span>
+              <span class="sidebar-label truncate">Rekap &amp; Laporan Donasi</span>
+            </button>
+
+            <button onclick="switchAdminTab('tab-school-history')" id="nav-tab-school-history" title="Riwayat Sekolah" class="sidebar-nav-item role-restricted-admin w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+              <span class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-base flex-shrink-0">🏫</span>
+              <span class="sidebar-label truncate">Riwayat Sekolah</span>
+            </button>
+
+            <p class="sidebar-section-title role-restricted-admin px-3 text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500 pt-3 pb-0.5">Pengaturan Web</p>
+
+            <button onclick="switchAdminTab('tab-header')" id="nav-tab-header" title="Banner Header Web" class="sidebar-nav-item role-restricted-super w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+              <span class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-base flex-shrink-0">🖼️</span>
+              <span class="sidebar-label truncate">Banner Header Web</span>
+            </button>
+
+            <button onclick="switchAdminTab('tab-admin-sosmed')" id="nav-tab-admin-sosmed" title="Kontak & Sosmed" class="sidebar-nav-item role-restricted-super w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+              <span class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-base flex-shrink-0">⚙️</span>
+              <span class="sidebar-label truncate">Kontak &amp; Sosmed</span>
+            </button>
+
+            <button onclick="switchAdminTab('tab-users-mgmt')" id="nav-tab-users-mgmt" title="Kelola Pengguna" class="sidebar-nav-item role-restricted-admin w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+              <span class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-base flex-shrink-0">👥</span>
+              <span class="sidebar-label truncate">Kelola Pengguna</span>
+            </button>
+          </nav>
+        </div>
+
+        <div class="p-3 border-t border-slate-100 dark:border-slate-800">
+          <button onclick="logoutAdmin()" title="Keluar dari Akun" class="sidebar-nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition">
+            <span class="w-8 h-8 rounded-lg bg-rose-100/80 dark:bg-rose-950 flex items-center justify-center text-sm flex-shrink-0">🚪</span>
+            <span class="sidebar-label truncate">Keluar Akun</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- KONTEN UTAMA DASHBOARD -->
+      <div class="flex-1 min-w-0 p-4 sm:p-6 space-y-6">
+
+        <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800 flex flex-col lg:flex-row justify-between lg:items-center gap-4 no-print">
+          <div class="flex items-start sm:items-center gap-3">
+            <button onclick="toggleAdminSidebar()" title="Buka / Ciutkan Menu Samping" class="p-2.5 rounded-xl bg-blue-900 hover:bg-blue-800 text-white shadow-sm transition active:scale-95 flex-shrink-0">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+              </svg>
+            </button>
+
+            <div>
+              <h2 class="text-base sm:text-xl font-extrabold text-slate-800 dark:text-white flex flex-wrap items-center gap-2">
+                <span>Dashboard Portal</span>
+                <span id="admin-user-role-badge" class="bg-blue-100 dark:bg-blue-900/60 text-blue-900 dark:text-blue-200 text-[11px] px-2.5 py-0.5 rounded-full font-extrabold uppercase">Role</span>
+              </h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Selamat datang, <b id="admin-user-fullname" class="text-slate-800 dark:text-slate-200">User</b> (<span id="admin-user-sekolah">SIT</span>)
+              </p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="migrateSheetsToFirebase()" id="btn-migrate-firebase" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5 role-restricted-super shadow-xs" title="Impor data lama dari Google Sheets ke Firebase">
+              <span>🔄</span> <span>Sinkron Sheets → Firebase</span>
+            </button>
+            <button onclick="openSelfProfileModal()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow-xs">
+              <span>⚙️</span> <span>Edit Akun Saya</span>
+            </button>
+            <button onclick="openCreateProgramModal()" class="bg-blue-900 hover:bg-blue-800 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 role-restricted-admin shadow-xs">
+              <span>+</span> <span>Program Baru</span>
+            </button>
+            <button onclick="logoutAdmin()" class="bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 text-rose-700 dark:text-rose-300 font-bold text-xs px-3 py-2 rounded-xl transition border border-rose-200 dark:border-rose-800">
+              Keluar
+            </button>
+          </div>
+        </div>
+
+        <div id="firebase-status-banner" class="hidden bg-amber-50 dark:bg-amber-950/40 border-l-4 border-amber-500 p-4 rounded-r-2xl text-xs text-amber-900 dark:text-amber-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 no-print">
+          <div>
+            <p class="font-bold">⚠️ Konfigurasi Firebase Belum Diisi (Mode Fallback GAS Aktif)</p>
+            <p class="text-[11px] mt-0.5">Website berjalan normal menggunakan Google Apps Script, namun untuk kecepatan loading instan (&lt; 0.5 detik) &amp; real-time, silakan isi <b>FIREBASE_CONFIG</b> pada <code>firebase-config.js</code>.</p>
+          </div>
+        </div>
+
+        <!-- TAB 1: RINGKASAN -->
+        <div id="tab-overview" class="space-y-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-4 hover:shadow-md transition">
+              <div class="p-3.5 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-2xl text-2xl">💰</div>
+              <div class="min-w-0">
+                <p id="lbl-card-donasi" class="text-xs text-slate-500 dark:text-slate-400 font-medium truncate">Total Donasi Terkumpul</p>
+                <h3 id="admin-card-donasi" class="text-lg font-extrabold text-slate-800 dark:text-white truncate">Rp 0</h3>
+              </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-4 hover:shadow-md transition">
+              <div class="p-3.5 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 rounded-2xl text-2xl">👥</div>
+              <div class="min-w-0">
+                <p id="lbl-card-donatur" class="text-xs text-slate-500 dark:text-slate-400 font-medium truncate">Total Transaksi Donatur</p>
+                <h3 id="admin-card-donatur" class="text-lg font-extrabold text-slate-800 dark:text-white">0</h3>
+              </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-4 hover:shadow-md transition">
+              <div class="p-3.5 bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 rounded-2xl text-2xl">📋</div>
+              <div class="min-w-0">
+                <p id="lbl-card-program" class="text-xs text-slate-500 dark:text-slate-400 font-medium truncate">Program Donasi Aktif</p>
+                <h3 id="admin-card-program" class="text-lg font-extrabold text-slate-800 dark:text-white">0</h3>
+              </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-4 hover:shadow-md transition">
+              <div class="p-3.5 bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 rounded-2xl text-2xl">💳</div>
+              <div class="min-w-0">
+                <p id="lbl-card-sisa" class="text-xs text-slate-500 dark:text-slate-400 font-medium truncate">Sisa Dana Tersedia</p>
+                <h3 id="admin-card-sisa" class="text-lg font-extrabold text-slate-800 dark:text-white truncate">Rp 0</h3>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm space-y-4">
+            <h3 id="title-recent-donations" class="font-extrabold text-slate-800 dark:text-white text-sm flex items-center gap-2">
+              <span>🕒</span> Transaksi Donasi Masuk Terbaru
+            </h3>
+            <div class="overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-800">
+              <table class="w-full text-left text-xs text-slate-600 dark:text-slate-300">
+                <thead class="bg-slate-50 dark:bg-slate-800/80 uppercase text-[10px] text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
+                  <tr>
+                    <th class="p-3">ID Transaksi</th>
+                    <th class="p-3">Tanggal</th>
+                    <th class="p-3">Donatur</th>
+                    <th class="p-3">Program</th>
+                    <th class="p-3">Nominal</th>
+                    <th class="p-3">Status</th>
+                    <th class="p-3">Bukti</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-table-recent-donations" class="divide-y divide-slate-100 dark:divide-slate-800">
+                  <tr><td colspan="7" class="p-4 text-center text-slate-400">Memuat data...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: KELOLA PROGRAM DONASI -->
+        <div id="tab-programs" class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4 hidden role-restricted-admin">
+          <div class="flex flex-wrap justify-between items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+            <h3 class="font-extrabold text-slate-800 dark:text-white text-sm flex items-center gap-2">
+              <span>📋</span> Daftar &amp; Status Program Donasi
+            </h3>
+            <button onclick="openCreateProgramModal()" class="bg-blue-900 hover:bg-blue-800 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition">
+              + Tambah Program Baru
+            </button>
+          </div>
+
+          <div class="overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-800">
+            <table class="w-full text-left text-xs text-slate-600 dark:text-slate-300">
+              <thead class="bg-slate-50 dark:bg-slate-800/80 uppercase text-[10px] text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
+                <tr>
+                  <th class="p-3">Cover</th>
+                  <th class="p-3">Judul Program</th>
+                  <th class="p-3">Sekolah/Pengaju</th>
+                  <th class="p-3">Target</th>
+                  <th class="p-3">Terkumpul</th>
+                  <th class="p-3">Disalurkan</th>
+                  <th class="p-3 text-center">Status</th>
+                  <th class="p-3 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="admin-table-programs" class="divide-y divide-slate-100 dark:divide-slate-800">
+                <tr><td colspan="8" class="p-4 text-center text-slate-400">Memuat program...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 3: REKAP & LAPORAN DONASI -->
+        <div id="tab-reports" class="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-5 hidden">
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-100 dark:border-slate-800 pb-4 gap-3 no-print">
+            <div>
+              <h3 class="font-extrabold text-slate-800 dark:text-white text-sm flex items-center gap-2">
+                <span>📄</span> Rekap Laporan Pertanggungjawaban Program
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Lihat riwayat donasi, unduh bukti kuitansi, atau ekspor CSV.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <button onclick="exportDonationsToCSV()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5">
+                <span>📥</span> Unduh CSV Rekap
+              </button>
+              <button onclick="printReport()" class="bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5">
+                <span>🖨️</span> Cetak Laporan PDF
+              </button>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-700 no-print">
+            <label class="text-xs font-bold text-slate-700 dark:text-slate-200">Pilih Program Donasi:</label>
+            <select id="report-program-filter" onchange="filterReportTable()" class="p-2 border border-slate-200 dark:border-slate-700 rounded-xl text-xs bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 sm:min-w-[260px]">
+              <option value="ALL">-- Semua Program Donasi --</option>
+            </select>
+          </div>
+
+          <div id="printable-report-area" class="overflow-x-auto space-y-4">
+            <div class="text-center py-2 border-b border-slate-200 dark:border-slate-700">
+              <h2 class="text-lg font-extrabold text-slate-900 dark:text-white">LAPORAN REKAPITULASI DANA DONASI</h2>
+              <p class="text-xs text-slate-600 dark:text-slate-400">KitaBantu Soskem JSIT Lampung - Bukti Pertanggungjawaban Resmi</p>
+            </div>
+
+            <table class="w-full text-left text-xs text-slate-700 dark:text-slate-300 border-collapse border border-slate-200 dark:border-slate-700">
+              <thead class="bg-slate-100 dark:bg-slate-800 text-[11px] font-bold border-b border-slate-200 dark:border-slate-700">
+                <tr>
+                  <th class="p-2.5 border border-slate-200 dark:border-slate-700 text-center">No</th>
+                  <th class="p-2.5 border border-slate-200 dark:border-slate-700">ID Transaksi</th>
+                  <th class="p-2.5 border border-slate-200 dark:border-slate-700">Tanggal</th>
+                  <th class="p-2.5 border border-slate-200 dark:border-slate-700">Nama Donatur</th>
+                  <th class="p-2.5 border border-slate-200 dark:border-slate-700">Program Donasi</th>
+                  <th class="p-2.5 border border-slate-200 dark:border-slate-700">Nominal (Rp)</th>
+                  <th class="p-2.5 border border-slate-200 dark:border-slate-700">Metode</th>
+                  <th class="p-2.5 border border-slate-200 dark:border-slate-700 text-center">Status</th>
+                  <th class="p-2.5 border border-slate-200 dark:border-slate-700 text-center print:hidden">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="report-table-body" class="divide-y divide-slate-200 dark:divide-slate-700">
+                <tr><td colspan="9" class="p-4 text-center text-slate-400 border">Memuat rekap...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 4: RIWAYAT SEKOLAH -->
+        <div id="tab-school-history" class="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-6 hidden role-restricted-admin">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 dark:border-slate-800 pb-4 gap-3">
+            <div>
+              <h3 class="font-extrabold text-slate-800 dark:text-white text-base flex items-center gap-2">
+                <span>🏫</span> Riwayat &amp; Total Donasi Per Unit Sekolah
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Pilih sekolah untuk melihat daftar program, transaksi, serta akumulasi total donasi.</p>
+            </div>
+            <div class="w-full sm:w-auto">
+              <select id="select-school-history" onchange="renderSchoolHistory()" class="w-full sm:w-64 p-2.5 border rounded-xl font-bold text-xs bg-amber-50 dark:bg-amber-950/50 border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200">
+                <option value="">-- Pilih Unit Sekolah --</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="school-history-container" class="space-y-6">
+            <div class="text-center py-12 text-slate-400 text-xs border border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-800/30">
+              <span class="text-3xl block mb-2">🏫</span>
+              Silakan pilih unit sekolah pada menu di atas untuk menampilkan data riwayat.
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 5: BANNER HEADER WEB -->
+        <div id="tab-header" class="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-5 hidden max-w-2xl role-restricted-super">
+          <h3 class="font-extrabold text-slate-800 dark:text-white text-sm border-b border-slate-100 dark:border-slate-800 pb-3 flex items-center gap-2">
+            <span>🖼️</span> Pengaturan Banner Header Utama &amp; Rekening Pembayaran
+          </h3>
+
+          <form id="form-header-settings" onsubmit="handleSaveHeaderSettings(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Judul Header Utama (Hero Title)</label>
+              <input type="text" id="setting-hero-title" required class="w-full p-2.5 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-xl text-sm">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Subteks Deskripsi Header</label>
+              <textarea id="setting-hero-subtext" rows="2" required class="w-full p-2.5 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-xl text-sm"></textarea>
+            </div>
+
+            <div class="bg-blue-50/60 dark:bg-slate-800/70 p-4 rounded-xl border border-blue-100 dark:border-slate-700 space-y-3">
+              <h4 class="font-bold text-xs text-blue-900 dark:text-blue-300">Upload Gambar Hero Slider Banner (Maksimal 3 Gambar via Google Drive)</h4>
+
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">Gambar Slider 1 (Utama)</label>
+                <input type="file" id="setting-hero-file1" accept="image/*" class="w-full text-xs p-1.5 border border-slate-200 dark:border-slate-700 rounded-xl mb-1 bg-white dark:bg-slate-900">
+                <input type="hidden" id="setting-hero-bg-url1">
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">Gambar Slider 2 (Opsional)</label>
+                <input type="file" id="setting-hero-file2" accept="image/*" class="w-full text-xs p-1.5 border border-slate-200 dark:border-slate-700 rounded-xl mb-1 bg-white dark:bg-slate-900">
+                <input type="hidden" id="setting-hero-bg-url2">
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">Gambar Slider 3 (Opsional)</label>
+                <input type="file" id="setting-hero-file3" accept="image/*" class="w-full text-xs p-1.5 border border-slate-200 dark:border-slate-700 rounded-xl mb-1 bg-white dark:bg-slate-900">
+                <input type="hidden" id="setting-hero-bg-url3">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Daftar Metode Pembayaran &amp; Nomor Rekening (1 per baris)</label>
+              <textarea id="setting-payment-methods" rows="3" required placeholder="Transfer BCA - 1234567890 a.n JSIT Lampung&#10;Transfer Mandiri - 0987654321 a.n JSIT Lampung&#10;QRIS All Payment" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-xl text-xs font-mono"></textarea>
+              <p class="text-[10px] text-slate-400 mt-0.5">Sistem akan otomatis mendeteksi nomor rekening untuk tombol salin.</p>
+            </div>
+
+            <button type="submit" id="btn-save-header" class="bg-blue-900 hover:bg-blue-800 text-white font-bold px-4 py-3 rounded-xl text-xs transition w-full shadow-sm">
+              Simpan Banner Header &amp; Metode Pembayaran
+            </button>
+          </form>
+        </div>
+
+        <!-- TAB 6: KONTAK & SOSMED -->
+        <div id="tab-admin-sosmed" class="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-5 hidden max-w-2xl role-restricted-super">
+          <h3 class="font-extrabold text-slate-800 dark:text-white text-sm border-b border-slate-100 dark:border-slate-800 pb-3 flex items-center gap-2">
+            <span>⚙️</span> Pengaturan Kontak Admin &amp; Link Sosial Media
+          </h3>
+
+          <form id="form-admin-sosmed" onsubmit="handleSaveAdminSosmedSettings(event)" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50 dark:bg-slate-800/70 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-700">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Nama Admin WA Konfirmasi</label>
+                <input type="text" id="setting-admin-name" required placeholder="Admin Soskem JSIT" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm bg-white dark:bg-slate-900">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">No. WA Admin (contoh: 628123456789)</label>
+                <input type="text" id="setting-admin-wa" required placeholder="628123456789" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm bg-white dark:bg-slate-900">
+              </div>
+            </div>
+
+            <div class="space-y-3">
+              <h4 class="font-bold text-xs text-slate-800 dark:text-slate-200">Link Sosial Media Header Web:</h4>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Link Facebook</label>
+                <input type="url" id="setting-link-fb" placeholder="https://facebook.com/namapage" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-xl text-xs">
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Link Instagram</label>
+                <input type="url" id="setting-link-ig" placeholder="https://instagram.com/username" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-xl text-xs">
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Link YouTube</label>
+                <input type="url" id="setting-link-yt" placeholder="https://youtube.com/@channel" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-xl text-xs">
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Link TikTok</label>
+                <input type="url" id="setting-link-tiktok" placeholder="https://tiktok.com/@username" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-xl text-xs">
+              </div>
+            </div>
+
+            <button type="submit" id="btn-save-admin-sosmed" class="bg-blue-900 hover:bg-blue-800 text-white font-bold px-4 py-3 rounded-xl text-xs transition w-full shadow-sm">
+              Simpan Kontak Admin &amp; Sosial Media
+            </button>
+          </form>
+        </div>
+
+        <!-- TAB 7: KELOLA PENGGUNA -->
+        <div id="tab-users-mgmt" class="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-5 hidden role-restricted-admin">
+          <div class="flex flex-wrap justify-between items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-3">
+            <div>
+              <h3 class="font-extrabold text-slate-800 dark:text-white text-sm flex items-center gap-2">
+                <span>👥</span> Manajemen Akun Pengguna (Multi-User)
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Kelola akun dan reset password untuk pengurus cabang / unit sekolah SIT.</p>
+            </div>
+            <button onclick="openAddUserModal()" class="bg-blue-900 hover:bg-blue-800 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition role-restricted-super">
+              + Tambah Akun Baru
+            </button>
+          </div>
+
+          <div class="overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-800">
+            <table class="w-full text-left text-xs text-slate-600 dark:text-slate-300 border-collapse">
+              <thead>
+                <tr class="bg-slate-50 dark:bg-slate-800/80 uppercase text-[10px] text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
+                  <th class="p-3">Username</th>
+                  <th class="p-3">Nama Lengkap</th>
+                  <th class="p-3">Role / Peran</th>
+                  <th class="p-3">Unit Sekolah SIT</th>
+                  <th class="p-3 text-center">Status</th>
+                  <th class="p-3 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="admin-table-users" class="divide-y divide-slate-100 dark:divide-slate-800">
+                <tr><td colspan="6" class="p-4 text-center text-slate-400">Memuat pengguna...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-slate-900 dark:bg-slate-950 text-slate-400 py-6 text-center text-xs mt-auto border-t border-slate-800 no-print">
+    <div class="max-w-7xl mx-auto px-4 space-y-1">
+      <p class="font-semibold text-slate-300">KitaBantu Soskem JSIT Wilayah Lampung</p>
+      <p>© 2026 KitaBantu Soskem JSIT Lampung. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Floating WhatsApp Widget -->
+  <div class="fixed bottom-5 right-5 z-40 flex flex-col items-end gap-2 no-print">
+    <div id="wa-popup-card" class="bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-2xl border border-emerald-200 dark:border-emerald-800/60 hidden max-w-xs text-xs space-y-2.5">
+      <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-1.5">
+        <p class="font-extrabold text-slate-800 dark:text-white flex items-center gap-1.5"><span>💬</span> Chat Admin WhatsApp</p>
+        <button onclick="toggleWaWidget()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white font-bold text-base leading-none">&times;</button>
+      </div>
+      <p id="wa-widget-admin-name" class="text-emerald-700 dark:text-emerald-400 font-extrabold">Admin Soskem JSIT</p>
+      <a id="wa-widget-link" href="#" target="_blank" class="block w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-3 rounded-xl text-center text-xs transition shadow-md">
+        Buka WhatsApp Sekarang
+      </a>
+    </div>
+
+    <button onclick="toggleWaWidget()" title="Hubungi Admin WA" class="bg-emerald-500 hover:bg-emerald-400 text-white p-3.5 rounded-full shadow-2xl transition transform hover:scale-105 flex items-center justify-center">
+      <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24">
+        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- ================= MODAL DIALOGS ADMIN ================= -->
+
+  <!-- Modal Ubah Profil Mandiri -->
+  <div id="modal-self-profile" class="fixed inset-0 bg-slate-950/65 backdrop-blur-xs flex items-center justify-center p-3 z-50 hidden">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-sm w-full relative shadow-2xl p-6 space-y-4">
+      <button onclick="closeModal('modal-self-profile')" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 dark:hover:text-white font-bold text-lg">&times;</button>
+      <div class="text-center">
+        <span class="text-3xl">🔑</span>
+        <h3 class="text-base font-extrabold text-slate-800 dark:text-white mt-1">Pengaturan Akun Saya</h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400">Ubah Username &amp; Password login Anda</p>
+      </div>
+
+      <form onsubmit="handleSaveSelfProfile(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Username Baru</label>
+          <input type="text" id="self-username" required placeholder="Username baru" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Password Baru</label>
+          <input type="password" id="self-password" placeholder="Kosongkan jika tidak ingin diubah" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl">
+          <p class="text-[10px] text-slate-400 mt-1">*Isi kolom ini hanya jika Anda ingin mengganti password saat ini.</p>
+        </div>
+        <button type="submit" id="btn-save-self-profile" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-2.5 rounded-xl transition">
+          Simpan Perubahan
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Kelola Akun User (Superadmin) -->
+  <div id="modal-user-account" class="fixed inset-0 bg-slate-950/65 backdrop-blur-xs flex items-center justify-center p-3 z-50 hidden">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full relative shadow-2xl p-6 space-y-4">
+      <button onclick="closeModal('modal-user-account')" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 dark:hover:text-white font-bold text-lg">&times;</button>
+      <h3 id="modal-user-title" class="text-base font-extrabold text-slate-800 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-2">Tambah Akun Pengguna Baru</h3>
+
+      <form id="form-user-account" onsubmit="handleSaveUserAccount(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Username</label>
+          <input type="text" id="usr-username" name="username" required placeholder="Contoh: sdit_permata" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Password</label>
+          <input type="password" id="usr-password" name="password" placeholder="Isi untuk ubah password" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Nama Lengkap Pengguna</label>
+          <input type="text" id="usr-name" name="name" required placeholder="Contoh: Operator SDIT Permata" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Role / Peran</label>
+            <select id="usr-role" name="role" required class="w-full p-2.5 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800">
+              <option value="Donatur">Donatur</option>
+              <option value="Sekolah">Sekolah</option>
+              <option value="Admin">Admin</option>
+              <option value="Superadmin">Superadmin</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Status</label>
+            <select id="usr-status" name="status" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800">
+              <option value="Aktif">Aktif</option>
+              <option value="Nonaktif">Nonaktif</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Nama Unit / Lembaga</label>
+          <input type="text" id="usr-sekolah" name="sekolah" required placeholder="Contoh: SDIT Permata Hati / Donatur Personal" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl">
+        </div>
+        <button type="submit" id="btn-save-usr" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-2.5 rounded-xl transition">Simpan Akun</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Tambah / Edit Program -->
+  <div id="modal-add-program" class="fixed inset-0 bg-slate-950/65 backdrop-blur-xs flex items-center justify-center p-3 z-50 hidden">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl p-6 space-y-4">
+      <button onclick="closeModal('modal-add-program')" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 dark:hover:text-white font-bold text-lg">&times;</button>
+
+      <h3 id="modal-program-title" class="text-lg font-extrabold text-slate-800 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-2 flex items-center gap-2">
+        <span>🛠️</span> Tambah Program Donasi
+      </h3>
+
+      <form id="form-program" onsubmit="handleProgramFormSubmit(event)" class="space-y-3 text-xs">
+        <input type="hidden" id="prog-id" name="id">
+
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Judul Program Donasi</label>
+          <input type="text" id="prog-title" name="title" required placeholder="Contoh: Beasiswa Anak Yatim Lampung" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-xs">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Kategori</label>
+            <select id="prog-category" name="category" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-xl text-xs">
+              <option value="Kemanusiaan">Kemanusiaan</option>
+              <option value="Pendidikan">Pendidikan</option>
+              <option value="Sosial">Sosial</option>
+              <option value="Bencana Alam">Bencana Alam</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Target Dana (Rp)</label>
+            <input type="number" id="prog-target" name="target" required min="100000" placeholder="10000000" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-xs">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-amber-900 dark:text-amber-300 mb-1">Dana Disalurkan Kepada Penerima Manfaat (Rp)</label>
+          <input type="number" id="prog-disalurkan" name="disalurkan" min="0" placeholder="0" class="w-full p-2.5 border border-amber-200 dark:border-amber-800 bg-amber-50/40 dark:bg-amber-950/30 rounded-xl text-xs font-semibold">
+        </div>
+
+        <div id="container-prog-sekolah" class="hidden">
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Unit Sekolah SIT Pengaju</label>
+          <input type="text" id="prog-sekolah" name="sekolah" placeholder="JSIT Wilayah Lampung" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-xs">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Upload Gambar Cover / Banner Program (Google Drive)</label>
+          <input type="file" id="prog-image-file" accept="image/*" class="w-full p-1.5 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-xl mb-1">
+          <input type="hidden" id="prog-image-url" name="imageUrl">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Teks Header Singkat</label>
+            <input type="text" id="prog-header-text" name="headerText" placeholder="Contoh: Bantu Beasiswa Hari Ini" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-xs">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Deadline / Batas Waktu</label>
+            <input type="date" id="prog-deadline" name="deadline" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-xs">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Deskripsi Lengkap</label>
+          <textarea id="prog-description" name="description" rows="3" required placeholder="Jelaskan peruntukan donasi..." class="w-full p-2.5 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-xs"></textarea>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Status Program</label>
+          <select id="prog-status" name="status" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-xl text-xs">
+            <option value="Aktif">Aktif</option>
+            <option value="Nonaktif">Nonaktif</option>
+          </select>
+        </div>
+
+        <button type="submit" id="btn-save-prog" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-2.5 rounded-xl text-xs transition">
+          Simpan Program
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Cetak Kuitansi Bukti Donasi -->
+  <div id="modal-receipt" class="fixed inset-0 bg-slate-950/65 backdrop-blur-xs flex items-center justify-center p-2 z-50 hidden">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-6 relative shadow-2xl space-y-4">
+      <button onclick="closeModal('modal-receipt')" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 dark:hover:text-white font-bold text-lg no-print">&times;</button>
+      <div id="printable-receipt-area" class="p-4 border border-blue-200 dark:border-slate-700 rounded-xl bg-blue-50/40 dark:bg-slate-800/70 space-y-3 text-xs">
+        <div class="text-center border-b border-blue-200/70 dark:border-slate-700 pb-2">
+          <h3 class="font-extrabold text-blue-900 dark:text-white text-base">KUITANSI BUKTI DONASI</h3>
+          <p class="text-[10px] text-slate-500 dark:text-slate-400">KitaBantu Soskem JSIT Lampung</p>
+        </div>
+        <div class="space-y-1.5" id="receipt-details"></div>
+        <div class="text-center pt-2 border-t border-blue-200/70 dark:border-slate-700 text-[10px] text-slate-500 dark:text-slate-400 italic">
+          Terima kasih atas kepedulian dan donasi Anda. Semoga berkah dan bermanfaat.
+        </div>
+      </div>
+      <button onclick="window.print()" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-2.5 rounded-xl text-xs transition no-print">
+        🖨️ Cetak Bukti Donasi PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- Custom Alert -->
+  <div id="custom-alert" class="fixed top-5 right-5 z-50 bg-emerald-600 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 transform -translate-y-20 opacity-0 transition-all duration-300 pointer-events-none no-print">
+    <span id="alert-icon" class="text-xl">✅</span>
+    <p id="alert-message" class="text-sm font-semibold"></p>
+  </div>
+
+  <script>
+    let globalAdminData = null;
+
+    window.onload = function() {
+      if (!verifiedAdminAuth) {
+        window.location.replace('index.html');
+        return;
+      }
+
+      initThemeMode();
+      initSidebarState();
+      updateLiveClock();
+      setInterval(updateLiveClock, 1000);
+      updateEngineIndicator();
+      initAdminSessionUI();
+      loadAdminDashboardData();
+    };
+
+    function initSidebarState() {
+      const sidebar = document.getElementById('admin-sidebar');
+      if (!sidebar) return;
+      const isCollapsed = localStorage.getItem('kitabantu_sidebar_collapsed') === 'true';
+      if (isCollapsed) {
+        sidebar.classList.remove('sidebar-expanded');
+        sidebar.classList.add('sidebar-collapsed');
+      } else {
+        sidebar.classList.remove('sidebar-collapsed');
+        sidebar.classList.add('sidebar-expanded');
+      }
+    }
+
+    function toggleAdminSidebar() {
+      const sidebar = document.getElementById('admin-sidebar');
+      const backdrop = document.getElementById('admin-sidebar-backdrop');
+      if (!sidebar) return;
+
+      const isDesktop = window.innerWidth >= 1024;
+      if (isDesktop) {
+        const willCollapse = !sidebar.classList.contains('sidebar-collapsed');
+        if (willCollapse) {
+          sidebar.classList.remove('sidebar-expanded');
+          sidebar.classList.add('sidebar-collapsed');
+          localStorage.setItem('kitabantu_sidebar_collapsed', 'true');
+        } else {
+          sidebar.classList.remove('sidebar-collapsed');
+          sidebar.classList.add('sidebar-expanded');
+          localStorage.setItem('kitabantu_sidebar_collapsed', 'false');
+        }
+      } else {
+        const isClosed = sidebar.classList.contains('-translate-x-full');
+        if (isClosed) {
+          sidebar.classList.remove('-translate-x-full');
+          sidebar.classList.add('translate-x-0');
+          if (backdrop) backdrop.classList.remove('hidden');
+        } else {
+          closeMobileSidebar();
+        }
+      }
+    }
+
+    function closeMobileSidebar() {
+      const sidebar = document.getElementById('admin-sidebar');
+      const backdrop = document.getElementById('admin-sidebar-backdrop');
+      if (sidebar) {
+        sidebar.classList.remove('translate-x-0');
+        sidebar.classList.add('-translate-x-full');
+      }
+      if (backdrop) {
+        backdrop.classList.add('hidden');
+      }
+    }
+
+    function logoutAdmin() {
+      verifiedAdminAuth = null;
+      localStorage.removeItem('kitabantu_admin_auth');
+      window.location.href = 'index.html';
+    }
+
+    function initAdminSessionUI() {
+      const roleBadge = document.getElementById('admin-user-role-badge');
+      const nameEl = document.getElementById('admin-user-fullname');
+      const sekolahEl = document.getElementById('admin-user-sekolah');
+      const sidebarNameEl = document.getElementById('sidebar-user-name');
+      const sidebarRoleEl = document.getElementById('sidebar-user-role');
+
+      const displayRole = verifiedAdminAuth.role || 'ROLE';
+      const displayName = verifiedAdminAuth.name || verifiedAdminAuth.username;
+
+      roleBadge.innerText = displayRole;
+      nameEl.innerText = displayName;
+      sekolahEl.innerText = verifiedAdminAuth.sekolah || 'Personal';
+      if (sidebarNameEl) sidebarNameEl.innerText = displayName;
+      if (sidebarRoleEl) sidebarRoleEl.innerText = displayRole;
+
+      const isSuper = verifiedAdminAuth.role === "Superadmin";
+      const isSuperOrAdmin = verifiedAdminAuth.role === "Superadmin" || verifiedAdminAuth.role === "Admin";
+      const isDonatur = verifiedAdminAuth.role === "Donatur";
+
+      document.querySelectorAll('.role-restricted-super').forEach(el => {
+        if (isSuper) el.classList.remove('hidden');
+        else el.classList.add('hidden');
+      });
+
+      document.querySelectorAll('.role-restricted-admin').forEach(el => {
+        if (isSuperOrAdmin) el.classList.remove('hidden');
+        else el.classList.add('hidden');
+      });
+
+      const lblDonasi = document.getElementById('lbl-card-donasi');
+      const lblDonatur = document.getElementById('lbl-card-donatur');
+      const titleRecent = document.getElementById('title-recent-donations');
+
+      if (isDonatur) {
+        if (lblDonasi) lblDonasi.innerText = "Total Donasi Saya";
+        if (lblDonatur) lblDonatur.innerText = "Jumlah Transaksi Saya";
+        if (titleRecent) titleRecent.innerText = "Riwayat Donasi Saya";
+      } else {
+        if (lblDonasi) lblDonasi.innerText = "Total Donasi Terkumpul";
+        if (lblDonatur) lblDonatur.innerText = "Total Transaksi Donatur";
+        if (titleRecent) titleRecent.innerText = "Transaksi Donasi Masuk Terbaru";
+      }
+
+      switchAdminTab('tab-overview');
+    }
+
+    function switchAdminTab(tabId) {
+      const tabs = [
+        'tab-overview',
+        'tab-programs',
+        'tab-reports',
+        'tab-school-history',
+        'tab-header',
+        'tab-admin-sosmed',
+        'tab-users-mgmt'
+      ];
+
+      tabs.forEach(t => {
+        const el = document.getElementById(t);
+        const nav = document.getElementById('nav-' + t);
+        if (el) el.classList.add('hidden');
+        if (nav) {
+          nav.classList.remove('bg-blue-900', 'text-white', 'font-bold', 'shadow-sm');
+          nav.classList.add('text-slate-600', 'dark:text-slate-300', 'font-semibold', 'hover:bg-slate-100', 'dark:hover:bg-slate-800');
+          const iconBox = nav.querySelector('span:first-child');
+          if (iconBox) {
+            iconBox.classList.remove('bg-white/15');
+            iconBox.classList.add('bg-slate-100', 'dark:bg-slate-800');
+          }
+        }
+      });
+
+      const activeEl = document.getElementById(tabId);
+      const activeNav = document.getElementById('nav-' + tabId);
+      if (activeEl) activeEl.classList.remove('hidden');
+      if (activeNav) {
+        activeNav.classList.remove('text-slate-600', 'dark:text-slate-300', 'font-semibold', 'hover:bg-slate-100', 'dark:hover:bg-slate-800');
+        activeNav.classList.add('bg-blue-900', 'text-white', 'font-bold', 'shadow-sm');
+        const iconBox = activeNav.querySelector('span:first-child');
+        if (iconBox) {
+          iconBox.classList.remove('bg-slate-100', 'dark:bg-slate-800');
+          iconBox.classList.add('bg-white/15');
+        }
+      }
+
+      if (window.innerWidth < 1024) {
+        closeMobileSidebar();
+      }
+    }
+
+    async function migrateSheetsToFirebase() {
+      if (!useFirebase) {
+        showCustomAlert('Isi FIREBASE_CONFIG terlebih dahulu sebelum melakukan migrasi!', false);
+        return;
+      }
+      if (!confirm('Impor seluruh data (Program, Donasi, Pengaturan, dan Pengguna) dari Google Sheets ke Firebase Firestore?')) return;
+
+      const btn = document.getElementById('btn-migrate-firebase');
+      btn.disabled = true; btn.innerText = '⏳ Mengimpor Data...';
+
+      try {
+        const res = await callGasApi('exportAllForFirebase', { auth: verifiedAdminAuth });
+        if (!res || !res.success) {
+          btn.disabled = false; btn.innerHTML = '<span>🔄</span> <span>Sinkron Sheets → Firebase</span>';
+          showCustomAlert(res ? res.message : 'Gagal mengambil data Sheets.', false);
+          return;
+        }
+
+        const batch = db.batch();
+
+        if (res.settings) {
+          batch.set(db.collection('settings').doc('general'), res.settings, { merge: true });
+        }
+
+        (res.users || []).forEach(u => {
+          if (u.username) {
+            batch.set(db.collection('users').doc(u.username.toLowerCase()), u, { merge: true });
+          }
+        });
+
+        (res.programs || []).forEach(p => {
+          if (p.id) {
+            batch.set(db.collection('programs').doc(p.id), p, { merge: true });
+          }
+        });
+
+        (res.donations || []).forEach(d => {
+          if (d.donationId) {
+            batch.set(db.collection('donations').doc(d.donationId), {
+              ...d,
+              timestamp: Date.now()
+            }, { merge: true });
+          }
+        });
+
+        await batch.commit();
+        btn.disabled = false; btn.innerHTML = '<span>🔄</span> <span>Sinkron Sheets → Firebase</span>';
+        showCustomAlert(`Migrasi selesai! ${(res.programs || []).length} program & ${(res.donations || []).length} transaksi tersinkron ke Firebase.`);
+        loadAdminDashboardData();
+      } catch (err) {
+        btn.disabled = false; btn.innerHTML = '<span>🔄</span> <span>Sinkron Sheets → Firebase</span>';
+        showCustomAlert('Gagal migrasi: ' + err.message, false);
+      }
+    }
+
+    function openSelfProfileModal() {
+      if (!verifiedAdminAuth) return;
+      document.getElementById('self-username').value = verifiedAdminAuth.username;
+      document.getElementById('self-password').value = '';
+      openModal('modal-self-profile');
+    }
+
+    async function handleSaveSelfProfile(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-save-self-profile');
+      btn.disabled = true; btn.innerText = 'Menyimpan...';
+
+      const newUsername = document.getElementById('self-username').value.trim();
+      const newPassword = document.getElementById('self-password').value.trim();
+
+      try {
+        if (useFirebase) {
+          const oldKey = verifiedAdminAuth.username.toLowerCase();
+          const newKey = newUsername.toLowerCase();
+
+          if (newKey !== oldKey) {
+            const checkDoc = await db.collection('users').doc(newKey).get();
+            if (checkDoc.exists) {
+              btn.disabled = false; btn.innerText = 'Simpan Perubahan';
+              showCustomAlert(`Username '${newUsername}' sudah digunakan oleh akun lain!`, false);
+              return;
+            }
+          }
+
+          const updatedPassword = newPassword !== "" ? newPassword : verifiedAdminAuth.password;
+          const updatedObj = {
+            username: newUsername,
+            password: updatedPassword,
+            name: verifiedAdminAuth.name,
+            role: verifiedAdminAuth.role,
+            sekolah: verifiedAdminAuth.sekolah,
+            status: "Aktif"
+          };
+
+          await db.collection('users').doc(newKey).set(updatedObj);
+          if (newKey !== oldKey) {
+            await db.collection('users').doc(oldKey).delete();
+          }
+
+          verifiedAdminAuth = updatedObj;
+          localStorage.setItem('kitabantu_admin_auth', JSON.stringify(verifiedAdminAuth));
+          btn.disabled = false; btn.innerText = 'Simpan Perubahan';
+          showCustomAlert('Profil akun berhasil diperbarui!');
+          closeModal('modal-self-profile');
+          initAdminSessionUI();
+        } else {
+          const res = await callGasApi('updateSelfProfile', { data: { newUsername, newPassword }, auth: verifiedAdminAuth });
+          btn.disabled = false; btn.innerText = 'Simpan Perubahan';
+          if (res.success) {
+            showCustomAlert(res.message);
+            closeModal('modal-self-profile');
+            verifiedAdminAuth = res.updatedUser;
+            localStorage.setItem('kitabantu_admin_auth', JSON.stringify(verifiedAdminAuth));
+            initAdminSessionUI();
+          } else {
+            showCustomAlert(res.message, false);
+          }
+        }
+      } catch (err) {
+        btn.disabled = false; btn.innerText = 'Simpan Perubahan';
+        showCustomAlert('Gagal memperbarui profil: ' + err.message, false);
+      }
+    }
+
+    async function resetPasswordByAdminAction(targetUsername) {
+      const newPass = prompt(`Masukkan Password Baru untuk akun "${targetUsername}":`);
+      if (!newPass || newPass.trim() === '') return;
+
+      try {
+        if (useFirebase) {
+          await db.collection('users').doc(targetUsername.toLowerCase()).update({ password: newPass.trim() });
+          showCustomAlert(`Password untuk akun '${targetUsername}' berhasil di-reset!`);
+          loadAdminDashboardData();
+        } else {
+          const res = await callGasApi('resetPasswordByAdmin', { targetUsername: targetUsername, newPassword: newPass.trim(), auth: verifiedAdminAuth });
+          if (res.success) {
+            showCustomAlert(res.message);
+            loadAdminDashboardData();
+          } else {
+            showCustomAlert(res.message, false);
+          }
+        }
+      } catch (err) {
+        showCustomAlert('Gagal reset password: ' + err.message, false);
+      }
+    }
+
+    async function loadAdminDashboardData() {
+      try {
+        let data = null;
+
+        if (useFirebase) {
+          const [settingsDoc, progSnap, donSnap, userSnap] = await Promise.all([
+            db.collection('settings').doc('general').get(),
+            db.collection('programs').get(),
+            db.collection('donations').get(),
+            db.collection('users').get()
+          ]);
+
+          const settings = settingsDoc.exists ? { ...getDefaultSettings(), ...settingsDoc.data() } : getDefaultSettings();
+          const user = verifiedAdminAuth;
+
+          const allPrograms = [];
+          const userPrograms = [];
+          let totalTarget = 0;
+          let totalCollected = 0;
+          let totalDisalurkan = 0;
+
+          progSnap.forEach(doc => {
+            const p = doc.data();
+            const target = Number(p.target || 0);
+            const collected = Number(p.collected || 0);
+            const disalurkan = Number(p.disalurkan || 0);
+            const sekolahProg = String(p.sekolah || "JSIT Wilayah Lampung");
+
+            const progObj = {
+              id: doc.id,
+              title: String(p.title || ""),
+              category: String(p.category || ""),
+              description: String(p.description || ""),
+              target: target,
+              collected: collected,
+              disalurkan: disalurkan,
+              imageUrl: String(p.imageUrl || ""),
+              headerText: String(p.headerText || ""),
+              status: String(p.status || "Aktif"),
+              deadline: String(p.deadline || ""),
+              sekolah: sekolahProg
+            };
+
+            allPrograms.push(progObj);
+
+            if (user.role === "Sekolah") {
+              if (sekolahProg === user.sekolah) {
+                totalTarget += target;
+                totalCollected += collected;
+                totalDisalurkan += disalurkan;
+                userPrograms.push(progObj);
+              }
+            } else {
+              totalTarget += target;
+              totalCollected += collected;
+              totalDisalurkan += disalurkan;
+              userPrograms.push(progObj);
+            }
+          });
+
+          const allDonations = [];
+          const userDonations = [];
+          let myTotalDonated = 0;
+
+          donSnap.forEach(doc => {
+            const d = doc.data();
+            const donObj = {
+              donationId: doc.id,
+              date: String(d.date || ""),
+              timestamp: Number(d.timestamp || 0),
+              name: String(d.name || ""),
+              phone: String(d.phone || ""),
+              email: String(d.email || "-"),
+              program: String(d.program || ""),
+              amount: Number(d.amount || 0),
+              message: String(d.message || ""),
+              paymentMethod: String(d.paymentMethod || ""),
+              status: String(d.status || "Menunggu Verifikasi"),
+              proofUrl: String(d.proofUrl || "-")
+            };
+
+            allDonations.push(donObj);
+
+            if (user.role === "Donatur") {
+              if (donObj.name.toLowerCase() === user.name.toLowerCase() || donObj.name.toLowerCase() === user.username.toLowerCase()) {
+                userDonations.push(donObj);
+                if (donObj.status.toLowerCase() === "approved" || donObj.status.toLowerCase() === "berhasil") {
+                  myTotalDonated += donObj.amount;
+                }
+              }
+            } else if (user.role === "Sekolah") {
+              const matchProg = userPrograms.find(p => p.title === donObj.program);
+              if (matchProg) userDonations.push(donObj);
+            } else {
+              userDonations.push(donObj);
+            }
+          });
+
+          allDonations.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+          userDonations.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+          const usersList = [];
+          const schoolNames = [];
+
+          userSnap.forEach(doc => {
+            const u = doc.data();
+            const uRole = String(u.role || "Donatur");
+            const uSekolah = String(u.sekolah || "");
+            usersList.push({
+              username: String(u.username || doc.id),
+              name: String(u.name || ""),
+              role: uRole,
+              sekolah: uSekolah,
+              status: String(u.status || "Aktif")
+            });
+            if (uSekolah && schoolNames.indexOf(uSekolah) === -1 && uRole === "Sekolah") {
+              schoolNames.push(uSekolah);
+            }
+          });
+
+          data = {
+            user: user,
+            settings: settings,
+            stats: {
+              totalDonasi: (user.role === "Donatur") ? myTotalDonated : totalCollected,
+              totalTarget: totalTarget,
+              totalDonatur: userDonations.length,
+              totalProgram: userPrograms.length,
+              totalDisalurkan: totalDisalurkan,
+              sisaDana: Math.max(0, totalCollected - totalDisalurkan)
+            },
+            programs: userPrograms,
+            donations: userDonations,
+            allPrograms: allPrograms,
+            allDonations: allDonations,
+            usersList: usersList,
+            schoolNames: schoolNames
+          };
+        } else {
+          data = await callGasApi('getDashboardData', { auth: verifiedAdminAuth });
+        }
+
+        if (!data) return;
+        globalAdminData = data;
+
+        updateTopBarSosmed(data.settings);
+        updateWaWidget(data.settings);
+
+        document.getElementById('admin-card-donasi').innerText = formatRupiah(data.stats.totalDonasi);
+        document.getElementById('admin-card-donatur').innerText = data.stats.totalDonatur;
+        document.getElementById('admin-card-program').innerText = data.stats.totalProgram;
+        document.getElementById('admin-card-sisa').innerText = formatRupiah(data.stats.sisaDana);
+
+        if (data.settings) {
+          document.getElementById('setting-hero-title').value = data.settings.HeroTitle || '';
+          document.getElementById('setting-hero-subtext').value = data.settings.HeroSubtext || '';
+          document.getElementById('setting-hero-bg-url1').value = data.settings.HeroBgImage1 || '';
+          document.getElementById('setting-hero-bg-url2').value = data.settings.HeroBgImage2 || '';
+          document.getElementById('setting-hero-bg-url3').value = data.settings.HeroBgImage3 || '';
+          document.getElementById('setting-payment-methods').value = data.settings.PaymentMethods || '';
+          document.getElementById('setting-admin-wa').value = data.settings.AdminWA || '';
+          document.getElementById('setting-admin-name').value = data.settings.AdminWAName || '';
+          document.getElementById('setting-link-fb').value = data.settings.LinkFB || '';
+          document.getElementById('setting-link-ig').value = data.settings.LinkIG || '';
+          document.getElementById('setting-link-yt').value = data.settings.LinkYT || '';
+          document.getElementById('setting-link-tiktok').value = data.settings.LinkTikTok || '';
+        }
+
+        renderAdminRecentDonations(data.donations);
+        renderAdminProgramsTable(data.programs);
+        renderUsersTable(data.usersList || []);
+        populateReportFilter(data.programs);
+        renderReportTable(data.donations);
+        populateSchoolHistorySelector(data.schoolNames || []);
+      } catch (err) {
+        showCustomAlert('Gagal memuat dashboard: ' + err.message, false);
+      }
+    }
+
+    function populateSchoolHistorySelector(schools) {
+      const sel = document.getElementById('select-school-history');
+      if (!sel) return;
+      sel.innerHTML = '<option value="">-- Pilih Unit Sekolah --</option>';
+      schools.forEach(s => {
+        sel.innerHTML += `<option value="${s}">${s}</option>`;
+      });
+    }
+
+    function renderSchoolHistory() {
+      const selectedSchool = document.getElementById('select-school-history').value;
+      const container = document.getElementById('school-history-container');
+      if (!container || !globalAdminData) return;
+
+      if (!selectedSchool) {
+        container.innerHTML = `
+          <div class="text-center py-12 text-slate-400 text-xs border border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-800/30">
+            <span class="text-3xl block mb-2">🏫</span>
+            Silakan pilih unit sekolah pada menu di atas untuk menampilkan data riwayat.
+          </div>
+        `;
+        return;
+      }
+
+      const allProgs = globalAdminData.allPrograms || [];
+      const allDons = globalAdminData.allDonations || [];
+
+      const schoolProgs = allProgs.filter(p => p.sekolah === selectedSchool);
+      const schoolProgTitles = schoolProgs.map(p => p.title);
+      const schoolDons = allDons.filter(d => schoolProgTitles.indexOf(d.program) !== -1);
+
+      let grandTotalCollected = 0;
+      let grandTotalDisalurkan = 0;
+
+      schoolProgs.forEach(p => {
+        grandTotalCollected += p.collected || 0;
+        grandTotalDisalurkan += p.disalurkan || 0;
+      });
+
+      let programBreakdownHtml = '';
+      if (schoolProgs.length === 0) {
+        programBreakdownHtml = '<tr><td colspan="6" class="p-4 text-center text-slate-400">Belum ada program donasi yang dibuat oleh sekolah ini.</td></tr>';
+      } else {
+        schoolProgs.forEach((p, idx) => {
+          const percent = p.target > 0 ? Math.min(Math.round((p.collected / p.target) * 100), 100) : 0;
+          programBreakdownHtml += `
+            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+              <td class="p-2.5 border border-slate-200 dark:border-slate-700 text-center font-bold text-slate-500">${idx + 1}</td>
+              <td class="p-2.5 border border-slate-200 dark:border-slate-700 font-bold text-slate-800 dark:text-white">${p.title}</td>
+              <td class="p-2.5 border border-slate-200 dark:border-slate-700 font-semibold text-slate-700 dark:text-slate-300">${formatRupiah(p.target)}</td>
+              <td class="p-2.5 border border-slate-200 dark:border-slate-700 font-extrabold text-blue-900 dark:text-blue-300">${formatRupiah(p.collected)}</td>
+              <td class="p-2.5 border border-slate-200 dark:border-slate-700 font-extrabold text-emerald-700 dark:text-emerald-400">${formatRupiah(p.disalurkan || 0)}</td>
+              <td class="p-2.5 border border-slate-200 dark:border-slate-700">
+                <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 mb-1">
+                  <div class="bg-blue-600 h-2 rounded-full" style="width: ${percent}%"></div>
+                </div>
+                <span class="text-[10px] text-slate-500 dark:text-slate-400 font-bold">${percent}%</span>
+              </td>
+            </tr>
+          `;
+        });
+      }
+
+      let donTableHtml = '';
+      if (schoolDons.length === 0) {
+        donTableHtml = '<tr><td colspan="8" class="p-4 text-center text-slate-400">Belum ada riwayat donasi masuk untuk sekolah ini.</td></tr>';
+      } else {
+        schoolDons.forEach((d, idx) => {
+          const isApproved = String(d.status).toLowerCase() === 'approved' || String(d.status).toLowerCase() === 'berhasil';
+          donTableHtml += `
+            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+              <td class="p-2.5 border border-slate-200 dark:border-slate-700 text-center font-bold text-slate-500">${idx + 1}</td>
+              <td class="p-2.5 border border-slate-200 dark:border-slate-700 font-mono font-bold text-blue-900 dark:text-blue-300">${d.donationId}</td>
+              <td class="p-2.5 border border-slate-200 dark:border-slate-700 text-slate-500">${d.date}</td>
+              <td class="p-2.5 border border-slate-200 dark:border-slate-700 font-semibold text-slate-800 dark:text-white">${d.name}</td>
+              <td class="p-2.5 border border-slate-200 dark:border-slate-700">${d.program}</td>
+              <td class="p-2.5 border border-slate-200 dark:border-slate-700 font-extrabold text-emerald-700 dark:text-emerald-400">${formatRupiah(d.amount)}</td>
+              <td class="p-2.5 border border-slate-200 dark:border-slate-700 text-center">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isApproved ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                  ${isApproved ? 'Approved' : 'Menunggu'}
+                </span>
+              </td>
+              <td class="p-2.5 border border-slate-200 dark:border-slate-700 text-center">
+                ${d.proofUrl && d.proofUrl !== '-' ? `<a href="${d.proofUrl}" target="_blank" class="text-blue-600 dark:text-blue-400 underline font-bold">Foto Bukti</a>` : '<span class="text-slate-400">-</span>'}
+              </td>
+            </tr>
+          `;
+        });
+      }
+
+      container.innerHTML = `
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+          <div class="bg-blue-50 dark:bg-blue-950/40 p-4 rounded-2xl border border-blue-200 dark:border-blue-800/60">
+            <p class="text-blue-800 dark:text-blue-300 font-medium">Unit Sekolah</p>
+            <h4 class="font-extrabold text-sm text-blue-950 dark:text-white mt-1">${selectedSchool}</h4>
+          </div>
+          <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs">
+            <p class="text-slate-500 dark:text-slate-400 font-medium">Total Program Dibuat</p>
+            <h4 class="font-extrabold text-base text-slate-800 dark:text-white mt-1">${schoolProgs.length} Program</h4>
+          </div>
+          <div class="bg-emerald-50 dark:bg-emerald-950/40 p-4 rounded-2xl border border-emerald-200 dark:border-emerald-800/60">
+            <p class="text-emerald-800 dark:text-emerald-300 font-medium">Grand Total Donasi Diterima</p>
+            <h4 class="font-extrabold text-base text-emerald-900 dark:text-emerald-300 mt-1">${formatRupiah(grandTotalCollected)}</h4>
+          </div>
+          <div class="bg-amber-50 dark:bg-amber-950/40 p-4 rounded-2xl border border-amber-200 dark:border-amber-800/60">
+            <p class="text-amber-800 dark:text-amber-300 font-medium">Total Dana Disalurkan</p>
+            <h4 class="font-extrabold text-base text-amber-900 dark:text-amber-300 mt-1">${formatRupiah(grandTotalDisalurkan)}</h4>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <h4 class="font-extrabold text-slate-800 dark:text-white text-xs flex items-center gap-1.5">
+            <span>📋</span> Rekap Donasi Per Program (${selectedSchool})
+          </h4>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse border border-slate-200 dark:border-slate-700">
+              <thead class="bg-slate-100 dark:bg-slate-800 text-[11px] font-bold uppercase text-slate-600 dark:text-slate-300">
+                <tr>
+                  <th class="p-2.5 border border-slate-200 dark:border-slate-700 w-10 text-center">No</th>
+                  <th class="p-2.5 border border-slate-200 dark:border-slate-700">Nama Program Donasi</th>
+                  <th class="p-2.5 border border-slate-200 dark:border-slate-700">Target Dana</th>
+                  <th class="p-2.5 border border-slate-200 dark:border-slate-700">Terkumpul</th>
+                  <th class="p-2.5 border border-slate-200 dark:border-slate-700">Disalurkan</th>
+                  <th class="p-2.5 border border-slate-200 dark:border-slate-700 w-32">Pencapaian</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200 dark:divide-slate-700 text-slate-700 dark:text-slate-300">${programBreakdownHtml}</tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="space-y-3 pt-2">
+          <h4 class="font-extrabold text-slate-800 dark:text-white text-xs flex items-center gap-1.5">
+            <span>💳</span> Riwayat Transaksi Donasi Masuk &amp; Bukti Transfer
+          </h4>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse border border-slate-200 dark:border-slate-700">
+              <thead class="bg-slate-100 dark:bg-slate-800 text-[11px] font-bold uppercase text-slate-600 dark:text-slate-300">
+                <tr>
+                  <th class="p-2.5 border border-slate-200 dark:border-slate-700 w-10 text-center">No</th>
+                  <th class="p-2.5 border border-slate-200 dark:border-slate-700">ID Donasi</th>
+                  <th class="p-2.5 border border-slate-200 dark:border-slate-700">Tanggal</th>
+                  <th class="p-2.5 border border-slate-200 dark:border-slate-700">Donatur</th>
+                  <th class="p-2.5 border border-slate-200 dark:border-slate-700">Program</th>
+                  <th class="p-2.5 border border-slate-200 dark:border-slate-700">Nominal</th>
+                  <th class="p-2.5 border border-slate-200 dark:border-slate-700 text-center">Status</th>
+                  <th class="p-2.5 border border-slate-200 dark:border-slate-700 text-center">Bukti Transfer</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200 dark:divide-slate-700 text-slate-700 dark:text-slate-300">${donTableHtml}</tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAdminRecentDonations(donations) {
+      const tbody = document.getElementById('admin-table-recent-donations');
+      tbody.innerHTML = '';
+
+      if (!donations || donations.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-400">Belum ada riwayat transaksi.</td></tr>';
+        return;
+      }
+
+      donations.slice(0, 10).forEach(d => {
+        const isApproved = String(d.status).toLowerCase() === 'approved' || String(d.status).toLowerCase() === 'berhasil';
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+            <td class="p-3 font-mono text-[11px] font-bold text-blue-900 dark:text-blue-300">${d.donationId}</td>
+            <td class="p-3 text-slate-500">${d.date}</td>
+            <td class="p-3 font-bold text-slate-800 dark:text-white">${d.name}</td>
+            <td class="p-3">${d.program}</td>
+            <td class="p-3 font-extrabold text-emerald-700 dark:text-emerald-400">${formatRupiah(d.amount)}</td>
+            <td class="p-3">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${isApproved ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                ${isApproved ? 'Approved' : 'Menunggu Verifikasi'}
+              </span>
+            </td>
+            <td class="p-3">
+              ${d.proofUrl && d.proofUrl !== '-' ? `<a href="${d.proofUrl}" target="_blank" class="text-blue-600 dark:text-blue-400 underline text-[11px] font-semibold">Lihat Bukti</a>` : '<span class="text-slate-400">-</span>'}
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function renderAdminProgramsTable(programs) {
+      const tbody = document.getElementById('admin-table-programs');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (!programs || programs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-400">Belum ada program.</td></tr>';
+        return;
+      }
+
+      programs.forEach(p => {
+        const isAktif = String(p.status).trim().toLowerCase() === 'aktif';
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+            <td class="p-3"><img src="${p.imageUrl || 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600'}" class="h-10 w-14 object-cover rounded-lg"></td>
+            <td class="p-3 font-bold text-slate-800 dark:text-white">${p.title}</td>
+            <td class="p-3"><span class="bg-amber-100 dark:bg-amber-950/70 text-amber-900 dark:text-amber-300 px-2.5 py-0.5 rounded-full text-[10px] font-bold">${p.sekolah || 'JSIT Lampung'}</span></td>
+            <td class="p-3">${formatRupiah(p.target)}</td>
+            <td class="p-3 font-extrabold text-blue-900 dark:text-blue-300">${formatRupiah(p.collected)}</td>
+            <td class="p-3 font-extrabold text-emerald-700 dark:text-emerald-400">${formatRupiah(p.disalurkan || 0)}</td>
+
+            <td class="p-3 text-center">
+              <button onclick="toggleProgramStatus('${p.id}')" title="Klik untuk mengubah status" class="px-3 py-1 rounded-xl text-[11px] font-bold transition shadow-xs ${isAktif ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-rose-600 hover:bg-rose-500 text-white'}">
+                ${isAktif ? '🟢 Aktif' : '🔴 Nonaktif'}
+              </button>
+            </td>
+
+            <td class="p-3 text-center">
+              <div class="flex items-center justify-center gap-1.5">
+                <button onclick="openEditProgramModal('${p.id}')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-2.5 py-1 rounded-lg text-[11px]">Edit</button>
+                <button onclick="confirmDeleteProgram('${p.id}')" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-2.5 py-1 rounded-lg text-[11px]">Hapus</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function renderUsersTable(users) {
+      const tbody = document.getElementById('admin-table-users');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (!users || users.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">Belum ada akun terdaftar.</td></tr>';
+        return;
+      }
+
+      const isSuper = verifiedAdminAuth && verifiedAdminAuth.role === "Superadmin";
+
+      users.forEach(u => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+            <td class="p-3 font-bold font-mono text-blue-900 dark:text-blue-300">${u.username}</td>
+            <td class="p-3 font-bold text-slate-800 dark:text-white">${u.name}</td>
+            <td class="p-3"><span class="bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold">${u.role}</span></td>
+            <td class="p-3 font-medium text-slate-600 dark:text-slate-300">${u.sekolah}</td>
+            <td class="p-3 text-center">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${u.status === 'Aktif' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${u.status}</span>
+            </td>
+            <td class="p-3 text-center">
+              <div class="flex items-center justify-center gap-1.5">
+                <button onclick="resetPasswordByAdminAction('${u.username}')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-2.5 py-1 rounded-lg text-[11px]" title="Reset Password User">🔑 Reset Pass</button>
+                ${isSuper ? `
+                  <button onclick="openEditUserModal('${u.username}')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-2.5 py-1 rounded-lg text-[11px]">Edit</button>
+                  <button onclick="confirmDeleteUser('${u.username}')" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-2.5 py-1 rounded-lg text-[11px]">Hapus</button>
+                ` : ''}
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function openAddUserModal() {
+      document.getElementById('modal-user-title').innerText = 'Tambah Akun Pengguna Baru';
+      document.getElementById('form-user-account').reset();
+      document.getElementById('usr-username').readOnly = false;
+      openModal('modal-user-account');
+    }
+
+    function openEditUserModal(username) {
+      if (!globalAdminData || !globalAdminData.usersList) return;
+      const u = globalAdminData.usersList.find(item => item.username === username);
+      if (!u) return;
+
+      document.getElementById('modal-user-title').innerText = 'Edit Akun Pengguna';
+      document.getElementById('usr-username').value = u.username;
+      document.getElementById('usr-username').readOnly = true;
+      document.getElementById('usr-password').value = '';
+      document.getElementById('usr-name').value = u.name;
+      document.getElementById('usr-role').value = u.role;
+      document.getElementById('usr-sekolah').value = u.sekolah;
+      document.getElementById('usr-status').value = u.status || 'Aktif';
+
+      openModal('modal-user-account');
+    }
+
+    async function handleSaveUserAccount(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-save-usr');
+      btn.disabled = true; btn.innerText = 'Menyimpan...';
+
+      const username = document.getElementById('usr-username').value.trim();
+      const password = document.getElementById('usr-password').value.trim();
+      const payload = {
+        username: username,
+        name: document.getElementById('usr-name').value.trim(),
+        role: document.getElementById('usr-role').value,
+        sekolah: document.getElementById('usr-sekolah').value.trim(),
+        status: document.getElementById('usr-status').value
+      };
+
+      try {
+        if (useFirebase) {
+          const docRef = db.collection('users').doc(username.toLowerCase());
+          const existing = await docRef.get();
+          if (existing.exists) {
+            payload.password = password || existing.data().password;
+          } else {
+            payload.password = password || "123456";
+          }
+          await docRef.set(payload, { merge: true });
+          btn.disabled = false; btn.innerText = 'Simpan Akun';
+          showCustomAlert(`Akun ${username} berhasil disimpan!`);
+          closeModal('modal-user-account');
+          loadAdminDashboardData();
+        } else {
+          payload.password = password;
+          const res = await callGasApi('saveUserAccount', { data: payload, auth: verifiedAdminAuth });
+          btn.disabled = false; btn.innerText = 'Simpan Akun';
+          if (res.success) {
+            showCustomAlert(res.message);
+            closeModal('modal-user-account');
+            loadAdminDashboardData();
+          } else {
+            showCustomAlert(res.message, false);
+          }
+        }
+      } catch (err) {
+        btn.disabled = false; btn.innerText = 'Simpan Akun';
+        showCustomAlert('Gagal menyimpan akun: ' + err.message, false);
+      }
+    }
+
+    async function confirmDeleteUser(targetUsername) {
+      if (!confirm('Apakah Anda yakin ingin menghapus akun pengguna ' + targetUsername + '?')) return;
+      try {
+        if (useFirebase) {
+          await db.collection('users').doc(targetUsername.toLowerCase()).delete();
+          showCustomAlert(`Akun ${targetUsername} berhasil dihapus!`);
+          loadAdminDashboardData();
+        } else {
+          const res = await callGasApi('deleteUserAccount', { username: targetUsername, auth: verifiedAdminAuth });
+          if (res.success) {
+            showCustomAlert(res.message);
+            loadAdminDashboardData();
+          } else {
+            showCustomAlert(res.message, false);
+          }
+        }
+      } catch (err) {
+        showCustomAlert('Gagal menghapus akun: ' + err.message, false);
+      }
+    }
+
+    async function toggleProgramStatus(progId) {
+      try {
+        if (useFirebase) {
+          const prog = globalAdminData.programs.find(p => String(p.id) === String(progId));
+          if (!prog) return;
+          const newStatus = String(prog.status).toLowerCase() === 'aktif' ? 'Nonaktif' : 'Aktif';
+          await db.collection('programs').doc(progId).update({ status: newStatus });
+          showCustomAlert(`Status program diubah menjadi: ${newStatus}`);
+          loadAdminDashboardData();
+        } else {
+          const res = await callGasApi('toggleProgramStatusByAdmin', { progId: progId, auth: verifiedAdminAuth });
+          if (res.success) {
+            showCustomAlert(res.message);
+            loadAdminDashboardData();
+          } else {
+            showCustomAlert(res.message, false);
+          }
+        }
+      } catch (err) {
+        showCustomAlert('Gagal mengubah status: ' + err.message, false);
+      }
+    }
+
+    function openCreateProgramModal() {
+      document.getElementById('modal-program-title').innerText = 'Tambah Program Donasi Baru';
+      document.getElementById('form-program').reset();
+      document.getElementById('prog-id').value = '';
+      document.getElementById('prog-disalurkan').value = '0';
+      document.getElementById('prog-image-url').value = '';
+
+      const containerSekolah = document.getElementById('container-prog-sekolah');
+      if (verifiedAdminAuth && (verifiedAdminAuth.role === "Superadmin" || verifiedAdminAuth.role === "Admin")) {
+        containerSekolah.classList.remove('hidden');
+        document.getElementById('prog-sekolah').value = verifiedAdminAuth.sekolah || 'JSIT Wilayah Lampung';
+      } else {
+        containerSekolah.classList.add('hidden');
+      }
+
+      openModal('modal-add-program');
+    }
+
+    function openEditProgramModal(progId) {
+      const program = globalAdminData.programs.find(p => String(p.id) === String(progId));
+      if (!program) return;
+
+      document.getElementById('modal-program-title').innerText = 'Edit Program Donasi';
+      document.getElementById('prog-id').value = program.id;
+      document.getElementById('prog-title').value = program.title;
+      document.getElementById('prog-category').value = program.category;
+      document.getElementById('prog-target').value = program.target;
+      document.getElementById('prog-disalurkan').value = program.disalurkan || 0;
+      document.getElementById('prog-image-url').value = program.imageUrl;
+      document.getElementById('prog-header-text').value = program.headerText;
+      document.getElementById('prog-deadline').value = program.deadline;
+      document.getElementById('prog-description').value = program.description;
+      document.getElementById('prog-status').value = program.status;
+
+      const containerSekolah = document.getElementById('container-prog-sekolah');
+      if (verifiedAdminAuth && (verifiedAdminAuth.role === "Superadmin" || verifiedAdminAuth.role === "Admin")) {
+        containerSekolah.classList.remove('hidden');
+        document.getElementById('prog-sekolah').value = program.sekolah || 'JSIT Wilayah Lampung';
+      } else {
+        containerSekolah.classList.add('hidden');
+      }
+
+      openModal('modal-add-program');
+    }
+
+    async function confirmDeleteProgram(progId) {
+      if (!confirm('Apakah Anda yakin ingin menghapus program donasi ini?')) return;
+      try {
+        if (useFirebase) {
+          await db.collection('programs').doc(progId).delete();
+          showCustomAlert('Program berhasil dihapus!');
+          loadAdminDashboardData();
+        } else {
+          const res = await callGasApi('deleteProgramByAdmin', { progId: progId, auth: verifiedAdminAuth });
+          if (res.success) {
+            showCustomAlert(res.message);
+            loadAdminDashboardData();
+          } else {
+            showCustomAlert(res.message, false);
+          }
+        }
+      } catch (err) {
+        showCustomAlert('Gagal menghapus program: ' + err.message, false);
+      }
+    }
+
+    function handleProgramFormSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-save-prog');
+      btn.disabled = true; btn.innerText = 'Menyimpan...';
+
+      const fileInput = document.getElementById('prog-image-file');
+
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const fileData = { fileName: file.name, mimeType: file.type, data: evt.target.result };
+          callGasApi('uploadImageToDrive', { fileData: fileData })
+            .then(imgRes => {
+              if (imgRes.success) {
+                submitProgramPayload(e.target, imgRes.url);
+              } else {
+                showCustomAlert('Gagal upload gambar: ' + imgRes.message, false);
+                btn.disabled = false; btn.innerText = 'Simpan Program';
+              }
+            })
+            .catch(err => {
+              showCustomAlert('Gagal upload gambar: ' + err.message, false);
+              btn.disabled = false; btn.innerText = 'Simpan Program';
+            });
+        };
+        reader.readAsDataURL(file);
+      } else {
+        submitProgramPayload(e.target, document.getElementById('prog-image-url').value);
+      }
+    }
+
+    async function submitProgramPayload(form, imageUrl) {
+      const sekolahPengaju = verifiedAdminAuth.role === "Sekolah"
+        ? verifiedAdminAuth.sekolah
+        : ((form.sekolah && form.sekolah.value) || verifiedAdminAuth.sekolah || "JSIT Wilayah Lampung");
+
+      const existingId = form.id.value.trim();
+      const progId = existingId || ("PROG-" + new Date().getTime().toString().slice(-5));
+
+      const payload = {
+        id: progId,
+        title: form.title.value.trim(),
+        category: form.category.value,
+        target: Number(form.target.value || 0),
+        disalurkan: Number(form.disalurkan.value || 0),
+        sekolah: sekolahPengaju,
+        imageUrl: imageUrl || "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600",
+        headerText: form.headerText.value || form.title.value.trim(),
+        deadline: form.deadline.value || "",
+        description: form.description.value.trim(),
+        status: form.status.value || "Aktif"
+      };
+
+      try {
+        if (useFirebase) {
+          const docRef = db.collection('programs').doc(progId);
+          if (existingId) {
+            await docRef.set(payload, { merge: true });
+          } else {
+            payload.collected = 0;
+            await docRef.set(payload);
+          }
+
+          const btn = document.getElementById('btn-save-prog');
+          btn.disabled = false; btn.innerText = 'Simpan Program';
+          showCustomAlert(existingId ? 'Program berhasil diperbarui!' : 'Program baru berhasil ditambahkan!');
+          form.reset();
+          closeModal('modal-add-program');
+          loadAdminDashboardData();
+        } else {
+          payload.id = existingId;
+          const res = await callGasApi('saveCampaignByAdmin', { data: payload, auth: verifiedAdminAuth });
+          const btn = document.getElementById('btn-save-prog');
+          btn.disabled = false; btn.innerText = 'Simpan Program';
+          if (res.success) {
+            showCustomAlert(res.message);
+            form.reset();
+            closeModal('modal-add-program');
+            loadAdminDashboardData();
+          } else {
+            showCustomAlert(res.message, false);
+          }
+        }
+      } catch (err) {
+        const btn = document.getElementById('btn-save-prog');
+        btn.disabled = false; btn.innerText = 'Simpan Program';
+        showCustomAlert('Gagal menyimpan program: ' + err.message, false);
+      }
+    }
+
+    async function uploadHeroFileIfSelected(fileInputId, hiddenUrlId) {
+      const fileInput = document.getElementById(fileInputId);
+      if (fileInput && fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = function(evt) {
+            const fileData = { fileName: file.name, mimeType: file.type, data: evt.target.result };
+            callGasApi('uploadImageToDrive', { fileData: fileData })
+              .then(imgRes => {
+                if (imgRes.success) resolve(imgRes.url);
+                else resolve(document.getElementById(hiddenUrlId).value);
+              })
+              .catch(() => resolve(document.getElementById(hiddenUrlId).value));
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+      return document.getElementById(hiddenUrlId).value;
+    }
+
+    async function handleSaveHeaderSettings(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-save-header');
+      btn.disabled = true; btn.innerText = 'Proses Menyimpan Gambar Banner...';
+
+      try {
+        const url1 = await uploadHeroFileIfSelected('setting-hero-file1', 'setting-hero-bg-url1');
+        const url2 = await uploadHeroFileIfSelected('setting-hero-file2', 'setting-hero-bg-url2');
+        const url3 = await uploadHeroFileIfSelected('setting-hero-file3', 'setting-hero-bg-url3');
+
+        if (useFirebase) {
+          await db.collection('settings').doc('general').set({
+            HeroTitle: document.getElementById('setting-hero-title').value,
+            HeroSubtext: document.getElementById('setting-hero-subtext').value,
+            HeroBgImage1: url1,
+            HeroBgImage2: url2,
+            HeroBgImage3: url3,
+            PaymentMethods: document.getElementById('setting-payment-methods').value
+          }, { merge: true });
+
+          btn.disabled = false; btn.innerText = 'Simpan Banner Header & Metode Pembayaran';
+          showCustomAlert('Pengaturan banner header & metode pembayaran berhasil diperbarui!');
+          loadAdminDashboardData();
+        } else {
+          const payload = {
+            heroTitle: document.getElementById('setting-hero-title').value,
+            heroSubtext: document.getElementById('setting-hero-subtext').value,
+            heroBgImage1: url1,
+            heroBgImage2: url2,
+            heroBgImage3: url3,
+            paymentMethods: document.getElementById('setting-payment-methods').value
+          };
+          const res = await callGasApi('saveHeaderSettings', { data: payload, auth: verifiedAdminAuth });
+          btn.disabled = false; btn.innerText = 'Simpan Banner Header & Metode Pembayaran';
+          if (res.success) {
+            showCustomAlert(res.message);
+            loadAdminDashboardData();
+          } else {
+            showCustomAlert(res.message, false);
+          }
+        }
+      } catch (err) {
+        btn.disabled = false; btn.innerText = 'Simpan Banner Header & Metode Pembayaran';
+        showCustomAlert('Gagal menyimpan pengaturan: ' + err.message, false);
+      }
+    }
+
+    async function handleSaveAdminSosmedSettings(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-save-admin-sosmed');
+      btn.disabled = true; btn.innerText = 'Menyimpan Kontak & Sosmed...';
+
+      try {
+        if (useFirebase) {
+          await db.collection('settings').doc('general').set({
+            AdminWA: document.getElementById('setting-admin-wa').value,
+            AdminWAName: document.getElementById('setting-admin-name').value,
+            LinkFB: document.getElementById('setting-link-fb').value,
+            LinkIG: document.getElementById('setting-link-ig').value,
+            LinkYT: document.getElementById('setting-link-yt').value,
+            LinkTikTok: document.getElementById('setting-link-tiktok').value
+          }, { merge: true });
+
+          btn.disabled = false; btn.innerText = 'Simpan Kontak Admin & Sosial Media';
+          showCustomAlert('Pengaturan Admin & Sosial Media berhasil diperbarui!');
+          loadAdminDashboardData();
+        } else {
+          const payload = {
+            adminWA: document.getElementById('setting-admin-wa').value,
+            adminWAName: document.getElementById('setting-admin-name').value,
+            linkFB: document.getElementById('setting-link-fb').value,
+            linkIG: document.getElementById('setting-link-ig').value,
+            linkYT: document.getElementById('setting-link-yt').value,
+            linkTikTok: document.getElementById('setting-link-tiktok').value
+          };
+          const res = await callGasApi('saveAdminSosmedSettings', { data: payload, auth: verifiedAdminAuth });
+          btn.disabled = false; btn.innerText = 'Simpan Kontak Admin & Sosial Media';
+          if (res.success) {
+            showCustomAlert(res.message);
+            loadAdminDashboardData();
+          } else {
+            showCustomAlert(res.message, false);
+          }
+        }
+      } catch (err) {
+        btn.disabled = false; btn.innerText = 'Simpan Kontak Admin & Sosial Media';
+        showCustomAlert('Gagal menyimpan sosmed: ' + err.message, false);
+      }
+    }
+
+    function populateReportFilter(programs) {
+      const filterSelect = document.getElementById('report-program-filter');
+      if (!filterSelect) return;
+      filterSelect.innerHTML = '<option value="ALL">-- Semua Program Donasi --</option>';
+      programs.forEach(p => {
+        filterSelect.innerHTML += `<option value="${p.title}">${p.title}</option>`;
+      });
+    }
+
+    function filterReportTable() {
+      const selectedProgram = document.getElementById('report-program-filter').value;
+      if (!globalAdminData) return;
+
+      if (selectedProgram === 'ALL') {
+        renderReportTable(globalAdminData.donations);
+      } else {
+        const filtered = globalAdminData.donations.filter(d => d.program === selectedProgram);
+        renderReportTable(filtered);
+      }
+    }
+
+    function renderReportTable(donations) {
+      const tbody = document.getElementById('report-table-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (!donations || donations.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400 border">Tidak ada data rekap.</td></tr>';
+        return;
+      }
+
+      let total = 0;
+      const isSuperOrAdmin = verifiedAdminAuth && (verifiedAdminAuth.role === "Superadmin" || verifiedAdminAuth.role === "Admin");
+
+      donations.forEach((d, idx) => {
+        total += d.amount;
+        const isApproved = String(d.status).toLowerCase() === 'approved' || String(d.status).toLowerCase() === 'berhasil';
+
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+            <td class="p-2.5 border border-slate-200 dark:border-slate-700 text-center">${idx + 1}</td>
+            <td class="p-2.5 border border-slate-200 dark:border-slate-700 font-mono font-bold text-blue-900 dark:text-blue-300">${d.donationId}</td>
+            <td class="p-2.5 border border-slate-200 dark:border-slate-700">${d.date}</td>
+            <td class="p-2.5 border border-slate-200 dark:border-slate-700 font-bold text-slate-800 dark:text-white">${d.name}</td>
+            <td class="p-2.5 border border-slate-200 dark:border-slate-700">${d.program}</td>
+            <td class="p-2.5 border border-slate-200 dark:border-slate-700 font-extrabold text-right text-emerald-700 dark:text-emerald-400">${formatRupiah(d.amount)}</td>
+            <td class="p-2.5 border border-slate-200 dark:border-slate-700">${d.paymentMethod}</td>
+
+            <td class="p-2.5 border border-slate-200 dark:border-slate-700 text-center">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${isApproved ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                ${isApproved ? 'Approved' : 'Menunggu Verifikasi'}
+              </span>
+            </td>
+
+            <td class="p-2.5 border border-slate-200 dark:border-slate-700 text-center print:hidden">
+              <div class="flex items-center justify-center gap-1.5">
+                ${isApproved ? `
+                  <button onclick="openReceiptModal('${d.donationId}')" title="Unduh / Cetak Bukti Donasi" class="bg-blue-600 hover:bg-blue-500 text-white px-2 py-1 rounded-lg text-[10px] font-bold">📄 Kuitansi</button>
+                ` : `
+                  ${isSuperOrAdmin ? `<button onclick="approveDonationStatus('${d.donationId}')" title="Setujui / Verifikasi Donasi Ini" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 rounded-lg text-[10px] font-bold">✏️ Approve</button>` : '<span class="text-slate-400 text-[10px]">Verifikasi Admin</span>'}
+                `}
+                ${isSuperOrAdmin ? `<button onclick="deleteDonationRecord('${d.donationId}')" title="Hapus Data Donasi Ini" class="bg-rose-600 hover:bg-rose-500 text-white px-2 py-1 rounded-lg text-[10px] font-bold">🗑️ Hapus</button>` : ''}
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML += `
+        <tr class="bg-slate-100 dark:bg-slate-800 font-extrabold">
+          <td colspan="5" class="p-2.5 border border-slate-200 dark:border-slate-700 text-right">TOTAL TERKUMPUL:</td>
+          <td class="p-2.5 border border-slate-200 dark:border-slate-700 text-right text-blue-900 dark:text-blue-300">${formatRupiah(total)}</td>
+          <td colspan="3" class="p-2.5 border border-slate-200 dark:border-slate-700"></td>
+        </tr>
+      `;
+    }
+
+    async function approveDonationStatus(donationId) {
+      if (!confirm('Verifikasi dan setujui (Approve) transaksi donasi ini? Nominal akan otomatis ditambahkan ke total terkumpul program.')) return;
+
+      try {
+        if (useFirebase) {
+          const donRef = db.collection('donations').doc(donationId);
+          let approvedRecord = null;
+
+          await db.runTransaction(async (transaction) => {
+            const donDoc = await transaction.get(donRef);
+            if (!donDoc.exists) throw new Error("Transaksi tidak ditemukan.");
+            const donData = donDoc.data();
+            if (donData.status === 'Approved') return;
+
+            transaction.update(donRef, { status: 'Approved' });
+            approvedRecord = { donationId: donationId, program: donData.program, amount: donData.amount };
+
+            const matchingProg = (globalAdminData.allPrograms || []).find(p => p.title === donData.program);
+            if (matchingProg) {
+              const progRef = db.collection('programs').doc(matchingProg.id);
+              const progDoc = await transaction.get(progRef);
+              if (progDoc.exists) {
+                const currentCollected = Number(progDoc.data().collected || 0);
+                transaction.update(progRef, { collected: currentCollected + Number(donData.amount || 0) });
+              }
+            }
+          });
+
+          if (approvedRecord) {
+            mirrorToGoogleSheets('donation_approved', approvedRecord);
+          }
+
+          showCustomAlert(`Status donasi ${donationId} berhasil diubah ke: Approved`);
+          loadAdminDashboardData();
+        } else {
+          const res = await callGasApi('updateDonationStatusByAdmin', { donationId: donationId, newStatus: 'Approved', auth: verifiedAdminAuth });
+          if (res.success) {
+            showCustomAlert(res.message);
+            loadAdminDashboardData();
+          } else {
+            showCustomAlert(res.message, false);
+          }
+        }
+      } catch (err) {
+        showCustomAlert('Gagal update status: ' + err.message, false);
+      }
+    }
+
+    async function deleteDonationRecord(donationId) {
+      if (!confirm('Apakah Anda yakin ingin menghapus transaksi donasi ini?')) return;
+      try {
+        if (useFirebase) {
+          await db.collection('donations').doc(donationId).delete();
+          showCustomAlert('Data donasi berhasil dihapus!');
+          loadAdminDashboardData();
+        } else {
+          const res = await callGasApi('deleteDonationByAdmin', { donationId: donationId, auth: verifiedAdminAuth });
+          if (res.success) {
+            showCustomAlert(res.message);
+            loadAdminDashboardData();
+          } else {
+            showCustomAlert(res.message, false);
+          }
+        }
+      } catch (err) {
+        showCustomAlert('Gagal menghapus donasi: ' + err.message, false);
+      }
+    }
+
+    function openReceiptModal(donationId) {
+      if (!globalAdminData || !globalAdminData.donations) return;
+      const d = globalAdminData.donations.find(item => item.donationId === donationId);
+      if (!d) return;
+
+      const container = document.getElementById('receipt-details');
+      container.innerHTML = `
+        <div class="flex justify-between border-b border-slate-200/70 dark:border-slate-700 pb-1"><span>No. Transaksi:</span><b class="text-blue-900 dark:text-blue-300 font-mono">${d.donationId}</b></div>
+        <div class="flex justify-between border-b border-slate-200/70 dark:border-slate-700 pb-1"><span>Tanggal:</span><b>${d.date}</b></div>
+        <div class="flex justify-between border-b border-slate-200/70 dark:border-slate-700 pb-1"><span>Nama Donatur:</span><b>${d.name}</b></div>
+        <div class="flex justify-between border-b border-slate-200/70 dark:border-slate-700 pb-1"><span>Program:</span><b>${d.program}</b></div>
+        <div class="flex justify-between border-b border-slate-200/70 dark:border-slate-700 pb-1"><span>Nominal Donasi:</span><b class="text-emerald-700 dark:text-emerald-400 text-sm">${formatRupiah(d.amount)}</b></div>
+        <div class="flex justify-between border-b border-slate-200/70 dark:border-slate-700 pb-1"><span>Metode Pembayaran:</span><b>${d.paymentMethod}</b></div>
+        <div class="flex justify-between"><span>Status:</span><b class="text-emerald-600 dark:text-emerald-400 uppercase">✅ Approved / Disetujui</b></div>
+      `;
+      openModal('modal-receipt');
+    }
+
+    function exportDonationsToCSV() {
+      if (!globalAdminData || !globalAdminData.donations) return;
+
+      const filterVal = document.getElementById('report-program-filter').value;
+      let dataToExport = globalAdminData.donations;
+      if (filterVal !== 'ALL') {
+        dataToExport = dataToExport.filter(d => d.program === filterVal);
+      }
+
+      let csvText = "ID Transaksi,Tanggal,Nama Donatur,No WA,Email,Program,Nominal,Metode,Status\n";
+
+      dataToExport.forEach(d => {
+        let row = `"${d.donationId}","${d.date}","${d.name}","'${d.phone}","${d.email}","${d.program}",${d.amount},"${d.paymentMethod}","${d.status}"`;
+        csvText += row + "\n";
+      });
+
+      const encodedUri = "data:text/csv;charset=utf-8,%EF%BB%BF" + encodeURIComponent(csvText);
+      const a = document.createElement("a");
+      a.setAttribute("href", encodedUri);
+      a.setAttribute("download", `Laporan_Donasi_${filterVal.replace(/\s+/g, '_')}.csv`);
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    function printReport() {
+      window.print();
+    }
+  </script>
+</body>
+</html>
